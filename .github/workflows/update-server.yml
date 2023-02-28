@@ -23,7 +23,7 @@ jobs:
                 password: ${{ secrets.DOCKERHUB_PASS }}            
             - name: Build the docker Docker image
               run: |
-                    docker build . -f server/Dockerfile.server --tag ghcr.io/above-os/rss-server-v1:latest
+                    docker build . -f Dockerfile.server --tag ghcr.io/above-os/rss-server-v1:latest
                     docker push ghcr.io/above-os/rss-server-v1:latest
 
 
