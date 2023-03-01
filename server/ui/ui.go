@@ -7,9 +7,7 @@ package ui // import "miniflux.app/ui"
 import (
 	"net/http"
 
-	"miniflux.app/logger"
 	"miniflux.app/storage"
-	"miniflux.app/template"
 	"miniflux.app/worker"
 
 	"github.com/gorilla/mux"
@@ -17,7 +15,7 @@ import (
 
 // Serve declares all routes for the user interface.
 func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
-	middleware := newMiddleware(router, store)
+	/*middleware := newMiddleware(router, store)
 
 	templateEngine := template.NewEngine(router)
 	if err := templateEngine.ParseTemplates(); err != nil {
@@ -149,7 +147,7 @@ func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
 	// Authentication pages.
 	uiRouter.HandleFunc("/login", handler.checkLogin).Name("checkLogin").Methods(http.MethodPost)
 	uiRouter.HandleFunc("/logout", handler.logout).Name("logout").Methods(http.MethodGet)
-	uiRouter.Handle("/", middleware.handleAuthProxy(http.HandlerFunc(handler.showLoginPage))).Name("login").Methods(http.MethodGet)
+	uiRouter.Handle("/", middleware.handleAuthProxy(http.HandlerFunc(handler.showLoginPage))).Name("login").Methods(http.MethodGet)*/
 
 	router.HandleFunc("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
