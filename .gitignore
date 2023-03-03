@@ -2,3 +2,5 @@
 *.deb
 miniflux.app
 run.sh
+server/.idea
+.DS_Store
