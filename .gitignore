@@ -1,2 +1,4 @@
 *.rpm
 *.deb
+miniflux.app
+run.sh

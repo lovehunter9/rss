@@ -1,0 +1,279 @@
+// app global css in SCSS form
+
+.text-7EB6FF {
+  color: #7EB6FF;
+}
+.text-ADC3DF {
+  color: #ADC3DF;
+}
+
+.text-title-16 {
+  font-size: 16px;
+  font-weight: 600;
+}
+.text-7A7A7A {
+  color: #7A7A7A;
+}
+.text-2787FF {
+  color: #2787FF;
+}
+.bg-FFFFFF {
+  color: #ffffff;
+}
+
+i {
+  font-style: normal;
+}
+
+
+.filedMenu {
+  background: #F9F9F9;
+  .menuItem {
+    border-bottom: 1px solid #ECECEC;
+  }
+}
+
+
+.titleBg {
+  background: #F5F5F5;
+}
+
+
+// Dark mode
+body.body--dark {
+  .text-212322 {
+    color: #ffffff;
+  }
+  .text-7A7A7A {
+    color: #B2B8CA;
+  }
+
+  .drawer {
+    background-color: #2A2D35;
+  }
+  .menuItem {}
+
+  .itemActiveStyle {}
+
+  .lauout-app {
+    background-color: #EcEceC;
+  }
+
+  .itemlist {
+    background-color: #23242A;
+    border-right: 1px solid #323741;
+
+    .vaultCard {
+      background-color: #23242A;
+      border-left: 2px solid #23242A;
+      border-bottom: 1px solid #323741;
+
+      &:hover {
+        border-left: 2px solid #2787FF;
+        background: #323741;
+      }
+    }
+
+    .vaultCardActive {
+      border-left: 2px solid #2787FF;
+      background: #323741;
+    }
+  }
+
+
+  .itemView {
+    background-color: #23242A;
+    .hearder-input {
+      .text {
+        color: #FFFFFF;
+      }
+    }
+
+    .tagSelect {
+      .tagChip {
+        background-color: #23242A;
+        border: 1px solid #ffffff;
+      }
+    }
+
+    .listRow {
+      border-bottom: 1px solid #323741;
+    }
+    .footer {
+      background: #323741;
+      box-shadow: 0px -2px 4px rgba(17, 17, 18, 0.35);
+      .reset {
+        color: #9298A8;
+        background: #23242A;
+      }
+    }
+
+  }
+
+  .d-creatVault {
+    .item {
+      border: 1px solid #7c7c7c;
+    }
+    .activeItem {
+      border: 1px solid #2787FF;
+    }
+    .but-cancel {
+      background: #23242A;
+      color: #9298A8;
+    }
+
+  }
+
+
+  .uploadTitle {
+    color: #ffffff;
+  }
+  .attachType {
+    color: #ffffff;
+  }
+  .hasValue {
+    color: #FFFFFF;;
+  }
+
+  .biIcon {
+    &:first-child {
+      background-color: #212121;
+    }
+  }
+
+}
+
+
+// Light Mode
+body.body--light {
+  .text-212322 {
+    color: #212322;
+  }
+  .text-7A7A7A {
+    color: #7A7A7A;
+  }
+
+  .drawer {
+    background-color: #f5f5f5;
+  }
+  .menuItem {
+    &:hover {
+      background: #F3F8FE;
+      color: #2787FF;
+    }
+  }
+
+  .itemActiveStyle {
+    background: #F3F8FE;
+    color: #2787FF;
+  }
+
+  .lauout-app {
+    background-color: #EcEceC;
+  }
+
+  .itemlist {
+    background-color: #ffffff;
+    border-right: 1px solid #ECECEC;
+    .vaultCard {
+      border-left: 2px solid #ffffff;
+      border-bottom: 1px solid #ECECEC;
+      &:hover {
+        border-left: 2px solid #2787FF;
+        background: #F3F8FE;
+      }
+    }
+
+    .vaultCardActive {
+      border-left: 2px solid #2787FF;
+      background: #F3F8FE;
+    }
+  }
+
+
+  .itemView {
+    background-color: #FFFFFF;
+    .hearder-input {
+      .text {
+        color: #212322;
+      }
+    }
+
+    .tagSelect {
+      .tagChip {
+        border: 1px solid #212322;
+      }
+    }
+
+    .listRow {
+      border-bottom: 1px solid #ECECEC;
+    }
+
+    .footer {
+      background-color: #ffffff;
+      .reset {
+        background: #ECECEC;
+        color: #7A7A7A;
+      }
+    }
+
+  }
+
+  .d-creatVault {
+    .item {
+      border: 1px solid #ECECEC;
+    }
+    .activeItem {
+      border: 1px solid #2787FF;
+    }
+    .but-cancel {
+      background: #f5f5f5;
+      color: #7a7a7a;
+    }
+  }
+
+  .uploadTitle {
+    color: #212322;
+  }
+  .attachType {
+    color: #212322;
+  }
+  .hasValue {
+    color: #7A7A7A;;
+  }
+}
+
+
+@mixin platform-height-scroll-area-conf($height) {
+  width: 100%;
+  height: $height;
+}
+
+.nav-bottom-button-height-scroll-area-conf {
+  @include platform-height-scroll-area-conf((calc(100% - 74px - 160px)));
+}
+
+.margin-bottom-safe-area {
+  margin-bottom: env(safe-area-inset-bottom);
+}
+
+//input
+.input-rule {
+  margin-left: 30px;
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 17px;
+  color: #7a7a7a
+}
+
+.input-rule-red {
+  @extend .input-rule;
+  color: #FF3826;
+}
+
+.input-rule-green {
+  @extend .input-rule;
+  color: #6DD400;
+}
