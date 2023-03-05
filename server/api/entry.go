@@ -204,6 +204,12 @@ func (h *handler) fetchContent(w http.ResponseWriter, r *http.Request) {
 	loggedUserID := request.UserID(r)
 	entryID := request.RouteInt64Param(r, "entryID")
 
+	content := h.store.GetFullContent(entryID)
+	if content != "" {
+		json.OK(w, r, map[string]string{"content": content})
+		return
+	}
+
 	entryBuilder := h.store.NewEntryQueryBuilder(loggedUserID)
 	entryBuilder.WithEntryID(entryID)
 	entryBuilder.WithoutStatus(model.EntryStatusRemoved)
@@ -247,7 +253,7 @@ func (h *handler) fetchContent(w http.ResponseWriter, r *http.Request) {
 		json.ServerError(w, r, err)
 		return
 	}
-
+	h.store.UpdateEntryFullContent(entryID, entry.Content)
 	json.OK(w, r, map[string]string{"content": entry.Content})
 }
 

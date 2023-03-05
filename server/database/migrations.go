@@ -81,6 +81,7 @@ var migrations = []func(tx *sql.Tx) error{
 				url text not null,
 				author text,
 				content text,
+				full_content text,
 				status entry_status default 'unread',
 				primary key (id),
 				unique (feed_id, hash),

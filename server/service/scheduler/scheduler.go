@@ -11,6 +11,7 @@ import (
 	"miniflux.app/logger"
 	"miniflux.app/metric"
 	"miniflux.app/model"
+	"miniflux.app/reader/processor"
 	"miniflux.app/storage"
 	"miniflux.app/worker"
 )
@@ -26,6 +27,10 @@ func Serve(store *storage.Storage, pool *worker.Pool) {
 		config.Opts.BatchSize(),
 	)
 
+	go fullContentScheduler(
+		store,
+	)
+
 	go cleanupScheduler(
 		store,
 		config.Opts.CleanupFrequencyHours(),
@@ -34,6 +39,44 @@ func Serve(store *storage.Storage, pool *worker.Pool) {
 		config.Opts.CleanupArchiveBatchSize(),
 		config.Opts.CleanupRemoveSessionsDays(),
 	)
+}
+
+var fullContentCheckId int64
+
+func fullContentScheduler(store *storage.Storage) {
+	for range time.Tick(time.Duration(5) * time.Second) {
+		entry, entryerr := store.EntryForFullContent(fullContentCheckId)
+		if entryerr != nil {
+			logger.Error("[Scheduler:fullContentScheduler get entroy error %d %v]", fullContentCheckId, entryerr)
+		}
+		if entry != nil {
+			fullContentCheckId = entry.ID
+
+			user, err := store.UserByID(entry.UserID)
+			if err != nil || user == nil {
+				logger.Error("[Scheduler:fullContentScheduler user error %d]", fullContentCheckId)
+			}
+
+			feedBuilder := storage.NewFeedQueryBuilder(store, entry.UserID)
+			feedBuilder.WithFeedID(entry.FeedID)
+			feed, err := feedBuilder.GetFeed()
+			if err != nil || feed == nil {
+				logger.Error("[Scheduler:fullContentScheduler feed error %d]", fullContentCheckId)
+			}
+
+			entry.Feed = &model.Feed{}
+			entry.Feed.ScraperRules = feed.ScraperRules
+			entry.Feed.UserAgent = feed.UserAgent
+			entry.Feed.Cookie = feed.Cookie
+			entry.Feed.RewriteRules = feed.RewriteRules
+			if err := processor.ProcessEntryWebPage(feed, entry, user); err != nil {
+				logger.Error("[Scheduler:fullContentScheduler get webpage error %d]", fullContentCheckId)
+			}
+
+			store.UpdateEntryFullContent(entry.ID, entry.Content)
+		}
+		logger.Info("fullContentScheduler ...")
+	}
 }
 
 func feedScheduler(store *storage.Storage, pool *worker.Pool, frequency, batchSize int) {

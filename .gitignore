@@ -1,2 +1,6 @@
 *.rpm
 *.deb
+.vscode
+**/.DS_Store
+sdk/logs
+sdk/node_modules

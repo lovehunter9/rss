@@ -17,13 +17,17 @@ import (
 )
 
 type jsonFeed struct {
-	Version string       `json:"version"`
-	Title   string       `json:"title"`
-	SiteURL string       `json:"home_page_url"`
-	FeedURL string       `json:"feed_url"`
-	Authors []jsonAuthor `json:"authors"`
-	Author  jsonAuthor   `json:"author"`
-	Items   []jsonItem   `json:"items"`
+	Version string `json:"version"`
+	Title   string `json:"title"`
+	//SiteURL string `json:"home_page_url"`
+	SiteURL string `json:"link"`
+	FeedURL string `json:"feed_url"`
+	//Authors []jsonAuthor `json:"authors"`
+	//Author  jsonAuthor   `json:"author"`
+	//Items   []jsonItem   `json:"items"`
+	Authors []string   `json:"authors"`
+	Author  string     `json:"author"`
+	Items   []jsonItem `json:"item"`
 }
 
 type jsonAuthor struct {
@@ -32,17 +36,20 @@ type jsonAuthor struct {
 }
 
 type jsonItem struct {
-	ID            string           `json:"id"`
-	URL           string           `json:"url"`
-	Title         string           `json:"title"`
-	Summary       string           `json:"summary"`
-	Text          string           `json:"content_text"`
-	HTML          string           `json:"content_html"`
-	DatePublished string           `json:"date_published"`
-	DateModified  string           `json:"date_modified"`
-	Authors       []jsonAuthor     `json:"authors"`
-	Author        jsonAuthor       `json:"author"`
-	Attachments   []jsonAttachment `json:"attachments"`
+	ID      string `json:"id"`
+	Title   string `json:"title"`
+	URL     string `json:"link"`
+	Summary string `json:"summary"`
+	//Text          string           `json:"content_text"`
+	Text          string   `json:"description"`
+	HTML          string   `json:"content_html"`
+	DatePublished string   `json:"pubDate"`
+	DateModified  string   `json:"date_modified"`
+	Authors       []string `json:"authors"`
+	Author        string   `json:"author"`
+	//Authors       []jsonAuthor     `json:"authors"`
+	//Author        jsonAuthor       `json:"author"`
+	Attachments []jsonAttachment `json:"attachments"`
 }
 
 type jsonAttachment struct {
@@ -55,9 +62,11 @@ type jsonAttachment struct {
 
 func (j *jsonFeed) GetAuthor() string {
 	if len(j.Authors) > 0 {
-		return (getAuthor(j.Authors[0]))
+		return j.Authors[0]
+		//return (getAuthor(j.Authors[0]))
 	}
-	return getAuthor(j.Author)
+	//return getAuthor(j.Author)
+	return j.Author
 }
 
 func (j *jsonFeed) Transform(baseURL string) *model.Feed {
@@ -115,9 +124,11 @@ func (j *jsonItem) GetDate() time.Time {
 
 func (j *jsonItem) GetAuthor() string {
 	if len(j.Authors) > 0 {
-		return getAuthor(j.Authors[0])
+		//return getAuthor(j.Authors[0])
+		return j.Authors[0]
 	}
-	return getAuthor(j.Author)
+	//return getAuthor(j.Author)
+	return j.Author
 }
 
 func (j *jsonItem) GetHash() string {

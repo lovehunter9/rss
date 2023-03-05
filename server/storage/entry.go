@@ -535,3 +535,44 @@ func (s *Storage) UnshareEntry(userID int64, entryID int64) (err error) {
 	}
 	return
 }
+
+func (s *Storage) EntryURLExistswZ(feedID int64, entryURL string) bool {
+	var result bool
+	query := `SELECT true FROM entries WHERE feed_id=$1 AND url=$2`
+	s.db.QueryRow(query, feedID, entryURL).Scan(&result)
+	return result
+}
+
+func (s *Storage) EntryForFullContent(entryId int64) (*model.Entry, error) {
+	var entry model.Entry
+
+	query := `SELECT id, user_id, feed_id, url FROM entries WHERE id>$1 and  status <> $2 and full_content is null limit 1`
+	err := s.db.QueryRow(query, entryId, model.EntryStatusRemoved).Scan(&entry.ID, &entry.UserID, &entry.FeedID, &entry.URL)
+
+	switch {
+	case err == sql.ErrNoRows:
+		return nil, nil
+	case err != nil:
+		return nil, fmt.Errorf(`store: unable to fetch entry: %v`, err)
+	default:
+		return &entry, nil
+	}
+}
+
+func (s *Storage) GetFullContent(entryId int64) string {
+	var content string
+	query := `SELECT full_content FROM entries WHERE id=$1`
+	s.db.QueryRow(query, entryId).Scan(&content)
+	return content
+
+}
+
+func (s *Storage) UpdateEntryFullContent(entryId int64, fullContent string) error {
+	query := `UPDATE entries SET full_content=$1 WHERE id=$2 `
+	_, err := s.db.Exec(query, fullContent, entryId)
+	if err != nil {
+		return fmt.Errorf(`store: unable to update full content  %v: %v`, entryId, err)
+	}
+
+	return nil
+}
