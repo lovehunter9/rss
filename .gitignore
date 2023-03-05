@@ -1,6 +1,15 @@
 *.rpm
 *.deb
-.vscode
+miniflux.app
+run.sh
+server/.idea
+.DS_Store
 **/.DS_Store
 sdk/logs
 sdk/node_modules
+.vscode
+
+
+
+
+

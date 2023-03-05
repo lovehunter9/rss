@@ -14,7 +14,7 @@ const (
 	EntryStatusRead         = "read"
 	EntryStatusRemoved      = "removed"
 	DefaultSortingOrder     = "published_at"
-	DefaultSortingDirection = "asc"
+	DefaultSortingDirection = "desc"
 )
 
 // Entry represents a feed item in the system.
