@@ -546,7 +546,7 @@ func (s *Storage) EntryURLExistswZ(feedID int64, entryURL string) bool {
 func (s *Storage) EntryForFullContent(entryId int64) (*model.Entry, error) {
 	var entry model.Entry
 
-	query := `SELECT id, user_id, feed_id, url FROM entries WHERE id>$1 and  status <> $2 and full_content is null limit 1`
+	query := `SELECT id, user_id, feed_id, url FROM entries WHERE id>$1 and  status <> $2 and full_content is null order by id limit 1`
 	err := s.db.QueryRow(query, entryId, model.EntryStatusRemoved).Scan(&entry.ID, &entry.UserID, &entry.FeedID, &entry.URL)
 
 	switch {
