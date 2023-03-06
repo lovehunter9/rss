@@ -1,8 +1,16 @@
 FROM node:18-alpine  AS build
 WORKDIR /usr/app/sdk
 
+RUN apk add --no-cache python3 g++ make
 COPY   sdk/tsconfig.json sdk/package.json  sdk/package-lock.json ./
+
+RUN apk --no-cache --virtual build-dependencies add \
+  python3 \
+  make \
+  g++
+
 RUN npm ci -—production
+
 COPY sdk/src ./src
 RUN npm run build
 
