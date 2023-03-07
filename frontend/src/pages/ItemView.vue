@@ -1,37 +1,32 @@
 <template>
-  <div class="itemView text-7A7A7A row items-center justify-center">
-    <div v-if="item">
+  <div class="column root justify-start">
+    <div class="row justify-between items-center">
+      <div class="row justify-start items-center">
+        <img class="icon-start" src="../assets/menu/backward.svg">
+        <img class="icon-start" src="../assets/menu/forward.svg">
+      </div>
+      <div class="row justify-end items-center">
+        <img class="icon-end" src="../assets/menu/bookmark.svg">
+        <img class="icon-end" src="../assets/menu/save.svg">
+        <img class="icon-end" src="../assets/menu/share.svg">
+      </div>
+    </div>
+    <div class="html-content" v-if="item">
       <div v-html="entry"></div>
     </div>
-    <div v-else></div>
   </div>
 </template>
 
 <script lang="ts">
 import {
   defineComponent,
-  computed,
   ref,
   watch,
   onMounted,
-  nextTick,
   PropType
 } from 'vue';
-import { useRssStore } from '../stores/rss';
-//import { extend } from 'quasar'
-import { Dialog, useQuasar } from 'quasar';
-import { useRouter } from 'vue-router';
-import {
-  Category,
-  CategoryRequest,
-  Feed,
-  FeedCreationRequest,
-  FeedCounters,
-  Entry,
-  EntriesQueryRequest,
-  EntriesQueryResponse,
-  EntryContent
-} from '../types';
+import {useRssStore} from 'stores/rss';
+import {Entry} from '../types';
 
 export default defineComponent({
   name: 'ItemView',
@@ -45,8 +40,6 @@ export default defineComponent({
   setup(props, context) {
     if (context) {
     }
-    const $q = useQuasar();
-    const Router = useRouter();
     const store = useRssStore();
 
     let entry = ref<string>('');
@@ -58,14 +51,14 @@ export default defineComponent({
       let id = newVal.id;
 
       let k = await store.fetch_entry_content(id);
-      console.log(k);
+      // console.log(k);
       if (k == null) {
       } else {
         entry.value = k;
       }
 
       //rssStore.entries.find((e) => e.id === id);
-      console.log(entry.value);
+      // console.log(entry.value);
     }
 
     watch(
@@ -95,8 +88,28 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.itemView {
+.root {
   height: 100vh;
-  overflow: auto;
+  width: 100%;
+
+  .icon-end {
+    height: 20px;
+    width: 20px;
+    margin-right: 16px;
+    margin-top: 22px;
+  }
+
+  .icon-start {
+    height: 20px;
+    width: 20px;
+    margin-left: 16px;
+    margin-top: 22px;
+  }
+
+  .html-content {
+    margin-top: 20px;
+    height: calc(100% - 74px);
+    width: 100%;
+  }
 }
 </style>

@@ -1,27 +1,27 @@
-import { defineStore } from 'pinia';
+import {defineStore} from 'pinia';
 import {
-  MenuType,
-  MenuChoice,
-  FeedCounters,
   Category,
-  Feed,
-  Entry,
   EntriesQueryRequest,
   EntriesQueryResponse,
+  Entry,
   EntryContent,
   EntryStatus,
+  Feed,
+  FeedCounters,
   FeedIconResponse,
+  MenuChoice,
+  MenuType,
 } from 'src/types';
 
 import {
-  get_categories,
-  get_feeds,
   fetch_feed_counter,
+  get_categories,
   get_entries,
-  get_today,
   get_entry_content,
-  update_entry_status,
   get_feed_icon,
+  get_feeds,
+  get_today,
+  update_entry_status,
 } from 'src/api/api';
 
 export type DataState = {
@@ -118,12 +118,7 @@ export const useRssStore = defineStore('rss', {
       }
 
       try {
-        const data = await get_feed_icon(feed_id);
-        this.feeds_icon[feed_id] = {
-          ...data,
-          data: data.data.replace('//', '/'),
-        };
-
+        this.feeds_icon[feed_id] = await get_feed_icon(feed_id);
         return this.feeds_icon[feed_id];
       } catch (e) {
         return undefined;
@@ -159,6 +154,14 @@ export const useRssStore = defineStore('rss', {
 
     get_local_entry(id: number): Entry | undefined {
       return this.entries.find((entry) => entry.id == id);
+    },
+
+    get_local_category(id: number): Category | undefined {
+      return this.categories.find((category) => category.id == id);
+    },
+
+    get_local_feed(id: number): Feed | undefined {
+      return this.feeds.find((feed) => feed.id == id);
     },
 
     async get_entries(q: EntriesQueryRequest) {
