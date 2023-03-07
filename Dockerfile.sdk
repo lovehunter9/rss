@@ -19,8 +19,8 @@ EXPOSE 3000
 WORKDIR /usr/app/sdk
 
 COPY  sdk/package.json  ./
-COPY  --from=build /usr/app/sdk/build ./build
+COPY  --from=build /usr/app/sdk/dist ./build
 COPY  --from=build /usr/app/sdk/node_modules ./node_modules
 
-CMD ["node", "build/app.js"]
+CMD ["node", "build/main.js"]
 
