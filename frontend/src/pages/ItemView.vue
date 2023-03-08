@@ -1,7 +1,8 @@
 <template>
-  <div class="itemView text-7A7A7A row items-center justify-center">
+  <div class="itemView111 ">
     <div v-if="item">
-      <div v-html="entry"></div>
+      <div v-html="entry" class="html-content"></div>
+      <!-- <article role="article" dir="auto" v-html="entry" class="html-content"></article> -->
     </div>
     <div v-else></div>
   </div>
@@ -52,16 +53,15 @@ export default defineComponent({
     let entry = ref<string>('');
 
     async function updateEntry(newVal: Entry) {
-      entry.value = newVal.content;
+      entry.value = formatRichText(newVal.content);
       store.update_entry_content(newVal.id, newVal.content);
 
       let id = newVal.id;
 
       let k = await store.fetch_entry_content(id);
       console.log(k);
-      if (k == null) {
-      } else {
-        entry.value = k;
+      if (k != undefined) {
+        entry.value = formatRichText(k);
       }
 
       //rssStore.entries.find((e) => e.id === id);
@@ -84,6 +84,23 @@ export default defineComponent({
       //store.get_local_entry(1);
     });
 
+
+    function formatRichText(html: string) {
+      let newContent = html.replace(/<img[^>]*>/gi, function (match) {
+        match = match.replace(/style="[^"]+"/gi, '').replace(/style='[^']+'/gi, '');
+        match = match.replace(/width="[^"]+"/gi, '').replace(/width='[^']+'/gi, '');
+        match = match.replace(/height="[^"]+"/gi, '').replace(/height='[^']+'/gi, '');
+        return match;
+      });
+      newContent = newContent.replace(/style="[^"]+"/gi, function (match) {
+        match = match.replace(/width:[^;]+;/gi, 'max-width:100%;').replace(/width:[^;]+;/gi, 'max-width:100%;');
+        return match;
+      });
+      newContent = newContent.replace(/<br[^>]*\/>/gi, '');
+      newContent = newContent.replace(/\<img/gi, '<img style="max-width:100%;height:auto;display:block;margin-top:0;margin-bottom:0;"');
+      return newContent;
+    }
+
     //const
 
     return {
@@ -95,8 +112,20 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.itemView {
+.itemView111 {
   height: 100vh;
   overflow: auto;
+  width: 100%;
 }
+
+.html-content {
+  // overflow-wrap: break-word;
+  width: 100%;
+  padding: 20px;
+  font-size: 15px;
+  // white-space:nowrap;
+  // background-color: red;
+  word-break: break-all;
+}
+
 </style>

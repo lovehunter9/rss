@@ -121,7 +121,7 @@ export const useRssStore = defineStore('rss', {
         const data = await get_feed_icon(feed_id);
         this.feeds_icon[feed_id] = {
           ...data,
-          data: data.data.replace('//', '/'),
+          // data: data.data.replace('//', '/'),
         };
 
         return this.feeds_icon[feed_id];
