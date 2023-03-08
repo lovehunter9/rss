@@ -1,18 +1,34 @@
 <template>
-  <div class="folder-setting-root column justify-start items-center">
+  <div class="folder-setting-root justify-start items-center">
     <div class="top-layout row justify-between items-center">
-      <span class="text-title">Organize Folder</span>
+      <span class="text-title">Organize Folders</span>
       <div class="row justify-end items-center">
         <img class="icon-end" src="../assets/menu/input.svg">
         <img class="icon-end" src="../assets/menu/output.svg">
       </div>
-
+    </div>
+    <div class="selected-layout row justify-start items-center">
+      <q-select borderless dense class="select-view" v-model="folderRef" :options="options"/>
+      <search-view class="search-view" placeholder="Search Feeds Name/URL" />
     </div>
 
   </div>
 </template>
 
 <script lang="ts" setup>
+
+import SearchView from 'components/rss/SearchView.vue';
+import {ref} from 'vue';
+import {useRssStore} from 'stores/rss';
+
+const store = useRssStore()
+const options : string[] = store.categories.map((value) => {
+  return value.title
+})
+
+options.push('All Folders')
+
+const folderRef = ref()
 
 </script>
 
@@ -43,6 +59,24 @@
       margin-top: 22px;
     }
 
+  }
+
+  .selected-layout{
+    margin-top: 16px;
+
+    .select-view{
+      height: 32px;
+      width: 200px;
+      margin-left: 16px;
+      border: 1px solid #E0E0E0;
+      border-radius: 6px;
+
+    }
+
+    .search-view{
+      width: 200px;
+      margin-left: 12px;
+    }
   }
 
 }

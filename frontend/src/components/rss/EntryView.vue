@@ -74,14 +74,13 @@ function getTime() {
   width: 100%;
   padding: 16px;
   margin: 0px;
-  // background-color: red;
   border-radius: 0;
 
   .circle {
     width: 6px;
     height: 6px;
     background-color: #81C565;
-    // border-radius: 50%;
+     border-radius: 50%;
     display: inline-block;
     margin-top: 13px;
   }
@@ -94,7 +93,6 @@ function getTime() {
   .layout-right {
     margin-left: 8px;
     width: calc(100% - 46px);
-    // background-color: red;
 
     .entry-icon {
       width: 32px;

@@ -1,5 +1,5 @@
 <template>
-  <q-item class="searchItem row justify-start items-center">
+  <div class="searchItem row justify-start items-center">
     <q-img
       class="searchImg"
       src="../../assets/search.svg"
@@ -7,15 +7,14 @@
     <q-input
       class="searchInput"
       v-model="searchValue"
-      dense
-      square
       borderless
+      dense
       name="search"
       debounce="500"
       :placeholder="placeholder"
       autocomplete="off"
     />
-  </q-item>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -49,16 +48,20 @@ watch(() => searchValue.value, () => {
 
   .searchImg {
     width: 16px;
+    margin-left:10px ;
+    margin-top: -5px;
     height: 16px;
   }
 
   .searchInput {
     margin-left: 10px;
-    width: 100%;
+    margin-top: -5px;
+    margin-right: 20px;
+    width: calc(100% - 60px);
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 400;
-    font-size: 15px;
+    font-size: 12px;
     line-height: 12px;
     color: #BDBDBD;
   }

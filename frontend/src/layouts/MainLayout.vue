@@ -551,22 +551,9 @@ export default defineComponent({
 .mainlayout {
   position: absolute;
 
-  .searchItem{
-    height: 32px;
-    margin : 16px;
-    border: 1px solid #E0E0E0;
-    border-radius: 6px;
-
-    .searchInput{
-      margin-left: 10px;
-      font-family: 'Roboto';
-      font-style: normal;
-      font-weight: 400;
-      font-size: 15px;
-      line-height: 12px;
-      color: #BDBDBD;
-    }
-
+  .search-view{
+    margin: 8px;
+    width : calc(100% - 16px)
   }
 
   .itemActiveStyle{
