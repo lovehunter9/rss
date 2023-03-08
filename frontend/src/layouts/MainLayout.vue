@@ -1,34 +1,20 @@
 <template>
   <q-layout view="lhr lpr lfr" class="lauout lauout-app">
-    <div
-      class="mainlayout"
-      :class="{
-        showDialog: dialogShow,
-        'mainlayout-ios': $q.platform.is.ios
-      }"
-    >
-      <q-drawer
-        v-model="leftDrawerOpen"
-        @update:model-value="updateLeftDrawer"
-        show-if-above
-        bordered
-        height="100%"
-        class="drawer"
-      >
+    <div class="mainlayout" :class="{
+      showDialog: dialogShow,
+      'mainlayout-ios': $q.platform.is.ios
+    }">
+      <q-drawer v-model="leftDrawerOpen" @update:model-value="updateLeftDrawer" show-if-above bordered height="100%"
+        class="drawer">
         <q-list class="margin-bottom-safe-area">
 
-          <search-view class="search-view" @onSearch="onSearch"/>
+          <search-view class="search-view" @onSearch="onSearch" />
 
-          <q-item
-            clickable
-            :active="store.menu_choice.type == MenuType.Discover"
-            active-class="itemActiveStyle"
-            class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs"
-            @click="changeItemMenu(MenuType.Discover)"
-          >
+          <q-item clickable :active="store.menu_choice.type == MenuType.Discover" active-class="itemActiveStyle"
+            class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs" @click="changeItemMenu(MenuType.Discover)">
             <q-item-section class="items-center" avatar>
-              <svg-icon icon-class="../../assets/icon/today.svg"/>
-<!--              <BtIcon :src="active === 'vault' ? 'vaultActive' : 'vault'" />-->
+              <svg-icon icon-class="../../assets/icon/today.svg" />
+              <!--              <BtIcon :src="active === 'vault' ? 'vaultActive' : 'vault'" />-->
             </q-item-section>
             <q-item-section class="text-subtitle1">Discover</q-item-section>
             <q-item-section class="q-mr-sm" side>
@@ -36,13 +22,8 @@
             </q-item-section>
           </q-item>
 
-          <q-item
-            clickable
-            :active="store.menu_choice.type == MenuType.Today"
-            active-class="itemActiveStyle"
-            class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs"
-            @click="changeItemMenu(MenuType.Today)"
-          >
+          <q-item clickable :active="store.menu_choice.type == MenuType.Today" active-class="itemActiveStyle"
+            class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs" @click="changeItemMenu(MenuType.Today)">
             <q-item-section class="items-center" avatar>
               <BtIcon :src="active === 'vault' ? 'vaultActive' : 'vault'" />
             </q-item-section>
@@ -52,13 +33,8 @@
             </q-item-section>
           </q-item>
 
-          <q-item
-            clickable
-            :active="store.menu_choice.type == MenuType.Unread"
-            active-class="itemActiveStyle"
-            class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs"
-            @click="changeItemMenu(MenuType.Unread)"
-          >
+          <q-item clickable :active="store.menu_choice.type == MenuType.Unread" active-class="itemActiveStyle"
+            class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs" @click="changeItemMenu(MenuType.Unread)">
             <q-item-section class="items-center" avatar>
               <BtIcon :src="active === 'vault' ? 'vaultActive' : 'vault'" />
             </q-item-section>
@@ -68,13 +44,8 @@
             </q-item-section>
           </q-item>
 
-          <q-item
-            clickable
-            :active="store.menu_choice.type == MenuType.ReadLater"
-            active-class="itemActiveStyle"
-            class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs"
-            @click="changeItemMenu(MenuType.ReadLater)"
-          >
+          <q-item clickable :active="store.menu_choice.type == MenuType.ReadLater" active-class="itemActiveStyle"
+            class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs" @click="changeItemMenu(MenuType.ReadLater)">
             <q-item-section class="items-center" avatar>
               <BtIcon :src="active === 'vault' ? 'vaultActive' : 'vault'" />
             </q-item-section>
@@ -87,36 +58,25 @@
           <!--  -->
         </q-list>
 
-        <div class="row justify-between items-center" style="height: 36px;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px" @click="goFolderSetting">
+        <div class="row justify-between items-center"
+          style="height: 36px;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px"
+          @click="goFolderSetting">
           <span style="font-family: 'Roboto';
-font-style: normal;
-font-weight: 400;
-font-size: 14px;
-line-height: 14px;
-color: #857C77;
-">Folder</span>
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 14px;
+  color: #857C77;
+  ">Folder</span>
           <img style="width: 12px;height: 12px" src="../assets/menu/setting.svg">
         </div>
 
-        <q-item
-          class="item q-mx-sm q-pl-lg q-py-xs"
-          clickable
-          v-for="(category, index) in store.categories"
-          :key="'ct' + index"
-        >
-          <q-expansion-item
-            :caption="category.title"
-            :disable="category.feeds.length == 0"
-            class=""
-          >
+        <q-item class="item q-mx-sm q-pl-lg q-py-xs" clickable v-for="(category, index) in store.categories"
+          :key="'ct' + index">
+          <q-expansion-item :caption="category.title" :disable="category.feeds.length == 0" class="">
             <template v-slot:header>
-              <q-item
-                clickable
-                :active="active === 'favorites'"
-                active-class="itemActiveStyle"
-                class="q-mx-sm q-pl-xs q-pr-md q-py-xs"
-                @click="changeItemMenu(MenuType.Category, category.id)"
-              >
+              <q-item clickable :active="active === 'favorites'" active-class="itemActiveStyle"
+                class="q-mx-sm q-pl-xs q-pr-md q-py-xs" @click="changeItemMenu(MenuType.Category, category.id)">
                 <q-item-section class="text-subtitle1">
                   {{ category.title }}
                 </q-item-section>
@@ -125,13 +85,8 @@ color: #857C77;
                 </q-item-section>
               </q-item>
             </template>
-            <q-item
-              class="item q-mx-sm q-pl-lg q-py-xs"
-              clickable
-              v-for="(feed, fi) in category.feeds"
-              :key="'ft' + fi"
-              @click="changeItemMenu(MenuType.Feed, feed.id)"
-            >
+            <q-item class="item q-mx-sm q-pl-lg q-py-xs" clickable v-for="(feed, fi) in category.feeds" :key="'ft' + fi"
+              @click="changeItemMenu(MenuType.Feed, feed.id)">
               <q-item-section>
                 {{ feed.title }}
               </q-item-section>
@@ -142,24 +97,16 @@ color: #857C77;
           </q-expansion-item>
         </q-item>
 
-        <q-item
-          clickable
-          active-class="itemActiveStyle"
-          class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs"
-          @click="addFolder()"
-        >
+        <q-item clickable active-class="itemActiveStyle" class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs"
+          @click="addFolder()">
           <q-item-section class="items-center" avatar>
             <BtIcon :src="active === 'vault' ? 'vaultActive' : 'vault'" />
           </q-item-section>
           <q-item-section class="text-subtitle1">Add Folder</q-item-section>
         </q-item>
 
-        <q-item
-          clickable
-          active-class="itemActiveStyle"
-          class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs"
-          @click="addFeed()"
-        >
+        <q-item clickable active-class="itemActiveStyle" class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs"
+          @click="addFeed()">
           <q-item-section class="items-center" avatar>
             <BtIcon :src="active === 'vault' ? 'vaultActive' : 'vault'" />
           </q-item-section>
@@ -188,26 +135,28 @@ color: #857C77;
 
 				</div> -->
 
-        <div class="row justify-between items-center" style="height: 36px;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px" >
+        <div class="row justify-between items-center"
+          style="height: 36px;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px">
           <span style="font-family: 'Roboto';
-font-style: normal;
-font-weight: 400;
-font-size: 14px;
-line-height: 14px;
-color: #857C77;
-">Board</span>
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 14px;
+  color: #857C77;
+  ">Board</span>
         </div>
 
-        <div class="row justify-between items-center" style="height: 48px;width : 100%;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px;position: absolute;bottom: 0" >
+        <div class="row justify-between items-center"
+          style="height: 48px;width : 100%;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px;position: absolute;bottom: 0">
           <div class="row justify-start items-center">
-          <span style="font-family: 'Roboto';
-font-style: normal;
-font-weight: 400;
-font-size: 14px;
-line-height: 14px;
-color: #857C77;
-">Setting</span>
-          <img style="margin-left: 8px;width: 12px;height: 12px" src="../assets/menu/setting.svg">
+            <span style="font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 14px;
+  color: #857C77;
+  ">Setting</span>
+            <img style="margin-left: 8px;width: 12px;height: 12px" src="../assets/menu/setting.svg">
           </div>
           <img style="margin-right: 18px;width: 12px;height: 12px" src="../assets/menu/refresh.svg">
         </div>
@@ -215,24 +164,58 @@ color: #857C77;
       </q-drawer>
 
       <q-page-container class="container">
+        <!-- <router-view /> -->
+
+
+        <q-splitter
+      v-model="splitterModel"
+      unit="px"
+      style="height: 100vh;background-color: white;"
+    >
+
+      <template v-slot:before>
         <router-view />
+      </template>
+
+      <template v-slot:after>
+        <!-- <div class="q-pa-md">
+          <div class="text-h4 q-mb-md">After</div>
+          <div v-for="n in 20" :key="n" class="q-my-md">{{ n }}. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quis praesentium cumque magnam odio iure quidem, quod illum numquam possimus obcaecati commodi minima assumenda consectetur culpa fuga nulla ullam. In, libero.</div>
+        </div> -->
+
+        <!-- <div class="q-pa-md" style="background:red;width: 100%;height: 100vh;"> -->
+          <!-- <ItemView v-if="item" :item="item" />
+        <div class="text-7A7A7A column items-center justify-center" v-else>
+          <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148" />
+          {{ 'No item selected.' }}
+        </div> -->
+        <!-- </div> -->
+        <div class="column items-center justify-center" style="height: 100vh;">
+            <ItemView v-if="item" :item="item" />
+          <div class="text-7A7A7A column items-center justify-center" v-else>
+            <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148" />
+            {{ 'No item selected.' }}
+          </div>
+          </div>
+
+      </template>
+
+    </q-splitter>
+
       </q-page-container>
 
-      <q-drawer
-        v-model="rightDrawerOpen"
-        bordered
-        show-if-above
-        side="right"
-        :width="innerWidth"
-        @update:model-value="updateRightDrawer"
-        class="column items-center justify-center"
-      >
-        <ItemView v-if="item" :item="item"/>
+      <!-- <q-drawer v-model="rightDrawerOpen" bordered show-if-above side="right" :width="innerWidth"
+        @update:model-value="updateRightDrawer" class="column items-center justify-center">
+        <ItemView v-if="item" :item="item" />
         <div class="text-7A7A7A column items-center justify-center" v-else>
           <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148" />
           {{ 'No item selected.' }}
         </div>
-      </q-drawer>
+      </q-drawer> -->
+
+
+
+
     </div>
   </q-layout>
 </template>
@@ -259,7 +242,7 @@ import {
 } from '../types';
 import { create_category } from '../api/api';
 import { EntryStatus } from '../types';
-import {getPageRSSHub} from '../utils/radar'
+import { getPageRSSHub } from '../utils/radar'
 import { defaultRules } from '../utils/radar-rules';
 import SvgIcon from "components/base/svgIcon.vue";
 import SearchView from "components/rss/SearchView.vue";
@@ -351,6 +334,8 @@ export default defineComponent({
       store.rightDrawerOpen = show;
     };
 
+    const updateArticleRef = ref(true)
+
     watch(
       () => Route.params.entry_id,
       (newValue, oldValue) => {
@@ -418,9 +403,9 @@ export default defineComponent({
       await store.refresh_category_and_feeds();
 
 
-      await console.log(getPageRSSHub( {
-        url : 'https://space.bilibili.com/65125803',
-        rules :defaultRules
+      await console.log(getPageRSSHub({
+        url: 'https://space.bilibili.com/65125803',
+        rules: defaultRules
       }))
     });
 
@@ -428,7 +413,7 @@ export default defineComponent({
       //
     });
 
-    function onSearch(vault : string){
+    function onSearch(vault: string) {
       console.log(vault)
     }
 
@@ -529,7 +514,8 @@ export default defineComponent({
       tags,
       searchTxt,
       addFolder,
-      addFeed
+      addFeed,
+      splitterModel: ref(400)
     };
   }
 });
@@ -556,7 +542,7 @@ export default defineComponent({
     width : calc(100% - 16px)
   }
 
-  .itemActiveStyle{
+  .itemActiveStyle {
     color: white;
     background: #F2C037
   }
@@ -590,6 +576,8 @@ export default defineComponent({
 // }
 .container {
   height: 100%;
+  width: 100%;
+  // background-color: red;
 }
 
 .logo {
@@ -624,7 +612,7 @@ export default defineComponent({
   border-radius: 8px;
   overflow: hidden;
 
-  > .q-item:hover {
+  >.q-item:hover {
     background: #f3f8fe;
     color: #2787ff;
   }
@@ -643,18 +631,23 @@ export default defineComponent({
   padding: 2px 6px;
   cursor: pointer;
   border-radius: 5px;
+
   i {
     font-size: 20px;
   }
+
   &:first-child {
     margin-left: 18px;
   }
+
   &:hover {
     background-color: #d8d8d8;
   }
 }
+
 .rotate {
   animation: aniRotate 0.8s linear infinite;
+
   &:hover {
     background: transparent !important;
   }
@@ -664,9 +657,11 @@ export default defineComponent({
   0% {
     transform: rotate(0deg);
   }
+
   50% {
     transform: rotate(180deg);
   }
+
   100% {
     transform: rotate(360deg);
   }

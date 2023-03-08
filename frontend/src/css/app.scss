@@ -38,15 +38,45 @@ i {
   background: #F5F5F5;
 }
 
-h1,h2,h3 {
+
+.h-common {
   font-family: 'Roboto';
-font-style: normal;
-font-weight: 700;
-font-size: 24px;
-line-height: 32px;
-color: #1A130F
+  font-style: normal;
+  font-weight: 700;
+  color: #1A130F
 }
 
+h1 {
+  @extend .h-common;
+  font-size: 32px;
+  line-height: 35px;
+}
+
+h2 {
+  @extend .h-common;
+  font-size: 28px;
+  line-height: 30px;
+}
+
+h3 {
+  @extend .h-common;
+  font-size: 24px;
+  line-height: 28px;
+}
+
+h4,h5,h6 {
+  @extend .h-common;
+  font-size: 20px;
+  line-height: 24px;
+}
+
+
+figure {
+  overflow: auto;
+  // margin: 20px 0;
+  padding: 0;
+  // background-color: #f7f7f7;
+}
 
 // Dark mode
 body.body--dark {
