@@ -9,9 +9,28 @@
     </div>
     <div class="selected-layout row justify-start items-center">
       <q-select borderless dense class="select-view" v-model="folderRef" :options="options"/>
-      <search-view class="search-view" placeholder="Search Feeds Name/URL" />
+      <search-view class="search-view" placeholder="Search Feeds Name/URL"/>
     </div>
+    <q-list>
+      <feed-item :key="item.id" v-for="item in store.feeds" :feed="item"/>
+    </q-list>
+    <div style="position: absolute;bottom: 20px;width: 100%" class="row justify-center items-center">
 
+      <q-pagination
+        glossy
+        gutter="10px"
+        v-model="pagination"
+        max="20"
+        max-pages="7"
+        direction-links
+        outline
+        boundary-numbers
+        color="grey-5"
+        active-design="outline"
+        active-color="white"
+        active-text-color="green"
+      />
+    </div>
   </div>
 </template>
 
@@ -20,13 +39,15 @@
 import SearchView from 'components/rss/SearchView.vue';
 import {ref} from 'vue';
 import {useRssStore} from 'stores/rss';
+import FeedItem from 'components/rss/FeedItem.vue';
 
 const store = useRssStore()
-const options : string[] = store.categories.map((value) => {
+const options: string[] = store.categories.map((value) => {
   return value.title
 })
-
 options.push('All Folders')
+
+const pagination = ref(8)
 
 const folderRef = ref()
 
@@ -61,19 +82,19 @@ const folderRef = ref()
 
   }
 
-  .selected-layout{
+  .selected-layout {
     margin-top: 16px;
 
-    .select-view{
+    .select-view {
       height: 32px;
       width: 200px;
       margin-left: 16px;
       border: 1px solid #E0E0E0;
       border-radius: 6px;
-
+      color: red;
     }
 
-    .search-view{
+    .search-view {
       width: 200px;
       margin-left: 12px;
     }
