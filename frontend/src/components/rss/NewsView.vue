@@ -2,13 +2,13 @@
   <div class="column root justify-start">
     <div class="row justify-between items-center">
       <div class="row justify-start items-center">
-        <img class="icon-start" src="../assets/menu/backward.svg">
-        <img class="icon-start" src="../assets/menu/forward.svg">
+        <img class="icon-start" src="../../assets/menu/backward.svg">
+        <img class="icon-start" src="../../assets/menu/forward.svg">
       </div>
       <div class="row justify-end items-center">
-        <img class="icon-end" src="../assets/menu/bookmark.svg">
-        <img class="icon-end" src="../assets/menu/save.svg">
-        <img class="icon-end" src="../assets/menu/share.svg">
+        <img class="icon-end" src="../../assets/menu/bookmark.svg">
+        <img class="icon-end" src="../../assets/menu/save.svg">
+        <img class="icon-end" src="../../assets/menu/share.svg">
       </div>
     </div>
     <div class="html-content" v-if="item">
@@ -26,7 +26,7 @@ import {
   PropType
 } from 'vue';
 import {useRssStore} from 'stores/rss';
-import {Entry} from '../types';
+import {Entry} from 'src/types';
 
 export default defineComponent({
   name: 'ItemView',

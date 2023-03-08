@@ -1,5 +1,5 @@
 <template>
-  <q-item class="root" clickable>
+  <q-item class="entry-root" clickable>
     <div class="row justify-start" @click="onEntryClick">
       <div class="circle" v-if="!readStatusRef"/>
       <div class="circle-temp" v-else/>
@@ -70,7 +70,7 @@ function getTime() {
 
 <style lang="scss" scoped>
 
-.root {
+.entry-root {
   width: 100%;
   padding: 16px;
   margin: 0px;
