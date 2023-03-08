@@ -1,38 +1,36 @@
 <template>
-  <div class="itemView111 ">
-    <div v-if="item">
-      <div v-html="entry" class="html-content"></div>
-      <!-- <article role="article" dir="auto" v-html="entry" class="html-content"></article> -->
+  <div class="root">
+    <div class="row justify-between items-center">
+      <div class="row justify-start items-center">
+        <img class="icon-start" src="../assets/menu/backward.svg">
+        <img class="icon-start" src="../assets/menu/forward.svg">
+      </div>
+      <div class="row justify-end items-center">
+        <img class="icon-end" src="../assets/menu/bookmark.svg">
+        <img class="icon-end" src="../assets/menu/save.svg">
+        <img class="icon-end" src="../assets/menu/share.svg">
+      </div>
     </div>
-    <div v-else></div>
+
+    
+
+    <div class="html-content" v-if="item">
+      <div v-html="entry"></div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import {
   defineComponent,
-  computed,
   ref,
   watch,
   onMounted,
-  nextTick,
   PropType
 } from 'vue';
-import { useRssStore } from '../stores/rss';
-//import { extend } from 'quasar'
-import { Dialog, useQuasar } from 'quasar';
-import { useRouter } from 'vue-router';
-import {
-  Category,
-  CategoryRequest,
-  Feed,
-  FeedCreationRequest,
-  FeedCounters,
-  Entry,
-  EntriesQueryRequest,
-  EntriesQueryResponse,
-  EntryContent
-} from '../types';
+import { useRssStore } from 'stores/rss';
+import { Entry } from '../types';
+import { formatContentHtml } from '../utils/utils'
 
 export default defineComponent({
   name: 'ItemView',
@@ -46,14 +44,12 @@ export default defineComponent({
   setup(props, context) {
     if (context) {
     }
-    const $q = useQuasar();
-    const Router = useRouter();
     const store = useRssStore();
 
     let entry = ref<string>('');
 
     async function updateEntry(newVal: Entry) {
-      entry.value = formatRichText(newVal.content);
+      entry.value = formatContentHtml(newVal.content);
       store.update_entry_content(newVal.id, newVal.content);
 
       let id = newVal.id;
@@ -61,11 +57,11 @@ export default defineComponent({
       let k = await store.fetch_entry_content(id);
       console.log(k);
       if (k != undefined) {
-        entry.value = formatRichText(k);
+        entry.value = formatContentHtml(k);
       }
 
       //rssStore.entries.find((e) => e.id === id);
-      console.log(entry.value);
+      // console.log(entry.value);
     }
 
     watch(
@@ -85,22 +81,6 @@ export default defineComponent({
     });
 
 
-    function formatRichText(html: string) {
-      let newContent = html.replace(/<img[^>]*>/gi, function (match) {
-        match = match.replace(/style="[^"]+"/gi, '').replace(/style='[^']+'/gi, '');
-        match = match.replace(/width="[^"]+"/gi, '').replace(/width='[^']+'/gi, '');
-        match = match.replace(/height="[^"]+"/gi, '').replace(/height='[^']+'/gi, '');
-        return match;
-      });
-      newContent = newContent.replace(/style="[^"]+"/gi, function (match) {
-        match = match.replace(/width:[^;]+;/gi, 'max-width:100%;').replace(/width:[^;]+;/gi, 'max-width:100%;');
-        return match;
-      });
-      newContent = newContent.replace(/<br[^>]*\/>/gi, '');
-      newContent = newContent.replace(/\<img/gi, '<img style="max-width:100%;height:auto;display:block;margin-top:0;margin-bottom:0;"');
-      return newContent;
-    }
-
     //const
 
     return {
@@ -112,20 +92,43 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.itemView111 {
+.root {
   height: 100vh;
-  overflow: auto;
   width: 100%;
-}
 
-.html-content {
-  // overflow-wrap: break-word;
-  width: 100%;
-  padding: 20px;
-  font-size: 15px;
-  // white-space:nowrap;
-  // background-color: red;
-  word-break: break-all;
-}
+  .icon-end {
+    height: 20px;
+    width: 20px;
+    margin-right: 16px;
+    margin-top: 22px;
+  }
 
+  .icon-start {
+    height: 20px;
+    width: 20px;
+    margin-left: 16px;
+    margin-top: 22px;
+  }
+
+  .html-content {
+    margin-top: 20px;
+    // height: calc(100% - 74px);
+    width: 100%;
+    padding: 0;
+
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    /* or 143% */
+
+
+    color: #1A130F;
+    word-break: break-all;
+    // padding-left: 0;
+    // padding-right: 0;
+    // background-color: red;
+  }
+}
 </style>

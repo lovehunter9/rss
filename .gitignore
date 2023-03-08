@@ -5,6 +5,7 @@ run.sh
 server/.idea
 .DS_Store
 **/.DS_Store
+sdk/dist
 sdk/logs
 sdk/node_modules
 .vscode

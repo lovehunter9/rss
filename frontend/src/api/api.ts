@@ -152,7 +152,11 @@ export async function get_feed_icon(
     {}
   );
 
-  return data;
+  console.log(data)
+  return {
+    ...data,
+    data : 'data:' + data.data
+  };
 }
 
 export async function one_feed_refresh(feed_id: string) {

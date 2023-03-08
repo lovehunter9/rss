@@ -16,29 +16,25 @@
         class="drawer"
       >
         <q-list class="margin-bottom-safe-area">
-          <q-item-label header />
 
-          <q-item class="searchItem q-ml-md q-pl-xs q-pr-md">
+          <q-item class="searchItem row justify-start items-center">
             <q-img
               class="searchImg"
               src="../assets/search.svg"
               width="16px"
               height="16px"
             />
-            <q-form @submit="onSearch" style="flex: 1">
-              <q-input
-                class="searchInput"
-                v-model="searchTxt"
-                dense
-                square
-                borderless
-                name="search"
-                debounce="500"
-                placeholder="Search"
-                autocomplete="off"
-                input-style="height: 16px"
-              />
-            </q-form>
+            <q-input
+              class="searchInput"
+              v-model="searchTxt"
+              dense
+              square
+              borderless
+              name="search"
+              debounce="500"
+              placeholder="Search"
+              autocomplete="off"
+            />
           </q-item>
 
           <q-item
@@ -49,7 +45,8 @@
             @click="changeItemMenu(MenuType.Discover)"
           >
             <q-item-section class="items-center" avatar>
-              <BtIcon :src="active === 'vault' ? 'vaultActive' : 'vault'" />
+              <svg-icon icon-class="../../assets/icon/today.svg"/>
+<!--              <BtIcon :src="active === 'vault' ? 'vaultActive' : 'vault'" />-->
             </q-item-section>
             <q-item-section class="text-subtitle1">Discover</q-item-section>
             <q-item-section class="q-mr-sm" side>
@@ -107,6 +104,17 @@
 
           <!--  -->
         </q-list>
+
+        <div class="row justify-between items-center" style="height: 36px;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px" @click="goFolderSetting">
+          <span style="font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 14px;
+color: #857C77;
+">Folder</span>
+          <img style="width: 12px;height: 12px" src="../assets/menu/setting.svg">
+        </div>
 
         <q-item
           class="item q-mx-sm q-pl-lg q-py-xs"
@@ -197,6 +205,31 @@
 					</span>
 
 				</div> -->
+
+        <div class="row justify-between items-center" style="height: 36px;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px" >
+          <span style="font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 14px;
+color: #857C77;
+">Board</span>
+        </div>
+
+        <div class="row justify-between items-center" style="height: 48px;width : 100%;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px;position: absolute;bottom: 0" >
+          <div class="row justify-start items-center">
+          <span style="font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 14px;
+color: #857C77;
+">Setting</span>
+          <img style="margin-left: 8px;width: 12px;height: 12px" src="../assets/menu/setting.svg">
+          </div>
+          <img style="margin-right: 18px;width: 12px;height: 12px" src="../assets/menu/refresh.svg">
+        </div>
+
       </q-drawer>
 
       <q-page-container class="container">
@@ -212,7 +245,7 @@
         @update:model-value="updateRightDrawer"
         class="column items-center justify-center"
       >
-        <ItemView v-if="item" :item="item"></ItemView>
+        <ItemView v-if="item" :item="item"/>
         <div class="text-7A7A7A column items-center justify-center" v-else>
           <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148" />
           {{ 'No item selected.' }}
@@ -246,10 +279,12 @@ import { create_category } from '../api/api';
 import { EntryStatus } from '../types';
 import {getPageRSSHub} from '../utils/radar'
 import { defaultRules } from '../utils/radar-rules';
+import SvgIcon from "components/base/svgIcon.vue";
 export default defineComponent({
   name: 'MainLayout',
 
   components: {
+    SvgIcon,
     ItemView
   },
 
@@ -316,6 +351,13 @@ export default defineComponent({
     //     dialogShow.value = newVal;
     //   }
     // );
+
+    const goFolderSetting = () => {
+      goto('/folderSetting')
+      setTimeout(() => {
+        store.rightDrawerOpen = false;
+      }, 0);
+    }
 
     const updateLeftDrawer = (show: boolean) => {
       store.leftDrawerOpen = show;
@@ -413,24 +455,33 @@ export default defineComponent({
         type,
         value
       };
-
+      console.log(store.menu_choice)
+      let openDrawer = true;
       if (type == MenuType.Feed) {
         store.get_entries(
           new EntriesQueryRequest({ limit: 50, offset: 0, feed_id: value })
         );
+        goto('/')
       } else if (type == MenuType.Category) {
         store.get_entries(
           new EntriesQueryRequest({ limit: 50, offset: 0, category_id: value })
         );
+        goto('/')
       } else if (type == MenuType.Today) {
         store.get_today();
+        goto('/')
       } else if (type == MenuType.Discover) {
-        // store.get_entries(
-        //   new EntriesQueryRequest({ limit: 50, offset: 0, category_id: value })
-        // );
+        goto('/discover')
+        openDrawer = false;
       } else if (type == MenuType.Unread) {
+        goto('/')
       } else if (type == MenuType.ReadLater) {
+        goto('/')
       }
+
+      setTimeout(() => {
+        store.rightDrawerOpen = openDrawer;
+      }, 0);
     }
 
     const onSearch = () => {
@@ -490,6 +541,7 @@ export default defineComponent({
       innerWidth,
       updateLeftDrawer,
       updateRightDrawer,
+      goFolderSetting,
       settingMode,
       dialogShow,
       changeItemMenu,
@@ -519,6 +571,29 @@ export default defineComponent({
 
 .mainlayout {
   position: absolute;
+
+  .searchItem{
+    height: 32px;
+    margin : 16px;
+    border: 1px solid #E0E0E0;
+    border-radius: 6px;
+
+    .searchInput{
+      margin-left: 10px;
+      font-family: 'Roboto';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 12px;
+      color: #BDBDBD;
+    }
+
+  }
+
+  .itemActiveStyle{
+    color: white;
+    background: #F2C037
+  }
 }
 
 .showDialog {
