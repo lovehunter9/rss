@@ -1,3 +1,4 @@
+import { EventBus } from 'quasar';
 import {ref, onMounted, onBeforeUnmount} from 'vue';
 
 export function useWinSize() {
@@ -94,6 +95,19 @@ export const formatContentHtml = (htmlContent: string) => {
     return match;
   });
   newContent = newContent.replace(/<br[^>]*\/>/gi, '');
-  newContent = newContent.replace(/\<img/gi, '<img style="max-width:100%;height:auto;background:red"');
+  newContent = newContent.replace(/\<img/gi, '<img style="max-width:100%;height:auto;"');
   return newContent;
 }
+
+
+/**
+ * news message list
+ *
+ */
+
+export enum newsBusMessage {
+  pre = 'PRE_MESSAGE',
+  next = 'NEXT_MESSAGE'
+}
+
+export const newsBus = new EventBus();
