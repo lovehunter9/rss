@@ -21,7 +21,7 @@
 import {useRssStore} from 'stores/rss';
 import {EntryStatus, MenuType} from 'src/types';
 import {onMounted, ref, watch} from 'vue';
-import EntryView from 'components/base/EntryView.vue';
+import EntryView from 'components/rss/EntryView.vue';
 
 const store = useRssStore();
 const labelRef = ref('')

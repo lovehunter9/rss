@@ -17,25 +17,7 @@
       >
         <q-list class="margin-bottom-safe-area">
 
-          <q-item class="searchItem row justify-start items-center">
-            <q-img
-              class="searchImg"
-              src="../assets/search.svg"
-              width="16px"
-              height="16px"
-            />
-            <q-input
-              class="searchInput"
-              v-model="searchTxt"
-              dense
-              square
-              borderless
-              name="search"
-              debounce="500"
-              placeholder="Search"
-              autocomplete="off"
-            />
-          </q-item>
+          <search-view class="search-view" @onSearch="onSearch"/>
 
           <q-item
             clickable
@@ -262,7 +244,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { useIsMobile } from '../utils/utils';
 import { useRssStore } from '../stores/rss';
 //import { useUserStore } from '../stores/user';
-import ItemView from '../pages/ItemView.vue';
+import ItemView from 'components/rss/NewsView.vue';
 import AddFeedDialog from '../components/AddFeedDialog.vue';
 import {
   MenuType,
@@ -280,10 +262,12 @@ import { EntryStatus } from '../types';
 import {getPageRSSHub} from '../utils/radar'
 import { defaultRules } from '../utils/radar-rules';
 import SvgIcon from "components/base/svgIcon.vue";
+import SearchView from "components/rss/SearchView.vue";
 export default defineComponent({
   name: 'MainLayout',
 
   components: {
+    SearchView,
     SvgIcon,
     ItemView
   },
@@ -444,6 +428,10 @@ export default defineComponent({
       //
     });
 
+    function onSearch(vault : string){
+      console.log(vault)
+    }
+
     function goto(path: string) {
       Router.push({
         path: path
@@ -483,15 +471,6 @@ export default defineComponent({
         store.rightDrawerOpen = openDrawer;
       }, 0);
     }
-
-    const onSearch = () => {
-      // Router.push({
-      //   path: '/appStorePage',
-      //   query: {
-      //     q: searchTxt.value
-      //   },
-      // })
-    };
 
     const addFolder = () => {
       $q.dialog({
@@ -536,6 +515,7 @@ export default defineComponent({
       leftDrawerOpen,
       rightDrawerOpen,
       goto,
+      onSearch,
       store,
       active,
       innerWidth,
@@ -547,7 +527,6 @@ export default defineComponent({
       changeItemMenu,
       count,
       tags,
-      onSearch,
       searchTxt,
       addFolder,
       addFeed

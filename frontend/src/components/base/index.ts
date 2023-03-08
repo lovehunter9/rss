@@ -1,6 +1,6 @@
 import { App } from 'vue';
-import Button from './Button.vue';
-import Search from './Search.vue';
+import Button from './BtButton.vue';
+import Search from './BtSearch.vue';
 import BtIcon from './BtIcon.vue';
 import BtMonthPicker from './BtMonthPicker.vue';
 import BtCheckBox from './BtCheckBox.vue';
