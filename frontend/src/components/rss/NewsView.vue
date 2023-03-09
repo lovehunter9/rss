@@ -2,8 +2,8 @@
   <div class="news-root">
     <div class="row justify-between items-center detail-header">
       <div class="row justify-start">
-        <img class="icon-start" src="../../assets/menu/backward.svg" @click="preAction">
-        <img class="icon-start" src="../../assets/menu/forward.svg" @click="nextAction">
+        <img class="icon-start" :src="preImage()" @click="preAction">
+        <img class="icon-start" :src="nextImage()" @click="nextAction">
       </div>
       <div class="row justify-end items-center">
         <img class="icon-end" src="../../assets/menu/bookmark.svg">
@@ -15,9 +15,9 @@
     <div class="content-bg">
 
       <div class="row justify-between items-center">
-        <div>
-        {{ item.feed.title }}
-      </div>
+        <div class="author">
+          <a href="javascript:;" @click="jumpToFeed()">{{ item.feed.title }}</a>
+        </div>
       <img class="entry-icon" :src="store.feeds_icon[item.feed_id].data">
       </div>
       <q-separator style="margin-top:16px"/>
@@ -25,8 +25,6 @@
         <div v-html="entry"></div>
       </div>
     </div>
-
-
   </div>
 </template>
 
@@ -39,8 +37,9 @@ import {
   PropType
 } from 'vue';
 import { useRssStore } from 'stores/rss';
-import { Entry } from 'src/types';
+import { EntriesQueryRequest, Entry,MenuType } from '../../types';
 import { formatContentHtml, newsBus, newsBusMessage } from 'src/utils/utils'
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'ItemView',
@@ -55,6 +54,7 @@ export default defineComponent({
     if (context) {
     }
     const store = useRssStore();
+    const router = useRouter()
 
     let entry = ref<string>('');
 
@@ -69,9 +69,6 @@ export default defineComponent({
       if (k != undefined) {
         entry.value = formatContentHtml(k);
       }
-
-      //rssStore.entries.find((e) => e.id === id);
-      // console.log(entry.value);
     }
 
     watch(
@@ -104,13 +101,42 @@ export default defineComponent({
       newsBus.emit(newsBusMessage.next)
     }
 
-    //const
+    const preImage = () => {
+      if (!store.can_pre_route(props.item)) {
+        return require('../../assets/menu/backward_disable.svg')
+      }
+      return require('../../assets/menu/backward.svg')
+    }
+
+    const nextImage = () => {
+      if (!store.can_next_route(props.item)) {
+        return require('../../assets/menu/forward_disable.svg')
+      }
+      return require('../../assets/menu/forward.svg')
+    }
+
+    const jumpToFeed = () => {
+      // store.
+
+      store.menu_choice = {
+        type: MenuType.Feed,
+        value: props.item.id
+      };
+      console.log(store.menu_choice)
+      store.get_entries(
+        new EntriesQueryRequest({ limit: 50, offset: 0, feed_id: props.item.id })
+      );
+      router.push('/')
+    }
 
     return {
       entry,
       store,
       preAction,
-      nextAction
+      nextAction,
+      preImage,
+      nextImage,
+      jumpToFeed
     };
   }
 });
@@ -147,6 +173,11 @@ export default defineComponent({
     // background-color: red;
     padding-left: 32px;
     padding-right: 32px;
+
+    .author  {
+      a:link{text-decoration:none; color:#1A130F;}
+      a:hover{color:blue}
+    }
 
 
     .entry-icon {

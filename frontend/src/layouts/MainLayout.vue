@@ -8,9 +8,9 @@
         class="drawer">
         <q-list class="margin-bottom-safe-area">
           <search-view class="search-view" @onSearch="onSearch" />
-          <layout-left-item-menu :menu-type="MenuType.Discover" :unread-count="count.total" @item-on-click="changeItemMenu(MenuType.Discover)"></layout-left-item-menu>
-          <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="count.total" @item-on-click="changeItemMenu(MenuType.Today)"></layout-left-item-menu>
-          <layout-left-item-menu :menu-type="MenuType.Unread" :unread-count="count.total" @item-on-click="changeItemMenu(MenuType.Unread)"></layout-left-item-menu>
+          <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false" @item-on-click="changeItemMenu(MenuType.Discover)"></layout-left-item-menu>
+          <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="`${todayCount}`" @item-on-click="changeItemMenu(MenuType.Today)"></layout-left-item-menu>
+          <layout-left-item-menu :menu-type="MenuType.Unread" :unread-count="`${store.allUnRead}`" @item-on-click="changeItemMenu(MenuType.Unread)"></layout-left-item-menu>
           <layout-left-item-menu :menu-type="MenuType.ReadLater" :unread-count="count.total" @item-on-click="changeItemMenu(MenuType.ReadLater)"></layout-left-item-menu>
         </q-list>
 
@@ -33,7 +33,7 @@
                 </q-item-section>
                 <q-item-section side>
                   <div class="unreadCount">
-                {{ count.total }}
+                {{ feedReduce(category.feeds)}}
               </div>
                 </q-item-section>
               </q-item>
@@ -105,7 +105,7 @@ import {
   CategoryRequest,
   Entry,
   EntriesQueryRequest,
-menuTypeName
+  Feed
 } from '../types';
 import { create_category } from '../api/api';
 import { EntryStatus } from '../types';
@@ -141,6 +141,9 @@ export default defineComponent({
     const screenWidth = ref(document.body.clientWidth);
 
     const count = ref<any>({ total: 10 });
+
+    const todayCount = ref<number>(0)
+
     const tags = ref<any>([]);
     const searchTxt = ref<string>('');
     watch(
@@ -216,6 +219,7 @@ export default defineComponent({
 
       await store.refresh_category_and_feeds();
 
+      todayCount.value = await store.get_today(true) || 0
 
       await console.log(getPageRSSHub({
         url: 'https://space.bilibili.com/65125803',
@@ -259,8 +263,10 @@ export default defineComponent({
       } else if (type == MenuType.Discover) {
         goto('/discover')
       } else if (type == MenuType.Unread) {
+        store.entries = []
         goto('/')
       } else if (type == MenuType.ReadLater) {
+        store.entries = []
         goto('/')
       }
     }
@@ -301,7 +307,15 @@ export default defineComponent({
         });
     };
 
-    addFeed;
+    const feedReduce = (array : Array<Feed>) : number => {
+      let result = 0
+      array.forEach(e => {
+        result += e.unread || 0
+      })
+      return result
+    };
+
+
     return {
       MenuType,
       item,
@@ -320,7 +334,9 @@ export default defineComponent({
       tags,
       searchTxt,
       addFolder,
-      addFeed
+      addFeed,
+      feedReduce,
+      todayCount
     };
   }
 });

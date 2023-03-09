@@ -21,7 +21,7 @@
 <script setup lang="ts">
 
 import { Entry, EntryStatus } from 'src/types';
-import { PropType, ref } from 'vue';
+import { PropType, ref, watch } from 'vue';
 import { useRssStore } from 'stores/rss';
 import { useRouter } from 'vue-router';
 import { getPastTime, utcToStamp } from 'src/utils/utils';
@@ -49,6 +49,16 @@ if (props.entry) {
   readStatusRef.value = props.entry.status == EntryStatus.Read
 }
 
+watch(() => props.entry, () => {
+  if (props.entry)
+    readStatusRef.value = props.entry.status == EntryStatus.Read
+  else {
+    readStatusRef.value = false
+  }
+},{
+  deep : true,
+  immediate : true
+})
 function onEntryClick() {
   if (!props.entry) {
     return
