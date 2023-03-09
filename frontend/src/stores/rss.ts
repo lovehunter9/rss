@@ -62,6 +62,13 @@ export const useRssStore = defineStore('rss', {
   },
   getters: {
     //doubleCount: (state) => state.counter * 2,
+    allUnRead(): number {
+      let result = 0
+      this.feeds.forEach(feed => {
+        result += feed.unread || 0
+      })
+      return result
+    }
   },
   actions: {
     async refresh_category_and_feeds() {
@@ -164,7 +171,7 @@ export const useRssStore = defineStore('rss', {
 
     can_next_route(entry:Entry) : boolean {
       const index = this.entries.findIndex(e => e.id == entry.id)
-      if (index < 0 || index >= this.entries.length) {
+      if (index < 0 || index+1 >= this.entries.length) {
         return false
       }
       return true
@@ -202,14 +209,17 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async get_today() {
+    async get_today(onlyAmount = false) {
       try {
         this.entries = [];
         this.entries_total = 0;
         const data: EntriesQueryResponse = await get_today();
 
-        this.entries = data.entries;
-        this.entries_total = data.total;
+        if (!onlyAmount) {
+          this.entries = data.entries;
+          this.entries_total = data.total;
+        }
+        return data.total
       } catch (e) {
         console.log(e);
       }

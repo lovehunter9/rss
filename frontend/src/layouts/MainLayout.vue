@@ -8,14 +8,10 @@
                 class="drawer">
         <q-list class="margin-bottom-safe-area">
           <search-view class="search-view" @onSearch="onSearch"/>
-          <layout-left-item-menu :menu-type="MenuType.Discover" :unread-count="count.total"
-                                 @item-on-click="changeItemMenu(MenuType.Discover)"></layout-left-item-menu>
-          <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="count.total"
-                                 @item-on-click="changeItemMenu(MenuType.Today)"></layout-left-item-menu>
-          <layout-left-item-menu :menu-type="MenuType.Unread" :unread-count="count.total"
-                                 @item-on-click="changeItemMenu(MenuType.Unread)"></layout-left-item-menu>
-          <layout-left-item-menu :menu-type="MenuType.ReadLater" :unread-count="count.total"
-                                 @item-on-click="changeItemMenu(MenuType.ReadLater)"></layout-left-item-menu>
+          <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false" @item-on-click="changeItemMenu(MenuType.Discover)"></layout-left-item-menu>
+          <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="`${todayCount}`" @item-on-click="changeItemMenu(MenuType.Today)"></layout-left-item-menu>
+          <layout-left-item-menu :menu-type="MenuType.Unread" :unread-count="`${store.allUnRead}`" @item-on-click="changeItemMenu(MenuType.Unread)"></layout-left-item-menu>
+          <layout-left-item-menu :menu-type="MenuType.ReadLater" :unread-count="count.total" @item-on-click="changeItemMenu(MenuType.ReadLater)"></layout-left-item-menu>
         </q-list>
 
         <q-separator style="margin-top:6px;margin-bottom: 11px;" inset/>
@@ -40,8 +36,8 @@
                 </q-item-section>
                 <q-item-section side>
                   <div class="unreadCount">
-                    {{ count.total }}
-                  </div>
+                {{ feedReduce(category.feeds)}}
+              </div>
                 </q-item-section>
               </q-item>
             </template>
@@ -117,7 +113,7 @@ import {
   CategoryRequest,
   Entry,
   EntriesQueryRequest,
-  menuTypeName
+  Feed
 } from '../types';
 import {create_category} from '../api/api';
 import {EntryStatus} from '../types';
@@ -153,7 +149,10 @@ export default defineComponent({
     const timer = ref();
     const screenWidth = ref(document.body.clientWidth);
 
-    const count = ref<any>({total: 10});
+    const count = ref<any>({ total: 10 });
+
+    const todayCount = ref<number>(0)
+
     const tags = ref<any>([]);
     const searchTxt = ref<string>('');
     watch(
@@ -229,6 +228,7 @@ export default defineComponent({
 
       await store.refresh_category_and_feeds();
 
+      todayCount.value = await store.get_today(true) || 0
 
       await console.log(getPageRSSHub({
         url: 'https://space.bilibili.com/65125803',
@@ -272,8 +272,10 @@ export default defineComponent({
       } else if (type == MenuType.Discover) {
         goto('/discover')
       } else if (type == MenuType.Unread) {
+        store.entries = []
         goto('/')
       } else if (type == MenuType.ReadLater) {
+        store.entries = []
         goto('/')
       }
     }
@@ -314,30 +316,15 @@ export default defineComponent({
         });
     };
 
-    const formatIconName = (type: MenuType) => {
-      let nameTypeName = menuTypeName(type)
-      nameTypeName = nameTypeName.toLowerCase()
-      nameTypeName = nameTypeName.replace(/\s*/g, '');
-      if (type === store.menu_choice.type || (willchangeType.value === type)) {
-        nameTypeName = nameTypeName + '_hover'
-      }
-      return `img:/imgs/${nameTypeName}.svg`
-    }
-
-    const willchangeType = ref(MenuType.Empty);
+    const feedReduce = (array : Array<Feed>) : number => {
+      let result = 0
+      array.forEach(e => {
+        result += e.unread || 0
+      })
+      return result
+    };
 
 
-    const willChange = (type: MenuType) => {
-      willchangeType.value = type
-    }
-
-    const changeBack = (type: MenuType) => {
-      if (willchangeType.value === type) {
-        willchangeType.value = MenuType.Empty
-      }
-    }
-
-    addFeed;
     return {
       MenuType,
       item,
@@ -356,12 +343,9 @@ export default defineComponent({
       tags,
       searchTxt,
       addFolder,
-      addSelectedFeed:
       addFeed,
-      splitterModel: ref(400),
-      formatIconName,
-      willChange,
-      changeBack
+      feedReduce,
+      todayCount
     };
   }
 });
@@ -469,43 +453,6 @@ export default defineComponent({
   border-radius: 8px;
 }
 
-.tagExpansion {
-  border-radius: 8px;
-  overflow: hidden;
-
-  > .q-item:hover {
-    background: #f3f8fe;
-    color: #2787ff;
-  }
-
-  .q-item {
-    padding: 0 5px 0 16px;
-  }
-
-  .q-expansion-item__toggle-icon {
-    margin-right: -30px !important;
-  }
-}
-
-.biIcon {
-  margin-right: 30px;
-  padding: 2px 6px;
-  cursor: pointer;
-  border-radius: 5px;
-
-  i {
-    font-size: 20px;
-  }
-
-  &:first-child {
-    margin-left: 18px;
-  }
-
-  &:hover {
-    background-color: #d8d8d8;
-  }
-}
-
 .rotate {
   animation: aniRotate 0.8s linear infinite;
 
@@ -553,11 +500,6 @@ export default defineComponent({
   line-height: 14px;
 }
 
-
-.item-title-margin-left {
-  margin-left: -15px;
-}
-
 .folder-extension-margin-left {
   margin-left: -25px;
   width: 228px;
@@ -578,20 +520,6 @@ export default defineComponent({
   // margin-top: 10px;
   // margin-bottom: 10px;
   // height: 36px;
-}
-
-.left-menu-title-normal {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 14px;
-  // color: #1A130F;
-}
-
-.left-menu-add-folder {
-  @extend .left-menu-title-normal;
-  font-size: 12px;
 }
 
 </style>
