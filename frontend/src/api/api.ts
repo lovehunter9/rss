@@ -5,7 +5,6 @@ import {
   Feed,
   FeedCreationRequest,
   FeedCounters,
-  Entry,
   EntriesQueryRequest,
   EntriesQueryResponse,
   EntryContent,

@@ -215,5 +215,6 @@ watch(
     width: 100%;
     // height: 120px;
   }
+
 }
 </style>

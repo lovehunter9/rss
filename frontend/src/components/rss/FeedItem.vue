@@ -21,8 +21,7 @@ import {useRssStore} from 'stores/rss';
 import {useFeedStore} from 'stores/feedStore';
 import {useQuasar} from 'quasar';
 import FeedDeleteDialog from 'components/dialog/FeedDeleteDialog.vue';
-import {getPastTime, utcToStamp} from 'src/utils/utils';
-import {Entry, Feed} from 'src/types';
+import { Feed } from 'src/types';
 
 
 const props = defineProps({

@@ -21,6 +21,7 @@
       <img class="entry-icon" :src="store.feeds_icon[item.feed_id].data">
       </div>
       <q-separator style="margin-top:16px"/>
+      <!-- <h1 v-if="!entry.startsWith('<h')"> {{ item.title }} </h1> -->
       <div class="html-content" v-if="item">
         <div v-html="entry"></div>
       </div>
@@ -70,7 +71,7 @@ export default defineComponent({
         entry.value = formatContentHtml(k);
       }
     }
-
+    // const showSelfTitle = ref(false)
     watch(
       () => props.item,
       async (newVal: Entry) => {
