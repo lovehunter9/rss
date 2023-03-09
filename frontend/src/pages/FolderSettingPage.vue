@@ -8,14 +8,15 @@
       </div>
     </div>
     <div class="selected-layout row justify-start items-center">
-      <q-select borderless dense class="select-view" v-model="folderRef" :options="options"/>
-      <search-view class="search-view" placeholder="Search Feeds Name/URL"/>
+      <q-select borderless dense class="select-view" v-model="folderRef" :options="folderOptions"
+                @update:model-value="folderChanged"/>
+      <search-view class="search-view" placeholder="Search Feeds Name/URL" @onSearch="searchChanged"/>
     </div>
+    <feed-title/>
     <q-list>
-      <feed-item :key="item.id" v-for="item in store.feeds" :feed="item"/>
+      <feed-item :key="item.id" v-for="item in feedStore.allFeeds" :feed="item"/>
     </q-list>
     <div style="position: absolute;bottom: 20px;width: 100%" class="row justify-center items-center">
-
       <q-pagination
         glossy
         gutter="10px"
@@ -37,19 +38,47 @@
 <script lang="ts" setup>
 
 import SearchView from 'components/rss/SearchView.vue';
-import {ref} from 'vue';
+import {watch, onUnmounted, ref} from 'vue';
 import {useRssStore} from 'stores/rss';
 import FeedItem from 'components/rss/FeedItem.vue';
+import FeedTitle from 'components/rss/FeedTitle.vue';
+import {useFeedStore} from 'stores/feedStore';
 
 const store = useRssStore()
-const options: string[] = store.categories.map((value) => {
+const folderOptions: string[] = store.categories.map((value) => {
   return value.title
 })
-options.push('All Folders')
-
+folderOptions.push('All Folders')
+const folderRef = ref('All Folders')
 const pagination = ref(8)
+const feedStore = useFeedStore()
+let searchData = '';
 
-const folderRef = ref()
+feedStore.updateAllFeeds(folderRef.value,searchData)
+
+onUnmounted(() => {
+  feedStore.clear()
+})
+
+function folderChanged(title: string) {
+  folderRef.value = title;
+  feedStore.updateAllFeeds(folderRef.value,searchData)
+  feedStore.unselectedAll()
+}
+
+function searchChanged(data: string) {
+  searchData = data
+  feedStore.updateAllFeeds(folderRef.value,searchData)
+  feedStore.unselectedAll()
+}
+
+watch(() => feedStore.selectedFeeds, () => {
+  console.log(feedStore.selectedFeeds)
+  console.log(feedStore.allFeeds)
+},{
+  deep : true,
+  immediate : true
+})
 
 </script>
 

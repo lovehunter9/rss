@@ -1,32 +1,51 @@
 <template>
-  <div class="item-list">
-    <div class="row justify-end items-center">
-      <img class="icon-read-all" src="../assets/menu/readAll.svg">
-      <img class="icon-refresh" src="../assets/menu/refresh.svg">
-    </div>
-    <div class="text-label">{{ labelRef }}</div>
-    <div class="text-sub-label">{{ subLabelRef }}</div>
-    <q-list class="list-view">
-      <div
-        v-for="(entry, index) in store.entries"
-        :key="`it` + index"
-        class="entry">
-        <entry-view :entry='entry' @onClickCallback="onClickCallback"/>
+  <q-splitter v-model="splitterModel" unit="px" disable style="height: 100%;background-color: white;">
+    <template v-slot:before>
+      <div class="item-list">
+        <div class="row justify-end items-center">
+          <img class="icon-read-all" src="../assets/menu/readAll.svg">
+          <img class="icon-refresh" src="../assets/menu/refresh.svg">
+        </div>
+        <div class="text-label">{{ labelRef }}</div>
+        <div class="text-sub-label">{{ subLabelRef }}</div>
+        <q-list class="list-view">
+          <div v-for="(entry, index) in store.entries" :key="`it` + index" class="entry">
+            <entry-view :entry='entry' :selected="index === selectIndex" @onClickCallback="onClickCallback(index)" />
+          </div>
+        </q-list>
       </div>
-    </q-list>
-  </div>
+    </template>
+
+    <template v-slot:after>
+      <div class="column items-center justify-center" style="height: 100vh;">
+        <ItemView v-if="item" :item="item" />
+        <div class="text-7A7A7A column items-center justify-center" v-else>
+          <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148" />
+          {{ 'No item selected.' }}
+        </div>
+      </div>
+
+    </template>
+
+  </q-splitter>
 </template>
 
 <script lang="ts" setup>
-import {useRssStore} from 'stores/rss';
-import {EntryStatus, MenuType} from 'src/types';
-import {onMounted, ref, watch} from 'vue';
+import { useRssStore } from 'stores/rss';
+import { EntryStatus, MenuType, Entry } from 'src/types';
+import { onMounted, ref, watch } from 'vue';
 import EntryView from 'components/rss/EntryView.vue';
+import { newsBus, newsBusMessage } from 'src/utils/utils';
+import { useRouter,useRoute } from 'vue-router';
+import ItemView from 'components/rss/NewsView.vue';
 
 const store = useRssStore();
 const labelRef = ref('')
 
 const subLabelRef = ref('0 Unread Feeds')
+const selectIndex = ref(-1)
+const router = useRouter()
+const Route = useRoute()
 
 watch(() => store.menu_choice, (newValue) => {
   if (newValue) {
@@ -39,23 +58,47 @@ watch(() => store.menu_choice, (newValue) => {
 
 onMounted(() => {
   updateUI();
+  newsBus.on(newsBusMessage.pre, () => {
+    if (selectIndex.value <= 0) {
+      return
+    }
+    selectIndex.value = selectIndex.value - 1
+    let entry = store.entries[selectIndex.value];
+    pushToEntry(entry)
+  })
+
+  newsBus.on(newsBusMessage.next, () => {
+    if (selectIndex.value < 0 || selectIndex.value + 1 >= store.entries.length) {
+      return
+    }
+    selectIndex.value = selectIndex.value + 1
+    let entry = store.entries[selectIndex.value];
+    pushToEntry(entry)
+  })
 })
 
-function getUnreadSize(){
-  const list =  store.entries.filter((entry) => {
+function pushToEntry(entry: Entry) {
+  router.push({
+    path: '/entry/' + ('' + entry.id)
+  });
+}
+
+function getUnreadSize() {
+  const list = store.entries.filter((entry) => {
     return entry.status == EntryStatus.Unread;
   })
   return list ? list.length : 0;
 }
 
-function onClickCallback(){
+function onClickCallback(index: number) {
   console.log('callback')
-  subLabelRef.value =`${getUnreadSize()} Unread Feeds`
+  selectIndex.value = index
+  subLabelRef.value = `${getUnreadSize()} Unread Feeds`
 }
 
 function updateUI() {
   console.log(store.menu_choice)
-  subLabelRef.value =`${getUnreadSize()} Unread Feeds`
+  subLabelRef.value = `${getUnreadSize()} Unread Feeds`
   switch (store.menu_choice.type) {
     case MenuType.Today:
       labelRef.value = 'Today'
@@ -88,6 +131,31 @@ function updateUI() {
       break;
   }
 }
+
+const splitterModel = ref(400)
+const item = ref<Entry | undefined>()
+
+watch(
+      () => Route.params.entry_id,
+      (newValue, oldValue) => {
+        console.log('newValue:', newValue, oldValue);
+        console.log(Route.params);
+        if (newValue == oldValue) {
+          return;
+        }
+
+        let entry_id = Number(newValue);
+        let entry = store.get_local_entry(entry_id);
+        if (entry) {
+          if (entry.status != EntryStatus.Read) {
+            store.mark_entry_read(entry_id);
+          }
+          item.value = entry;
+        } else {
+          item.value = undefined
+        }
+      }
+    );
 
 </script>
 

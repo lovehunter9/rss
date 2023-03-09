@@ -37,7 +37,6 @@ export type DataState = {
   contents: Record<number, string>;
 
   leftDrawerOpen: boolean;
-  rightDrawerOpen: boolean;
   dialogShow: boolean;
 };
 
@@ -58,7 +57,6 @@ export const useRssStore = defineStore('rss', {
       //entry_choice: undefined,
 
       leftDrawerOpen: false,
-      rightDrawerOpen: false,
       dialogShow: false,
     } as DataState;
   },
@@ -155,6 +153,23 @@ export const useRssStore = defineStore('rss', {
     get_local_entry(id: number): Entry | undefined {
       return this.entries.find((entry) => entry.id == id);
     },
+
+    can_pre_route(entry:Entry) : boolean {
+      const index = this.entries.findIndex(e => e.id == entry.id)
+      if (index <= 0) {
+        return false
+      }
+      return true
+    },
+
+    can_next_route(entry:Entry) : boolean {
+      const index = this.entries.findIndex(e => e.id == entry.id)
+      if (index < 0 || index >= this.entries.length) {
+        return false
+      }
+      return true
+    },
+
 
     get_local_category(id: number): Category | undefined {
       return this.categories.find((category) => category.id == id);

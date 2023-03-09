@@ -1,6 +1,6 @@
 <template>
-  <div class="feed-root row items-center">
-    <q-checkbox size="xs" class="check-box" v-model="selection" color="orange"/>
+  <div class="feed-root row items-center" @click="onClick">
+    <q-checkbox size="xs" class="check-box" v-model="selection" color="orange" @update:model-value="onSelected"/>
     <div class="text-layout row items-center">
       <div class="col row">
         <img class="feed-icon" :src="store.feeds_icon[feed.id].data">
@@ -17,20 +17,44 @@
 <script setup lang="ts">
 
 import {Feed} from 'src/types';
+import {PropType, ref, watch} from 'vue';
+import {useRssStore} from 'stores/rss';
+import {useFeedStore} from 'stores/feedStore';
 
-defineProps({
+const props = defineProps({
   feed: {
     type: Object as PropType<Feed>,
     require: true
   }
 })
 
-import {PropType, ref} from 'vue';
-import {useRssStore} from 'stores/rss';
-
 const store = useRssStore()
+const feedStore = useFeedStore()
 
-const selection = ref(false)
+const selection = ref<boolean>(false)
+
+watch(() => feedStore.status, (value) => {
+  if (value != null){
+    selection.value = value
+  }
+})
+
+function onClick() {
+  selection.value = !selection.value
+}
+
+function onSelected(value: boolean) {
+  console.log('onSelected onSelected')
+  if (!props.feed) {
+    console.log('!!!!!!!!')
+    return
+  }
+  if (value) {
+    feedStore.addFeed(props.feed)
+  } else {
+    feedStore.removeFeed(props.feed)
+  }
+}
 
 </script>
 

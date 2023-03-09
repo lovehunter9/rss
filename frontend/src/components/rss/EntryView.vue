@@ -1,5 +1,5 @@
 <template>
-  <q-item class="entry-root" clickable dense>
+  <q-item class="entry-root" clickable dense manualFocus :focused="selected">
     <div class="row justify-start" style="width:100%;" @click="onEntryClick">
       <div class="circle" v-if="!readStatusRef" />
       <div class="circle-temp" v-else />
@@ -33,6 +33,10 @@ const props = defineProps({
   entry: {
     type: Object as PropType<Entry>,
     require: true
+  },
+  selected: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -54,9 +58,6 @@ function onEntryClick() {
   router.push({
     path: '/entry/' + ('' + props.entry.id)
   });
-  setTimeout(() => {
-    store.rightDrawerOpen = true;
-  }, 0);
 }
 
 function getTime() {

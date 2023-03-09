@@ -62,12 +62,12 @@
           style="height: 36px;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px"
           @click="goFolderSetting">
           <span style="font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 14px;
-  color: #857C77;
-  ">Folder</span>
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 14px;
+    color: #857C77;
+    ">Folder</span>
           <img style="width: 12px;height: 12px" src="../assets/menu/setting.svg">
         </div>
 
@@ -138,24 +138,24 @@
         <div class="row justify-between items-center"
           style="height: 36px;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px">
           <span style="font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 14px;
-  color: #857C77;
-  ">Board</span>
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 14px;
+    color: #857C77;
+    ">Board</span>
         </div>
 
         <div class="row justify-between items-center"
           style="height: 48px;width : 100%;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px;position: absolute;bottom: 0">
           <div class="row justify-start items-center">
             <span style="font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 14px;
-  color: #857C77;
-  ">Setting</span>
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 14px;
+    color: #857C77;
+    ">Setting</span>
             <img style="margin-left: 8px;width: 12px;height: 12px" src="../assets/menu/setting.svg">
           </div>
           <img style="margin-right: 18px;width: 12px;height: 12px" src="../assets/menu/refresh.svg">
@@ -164,57 +164,8 @@
       </q-drawer>
 
       <q-page-container class="container">
-        <!-- <router-view /> -->
-
-
-        <q-splitter
-      v-model="splitterModel"
-      unit="px"
-      style="height: 100vh;background-color: white;"
-    >
-
-      <template v-slot:before>
         <router-view />
-      </template>
-
-      <template v-slot:after>
-        <!-- <div class="q-pa-md">
-          <div class="text-h4 q-mb-md">After</div>
-          <div v-for="n in 20" :key="n" class="q-my-md">{{ n }}. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quis praesentium cumque magnam odio iure quidem, quod illum numquam possimus obcaecati commodi minima assumenda consectetur culpa fuga nulla ullam. In, libero.</div>
-        </div> -->
-
-        <!-- <div class="q-pa-md" style="background:red;width: 100%;height: 100vh;"> -->
-          <!-- <ItemView v-if="item" :item="item" />
-        <div class="text-7A7A7A column items-center justify-center" v-else>
-          <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148" />
-          {{ 'No item selected.' }}
-        </div> -->
-        <!-- </div> -->
-        <div class="column items-center justify-center" style="height: 100vh;">
-            <ItemView v-if="item" :item="item" />
-          <div class="text-7A7A7A column items-center justify-center" v-else>
-            <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148" />
-            {{ 'No item selected.' }}
-          </div>
-          </div>
-
-      </template>
-
-    </q-splitter>
-
       </q-page-container>
-
-      <!-- <q-drawer v-model="rightDrawerOpen" bordered show-if-above side="right" :width="innerWidth"
-        @update:model-value="updateRightDrawer" class="column items-center justify-center">
-        <ItemView v-if="item" :item="item" />
-        <div class="text-7A7A7A column items-center justify-center" v-else>
-          <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148" />
-          {{ 'No item selected.' }}
-        </div>
-      </q-drawer> -->
-
-
-
 
     </div>
   </q-layout>
@@ -225,18 +176,13 @@ import { defineComponent, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useQuasar } from 'quasar';
 import { useRouter, useRoute } from 'vue-router';
 import { useIsMobile } from '../utils/utils';
-import { useRssStore } from '../stores/rss';
+import { useRssStore } from 'stores/rss';
 //import { useUserStore } from '../stores/user';
-import ItemView from 'components/rss/NewsView.vue';
+
 import AddFeedDialog from '../components/AddFeedDialog.vue';
 import {
   MenuType,
-  MenuChoice,
-  Category,
   CategoryRequest,
-  Feed,
-  FeedCreationRequest,
-  FeedCounters,
   Entry,
   EntriesQueryRequest
 } from '../types';
@@ -244,15 +190,15 @@ import { create_category } from '../api/api';
 import { EntryStatus } from '../types';
 import { getPageRSSHub } from '../utils/radar'
 import { defaultRules } from '../utils/radar-rules';
-import SvgIcon from "components/base/svgIcon.vue";
-import SearchView from "components/rss/SearchView.vue";
+import SvgIcon from 'components/base/svgIcon.vue';
+import SearchView from 'components/rss/SearchView.vue';
 export default defineComponent({
   name: 'MainLayout',
 
   components: {
     SearchView,
     SvgIcon,
-    ItemView
+    // ItemView
   },
 
   setup() {
@@ -268,7 +214,6 @@ export default defineComponent({
     const store = useRssStore();
 
     const leftDrawerOpen = ref(false);
-    const rightDrawerOpen = ref(false);
     let innerWidth = ref(450);
     const timer = ref();
     const screenWidth = ref(document.body.clientWidth);
@@ -304,13 +249,7 @@ export default defineComponent({
         leftDrawerOpen.value = newVal;
       }
     );
-    watch(
-      () => store.rightDrawerOpen,
-      (newVal) => {
-        console.log('rightDrawerOpen:::', newVal);
-        rightDrawerOpen.value = newVal;
-      }
-    );
+
 
     // watch(
     //   () => store.dialogShow,
@@ -321,20 +260,11 @@ export default defineComponent({
 
     const goFolderSetting = () => {
       goto('/folderSetting')
-      setTimeout(() => {
-        store.rightDrawerOpen = false;
-      }, 0);
     }
 
     const updateLeftDrawer = (show: boolean) => {
       store.leftDrawerOpen = show;
     };
-    const updateRightDrawer = (show: boolean) => {
-      console.log('updateRightDrawer,', show);
-      store.rightDrawerOpen = show;
-    };
-
-    const updateArticleRef = ref(true)
 
     watch(
       () => Route.params.entry_id,
@@ -352,24 +282,8 @@ export default defineComponent({
             store.mark_entry_read(entry_id);
           }
           item.value = entry;
-        }
-      }
-    );
-
-    watch(
-      () => Route.path,
-      (newValue, oldValue) => {
-        console.log('newValuenewValuenewValue', newValue);
-        if (newValue == oldValue) {
-          return;
-        }
-
-        if (!useIsMobile()) {
-          if (newValue === '/generator' || newValue === '/security') {
-            store.rightDrawerOpen = false;
-          } else {
-            store.rightDrawerOpen = true;
-          }
+        } else {
+          item.value = undefined
         }
       }
     );
@@ -429,7 +343,6 @@ export default defineComponent({
         value
       };
       console.log(store.menu_choice)
-      let openDrawer = true;
       if (type == MenuType.Feed) {
         store.get_entries(
           new EntriesQueryRequest({ limit: 50, offset: 0, feed_id: value })
@@ -445,16 +358,11 @@ export default defineComponent({
         goto('/')
       } else if (type == MenuType.Discover) {
         goto('/discover')
-        openDrawer = false;
       } else if (type == MenuType.Unread) {
         goto('/')
       } else if (type == MenuType.ReadLater) {
         goto('/')
       }
-
-      setTimeout(() => {
-        store.rightDrawerOpen = openDrawer;
-      }, 0);
     }
 
     const addFolder = () => {
@@ -498,14 +406,12 @@ export default defineComponent({
       MenuType,
       item,
       leftDrawerOpen,
-      rightDrawerOpen,
       goto,
       onSearch,
       store,
       active,
       innerWidth,
       updateLeftDrawer,
-      updateRightDrawer,
       goFolderSetting,
       settingMode,
       dialogShow,
