@@ -39,7 +39,7 @@ export const useFeedStore = defineStore('feedStore', {
       }
       this.allFeeds = selectedFeeds ? selectedFeeds : []
     },
-    addFeed(feed: Feed) {
+    addSelectedFeed(feed: Feed) {
       console.log('add')
       const find = this.selectedFeeds.find((value) => {
         return value.id === feed.id
@@ -49,7 +49,7 @@ export const useFeedStore = defineStore('feedStore', {
         this._updateState()
       }
     },
-    removeFeed(feed: Feed) {
+    removeSelectedFeed(feed: Feed) {
       console.log('remove')
       let feedIndex = -1;
       this.selectedFeeds.forEach((value,index) => {
@@ -62,6 +62,20 @@ export const useFeedStore = defineStore('feedStore', {
         this.selectedFeeds.splice(feedIndex, 1);
         this._updateState()
       }
+    },
+    removeFeed(feed: Feed){
+      let feedIndex = -1;
+      this.allFeeds.forEach((value,index) => {
+        if (value.id === feed.id) {
+          feedIndex = index
+        }
+      });
+      console.log(feedIndex)
+      if (feedIndex != -1){
+        this.allFeeds.splice(feedIndex, 1);
+        this._updateState()
+      }
+      this.removeSelectedFeed(feed)
     },
     _updateState() {
       if (this.selectedFeeds.length === 0) {
@@ -87,7 +101,7 @@ export const useFeedStore = defineStore('feedStore', {
       this.status = false;
     },
     selectedAll() {
-      this.selectedFeeds = this.allFeeds;
+      this.selectedFeeds= this.allFeeds.concat([]);
       this.status = true;
     }
   }
