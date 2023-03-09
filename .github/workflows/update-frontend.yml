@@ -27,7 +27,7 @@ jobs:
             - name: Install
               run: npm i -g @quasar/cli
             - name: Build
-              run: cd frontend/;quasar build
+              run: cd frontend/;yarn;yarn build
             - name: Build the hello-docker Docker image
               run: |
                   docker build . --tag ghcr.io/above-os/RSS-v1:latest
