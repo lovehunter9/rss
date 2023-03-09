@@ -30,5 +30,5 @@ jobs:
               run: cd frontend/;yarn;quasar build
             - name: Build the hello-docker Docker image
               run: |
-                  docker build . --tag ghcr.io/above-os/rss-v1:latest
+                  docker build . -f Dockerfile.frontend --tag ghcr.io/above-os/rss-v1:latest
                   docker push ghcr.io/above-os/rss-v1:latest
