@@ -25,11 +25,9 @@ jobs:
               with:
                   node-version: "16.18"
             - name: Install
-              run: |
-                  npm run bootstrap
-            - run: npm i -g @quasar/cli
+              - run: npm i -g @quasar/cli
             - name: Build
-              run: cd frontend/;quasar build;
+              run: cd frontend/;quasar build
             - name: Build the hello-docker Docker image
               run: |
                   docker build . --tag ghcr.io/above-os/RSS-v1:latest
