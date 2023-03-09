@@ -73,9 +73,15 @@ h4,h5,h6 {
 
 figure {
   overflow: auto;
-  // margin: 20px 0;
+  margin: 10px 0;
   padding: 0;
   // background-color: #f7f7f7;
+}
+
+figure table {
+  background-color: #f7f7f7;
+  margin: 0;
+  padding: 0;
 }
 
 // Dark mode
@@ -197,14 +203,14 @@ body.body--light {
   }
   .menuItem {
     &:hover {
-      background: #F3F8FE;
-      color: #2787FF;
+      // background: #F3F8FE;
+      color: #FF8642;
     }
   }
 
   .itemActiveStyle {
-    background: #F3F8FE;
-    color: #2787FF;
+    // background: #F3F8FE;
+    // color: #2787FF;
   }
 
   .lauout-app {

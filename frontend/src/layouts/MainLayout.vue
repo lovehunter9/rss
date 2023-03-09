@@ -7,156 +7,77 @@
       <q-drawer v-model="leftDrawerOpen" @update:model-value="updateLeftDrawer" show-if-above bordered height="100%"
         class="drawer">
         <q-list class="margin-bottom-safe-area">
-
           <search-view class="search-view" @onSearch="onSearch" />
-
-          <q-item clickable :active="store.menu_choice.type == MenuType.Discover" active-class="itemActiveStyle"
-            class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs" @click="changeItemMenu(MenuType.Discover)">
-            <q-item-section class="items-center" avatar>
-              <svg-icon icon-class="../../assets/icon/today.svg" />
-              <!--              <BtIcon :src="active === 'vault' ? 'vaultActive' : 'vault'" />-->
-            </q-item-section>
-            <q-item-section class="text-subtitle1">Discover</q-item-section>
-            <q-item-section class="q-mr-sm" side>
-              {{ count.total }}
-            </q-item-section>
-          </q-item>
-
-          <q-item clickable :active="store.menu_choice.type == MenuType.Today" active-class="itemActiveStyle"
-            class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs" @click="changeItemMenu(MenuType.Today)">
-            <q-item-section class="items-center" avatar>
-              <BtIcon :src="active === 'vault' ? 'vaultActive' : 'vault'" />
-            </q-item-section>
-            <q-item-section class="text-subtitle1">Today</q-item-section>
-            <q-item-section class="q-mr-sm" side>
-              {{ count.total }}
-            </q-item-section>
-          </q-item>
-
-          <q-item clickable :active="store.menu_choice.type == MenuType.Unread" active-class="itemActiveStyle"
-            class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs" @click="changeItemMenu(MenuType.Unread)">
-            <q-item-section class="items-center" avatar>
-              <BtIcon :src="active === 'vault' ? 'vaultActive' : 'vault'" />
-            </q-item-section>
-            <q-item-section class="text-subtitle1">Unread</q-item-section>
-            <q-item-section class="q-mr-sm" side>
-              {{ count.total }}
-            </q-item-section>
-          </q-item>
-
-          <q-item clickable :active="store.menu_choice.type == MenuType.ReadLater" active-class="itemActiveStyle"
-            class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs" @click="changeItemMenu(MenuType.ReadLater)">
-            <q-item-section class="items-center" avatar>
-              <BtIcon :src="active === 'vault' ? 'vaultActive' : 'vault'" />
-            </q-item-section>
-            <q-item-section class="text-subtitle1">Read Later</q-item-section>
-            <q-item-section class="q-mr-sm" side>
-              {{ count.total }}
-            </q-item-section>
-          </q-item>
-
-          <!--  -->
+          <layout-left-item-menu :menu-type="MenuType.Discover" :unread-count="count.total" @item-on-click="changeItemMenu(MenuType.Discover)"></layout-left-item-menu>
+          <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="count.total" @item-on-click="changeItemMenu(MenuType.Today)"></layout-left-item-menu>
+          <layout-left-item-menu :menu-type="MenuType.Unread" :unread-count="count.total" @item-on-click="changeItemMenu(MenuType.Unread)"></layout-left-item-menu>
+          <layout-left-item-menu :menu-type="MenuType.ReadLater" :unread-count="count.total" @item-on-click="changeItemMenu(MenuType.ReadLater)"></layout-left-item-menu>
         </q-list>
 
-        <div class="row justify-between items-center"
-          style="height: 36px;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px"
+        <q-separator style="margin-top:6px;margin-bottom: 11px;" inset/>
+
+        <div class="row justify-between items-center folderInfo"
           @click="goFolderSetting">
-          <span style="font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 14px;
-    color: #857C77;
-    ">Folder</span>
-          <img style="width: 12px;height: 12px" src="../assets/menu/setting.svg">
+          <span class="folder">Folder</span>
+          <img style="width: 16px;height: 16px" src="../assets/menu/setting.svg">
         </div>
 
-        <q-item class="item q-mx-sm q-pl-lg q-py-xs" clickable v-for="(category, index) in store.categories"
-          :key="'ct' + index">
-          <q-expansion-item :caption="category.title" :disable="category.feeds.length == 0" class="">
+        <q-item class="item" dense v-for="(category, index) in store.categories"
+          :key="'ct' + index" style="padding: 0;">
+          <q-expansion-item dense switchToggleSide  :disable="category.feeds.length == 0">
             <template v-slot:header>
-              <q-item clickable :active="active === 'favorites'" active-class="itemActiveStyle"
-                class="q-mx-sm q-pl-xs q-pr-md q-py-xs" @click="changeItemMenu(MenuType.Category, category.id)">
-                <q-item-section class="text-subtitle1">
+              <q-item class="menuItem" :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && category.feeds.find(e => e.id === store.menu_choice.value) !== undefined" active-class="itemActiveStyle" dense :class="category.feeds.length > 0 ? 'folder-extension-margin-left' : 'folder-extension-margin-none'"
+                @click="changeItemMenu(MenuType.Category, category.id)">
+                <q-item-section class="folderTitle">
                   {{ category.title }}
                 </q-item-section>
-                <q-item-section class="q-mr-sm" side>
-                  <!-- {{ count.favorites }} -->
+                <q-item-section side>
+                  <div class="unreadCount">
+                {{ count.total }}
+              </div>
                 </q-item-section>
               </q-item>
             </template>
-            <q-item class="item q-mx-sm q-pl-lg q-py-xs" clickable v-for="(feed, fi) in category.feeds" :key="'ft' + fi"
-              @click="changeItemMenu(MenuType.Feed, feed.id)">
-              <q-item-section>
-                {{ feed.title }}
+            <q-item dense class="menuItem feed-select-item" clickable v-for="(feed, fi) in category.feeds" :key="'ft' + fi"
+              @click="changeItemMenu(MenuType.Feed, feed.id)" :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && store.menu_choice.value === feed.id" active-class="itemActiveStyle">
+              <q-item-section avatar>
+                <!-- <q-icon :name="formatIconName(MenuType.Discover)" size="14px"></q-icon> -->
+                <img v-if="store.feeds_icon[feed.id] && store.feeds_icon[feed.id].data" :src="store.feeds_icon[feed.id].data" :width="14" :height="14"/>
+              </q-item-section>
+              <q-item-section class="folderTitle" style="margin-left:-30px;padding-top: 10px;padding-bottom: 10px;">
+                {{ feed.title  }}
               </q-item-section>
               <q-item-section side>
-                {{ feed.unread }}
+                <div class="unreadCount">
+                {{ feed.unread ?? 0 }}
+              </div>
               </q-item-section>
             </q-item>
           </q-expansion-item>
         </q-item>
 
-        <q-item clickable active-class="itemActiveStyle" class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs"
+        <!-- <q-item clickable active-class="itemActiveStyle" class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs"
           @click="addFolder()">
           <q-item-section class="items-center" avatar>
-            <BtIcon :src="active === 'vault' ? 'vaultActive' : 'vault'" />
+             <q-icon :name="formatIconName(MenuType.AddFolder)" size="20px"></q-icon>
           </q-item-section>
           <q-item-section class="text-subtitle1">Add Folder</q-item-section>
-        </q-item>
+        </q-item> -->
 
-        <q-item clickable active-class="itemActiveStyle" class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs"
-          @click="addFeed()">
-          <q-item-section class="items-center" avatar>
-            <BtIcon :src="active === 'vault' ? 'vaultActive' : 'vault'" />
-          </q-item-section>
-          <q-item-section class="text-subtitle1">Add Feed</q-item-section>
-        </q-item>
-
-        <!-- <div class="row absolute-bottom q-mb-sm">
-					<span class="biIcon" @click="lock">
-						<i class="bi bi-lock"></i>
-					</span>
-					<span class="biIcon" @click="changeTheme">
-						<i
-							class="bi bi-gear-wide-connected"
-							v-if="theme === 'auto'"
-						></i>
-						<i class="bi bi-moon" v-if="theme === 'dark'"></i>
-						<i class="bi bi-sun" v-if="theme === 'light'"></i>
-					</span>
-					<span
-						class="biIcon"
-						@click="sync"
-						:class="{ rotate: syncing }"
-					>
-						<i class="bi bi-arrow-clockwise rotate"></i>
-					</span>
-
-				</div> -->
-
-        <div class="row justify-between items-center"
-          style="height: 36px;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px">
-          <span style="font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 14px;
-    color: #857C77;
-    ">Board</span>
+        <layout-left-item-menu :menu-type="MenuType.CreateNewFolder" :show-un-read-count="false" :dense="true" @item-on-click="addFolder()"></layout-left-item-menu>
+        <div class="row justify-between items-center folderInfo">
+          <span class="folder">Boards</span>
         </div>
+
+        <layout-left-item-menu :menu-type="MenuType.Innovation" :show-un-read-count="false"></layout-left-item-menu>
 
         <div class="row justify-between items-center"
           style="height: 48px;width : 100%;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px;position: absolute;bottom: 0">
           <div class="row justify-start items-center">
-            <span style="font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 14px;
-    color: #857C77;
-    ">Setting</span>
-            <img style="margin-left: 8px;width: 12px;height: 12px" src="../assets/menu/setting.svg">
+            <img style="margin-right: 8px;width: 12px;height: 12px" src="../assets/menu/setting.svg">
+
+            <span class="folderTitle">Setting</span>
+
           </div>
           <img style="margin-right: 18px;width: 12px;height: 12px" src="../assets/menu/refresh.svg">
         </div>
@@ -177,33 +98,30 @@ import { useQuasar } from 'quasar';
 import { useRouter, useRoute } from 'vue-router';
 import { useIsMobile } from '../utils/utils';
 import { useRssStore } from '../stores/rss';
-//import { useUserStore } from '../stores/user';
 
 import AddFeedDialog from '../components/AddFeedDialog.vue';
 import {
   MenuType,
-  MenuChoice,
-  Category,
   CategoryRequest,
-  Feed,
-  FeedCreationRequest,
-  FeedCounters,
   Entry,
-  EntriesQueryRequest
+  EntriesQueryRequest,
+menuTypeName
 } from '../types';
 import { create_category } from '../api/api';
 import { EntryStatus } from '../types';
 import { getPageRSSHub } from '../utils/radar'
 import { defaultRules } from '../utils/radar-rules';
-import SvgIcon from "components/base/svgIcon.vue";
-import SearchView from "components/rss/SearchView.vue";
+import SearchView from 'components/rss/SearchView.vue';
+import LayoutLeftItemMenu from 'components/LayoutLeftItemMenu.vue'
+
 export default defineComponent({
   name: 'MainLayout',
 
   components: {
     SearchView,
-    SvgIcon,
+    // SvgIcon,
     // ItemView
+    LayoutLeftItemMenu
   },
 
   setup() {
@@ -226,28 +144,6 @@ export default defineComponent({
     const count = ref<any>({ total: 10 });
     const tags = ref<any>([]);
     const searchTxt = ref<string>('');
-
-    // let _lockDelay: number = app.settings.autoLockDelay * 60 * 1000;
-    // //let  _lockDelay :number = 10 * 1000;
-    // let _pausedAt: Date | null = null;
-    // let _lockTimeout = 0;
-    // let _syncTimeout: any = null;
-    // const theme = ref(app.settings.theme);
-    // if (theme.value === 'auto') {
-    // 	if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    // 		$q.dark.set(true);
-    // 	} else {
-    // 		$q.dark.set(false);
-    // 	}
-    // }
-    // if (theme.value === 'dark') {
-    // 	$q.dark.set(true);
-    // }
-    // if (theme.value === 'light') {
-    // 	$q.dark.set(false);
-    // }
-
-    // Listen for drawer events
     watch(
       () => store.leftDrawerOpen,
       (newVal) => {
@@ -406,6 +302,29 @@ export default defineComponent({
         });
     };
 
+    const formatIconName = (type:MenuType) => {
+      let nameTypeName = menuTypeName(type)
+      nameTypeName = nameTypeName.toLowerCase()
+      nameTypeName = nameTypeName.replace(/\s*/g,'');
+      if (type === store.menu_choice.type || (willchangeType.value === type)) {
+        nameTypeName = nameTypeName + '_hover'
+      }
+      return `img:/imgs/${nameTypeName}.svg`
+    }
+
+    const willchangeType = ref(MenuType.Empty);
+
+
+    const willChange = (type: MenuType) => {
+      willchangeType.value = type
+    }
+
+    const changeBack = (type: MenuType) => {
+      if (willchangeType.value === type) {
+        willchangeType.value = MenuType.Empty
+      }
+    }
+
     addFeed;
     return {
       MenuType,
@@ -426,7 +345,9 @@ export default defineComponent({
       searchTxt,
       addFolder,
       addFeed,
-      splitterModel: ref(400)
+      formatIconName,
+      willChange,
+      changeBack
     };
   }
 });
@@ -449,15 +370,18 @@ export default defineComponent({
   position: absolute;
 
   .search-view{
-    margin: 8px;
-    width : calc(100% - 16px)
+    margin: 16px 16px 8px;
+    width : calc(100% - 32px)
   }
 
-  .itemActiveStyle {
-    color: white;
-    background: #F2C037
-  }
+
 }
+
+
+.itemActiveStyle {
+    color: #FF8642;
+    // background: #F2C037
+  }
 
 .showDialog {
   filter: blur(2px);
@@ -519,6 +443,20 @@ export default defineComponent({
   border-radius: 8px;
 }
 
+.unreadCount {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 12px;
+    text-align: center;
+    color: #847C77;
+
+    background: rgba(26, 19, 15, 0.05);
+    padding:2px 8px;
+    border-radius: 8px;
+  }
+
 .tagExpansion {
   border-radius: 8px;
   overflow: hidden;
@@ -577,4 +515,71 @@ export default defineComponent({
     transform: rotate(360deg);
   }
 }
+
+.folderInfo {
+  height: 36px;
+  margin-left: 8px;
+  margin-right: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+
+  .folder {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 14px;
+    color: #857C77;
+  }
+}
+
+.folderTitle {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 14px;
+}
+
+
+.item-title-margin-left {
+  margin-left: -15px;
+}
+
+.folder-extension-margin-left {
+  margin-left: -25px;
+  width: 228px;
+  height: 36px;
+  padding: 0;
+}
+
+.folder-extension-margin-none {
+  width:260px;
+  height: 36px;
+  padding: 0;
+  // background-color: red;
+}
+
+.feed-select-item {
+  margin-left: 10px;
+  width: 280px;
+  // margin-top: 10px;
+  // margin-bottom: 10px;
+  // height: 36px;
+}
+
+.left-menu-title-normal {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 14px;
+  // color: #1A130F;
+}
+
+.left-menu-add-folder {
+  @extend .left-menu-title-normal;
+  font-size: 12px;
+}
+
 </style>
