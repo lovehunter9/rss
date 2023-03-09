@@ -1,5 +1,5 @@
 <template>
-  <q-item class="entry-root" clickable dense manualFocus :focused="selected">
+  <q-item class="entry-root" clickable dense manualFocus :active="selected" activeClass="itemActiveStyle">
     <div class="row justify-start" style="width:100%;" @click="onEntryClick">
       <div class="circle" v-if="!readStatusRef" />
       <div class="circle-temp" v-else />
@@ -154,5 +154,12 @@ function getTime() {
     }
   }
 
+
+
 }
+
+.itemActiveStyle {
+    background-color: rgba(26, 19, 15, 0.05);
+  }
+
 </style>

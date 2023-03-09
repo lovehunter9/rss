@@ -107,7 +107,6 @@ export default {
       useDialogPluginComponent();
     //const loading = ref(false);
     const error = ref('');
-    const stakeAmount = ref(0);
     const rssStore = useRssStore();
     const feedUrl = ref('');
     const category = ref<Category | null>(
