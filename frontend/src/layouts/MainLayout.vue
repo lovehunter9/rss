@@ -6,8 +6,10 @@
     }">
       <q-drawer v-model="leftDrawerOpen" @update:model-value="updateLeftDrawer" show-if-above bordered height="100%"
                 class="drawer">
-        <q-list class="margin-bottom-safe-area">
-          <search-view class="search-view" @onSearch="onSearch"/>
+        <search-view class="search-view" @onSearch="onSearch"/>
+        <q-scroll-area style="height:calc(100% - 110px);">
+          <q-list class="margin-bottom-safe-area">
+
           <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false" @item-on-click="changeItemMenu(MenuType.Discover)"></layout-left-item-menu>
           <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="`${todayCount}`" @item-on-click="changeItemMenu(MenuType.Today)"></layout-left-item-menu>
           <layout-left-item-menu :menu-type="MenuType.Unread" :unread-count="`${store.allUnRead}`" @item-on-click="changeItemMenu(MenuType.Unread)"></layout-left-item-menu>
@@ -78,6 +80,7 @@
         </div>
 
         <layout-left-item-menu :menu-type="MenuType.Innovation" :show-un-read-count="false"></layout-left-item-menu>
+        </q-scroll-area>
 
         <div class="row justify-between items-center"
              style="height: 48px;width : 100%;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px;position: absolute;bottom: 0">
