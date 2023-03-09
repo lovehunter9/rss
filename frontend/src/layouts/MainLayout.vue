@@ -74,7 +74,9 @@
         </q-item> -->
 
         <layout-left-item-menu :menu-type="MenuType.CreateNewFolder" :show-un-read-count="false" :dense="true"
-                               @item-on-click="addFolder()"></layout-left-item-menu>
+                               @item-on-click="addFolder()"/>
+        <layout-left-item-menu :menu-type="MenuType.CreateNewFeed" :show-un-read-count="false" :dense="true"
+                               @item-on-click="addFeed()"/>
         <div class="row justify-between items-center folderInfo">
           <span class="folder">Boards</span>
         </div>

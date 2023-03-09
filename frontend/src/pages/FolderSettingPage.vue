@@ -2,21 +2,92 @@
   <div class="folder-setting-root justify-start items-center">
     <div class="top-layout row justify-between items-center">
       <span class="text-title">Organize Folders</span>
-<!--      <div class="row justify-end items-center">-->
-<!--        <img class="icon-end" src="../assets/menu/input.svg">-->
-<!--        <img class="icon-end" src="../assets/menu/output.svg">-->
-<!--      </div>-->
+      <!--      <div class="row justify-end items-center">-->
+      <!--        <img class="icon-end" src="../assets/menu/input.svg">-->
+      <!--        <img class="icon-end" src="../assets/menu/output.svg">-->
+      <!--      </div>-->
     </div>
     <div class="selected-layout row justify-start items-center">
-      <q-select borderless dense class="select-view" v-model="folderRef" :options="folderOptionsRef"
-                @update:model-value="folderChanged"/>
-      <search-view class="search-view" placeholder="Search Feeds Name/URL" @onSearch="searchChanged"/>
+      <!-- <q-select borderless dense class="select-view" v-model="folderRef" :options="folderOptionsRef"
+                @update:model-value="folderChanged"/> -->
+
+      <q-btn-dropdown
+        dropdown-icon="img:/imgs/arrow-down.svg"
+        class="select-view"
+        :ripple="false"
+        no-caps
+        menu-self="top left"
+        menu-anchor="bottom start"
+        :menu-offset="[0, 5]"
+        unelevated
+      >
+        <template v-slot:label>
+          <div
+            class="row items-center no-wrap justify-between"
+            style="width: 120px"
+          >
+            <div class="select-title-item">{{ folderRef }}</div>
+          </div>
+        </template>
+        <q-list class="rounded-borders">
+          <q-item
+            v-for="contentMode in folderOptionsRef"
+            :key="contentMode"
+            clickable
+            v-close-popup
+            @click="folderChanged(contentMode)"
+          >
+            <q-item-section>
+              <q-item-label
+                :class="
+                  contentMode === folderRef ? 'selected-item' : 'normal-item'
+                "
+              >
+                {{ contentMode }}</q-item-label
+              >
+            </q-item-section>
+          </q-item>
+        </q-list>
+
+        <!-- <q-list>
+        <q-item clickable v-close-popup >
+          <q-item-section>
+            <q-item-label style="color:red">Photos</q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-item clickable v-close-popup >
+          <q-item-section>
+            <q-item-label>Videos</q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-item clickable v-close-popup >
+          <q-item-section>
+            <q-item-label>Articles</q-item-label>
+          </q-item-section>
+        </q-item>
+      </q-list> -->
+      </q-btn-dropdown>
+
+      <search-view
+        class="search-view"
+        placeholder="Search Feeds Name/URL"
+        @onSearch="searchChanged"
+      />
     </div>
-    <feed-title/>
+    <feed-title />
     <q-list>
-      <feed-item :key="item.feed.id" v-for="item in feedStore.allFeeds" :feed="item.feed"/>
+      <feed-item
+        :key="item.feed.id"
+        v-for="item in feedStore.allFeeds"
+        :feed="item.feed"
+      />
     </q-list>
-    <div style="position: absolute;bottom: 20px;width: 100%" class="row justify-center items-center">
+    <div
+      style="position: absolute; bottom: 20px; width: 100%"
+      class="row justify-center items-center"
+    >
       <q-pagination
         glossy
         gutter="10px"
@@ -36,53 +107,55 @@
 </template>
 
 <script lang="ts" setup>
-
 import SearchView from 'components/rss/SearchView.vue';
-import {watch, ref} from 'vue';
-import {useRssStore} from 'stores/rss';
+import { watch, ref } from 'vue';
+import { useRssStore } from 'stores/rss';
 import FeedItem from 'components/rss/FeedItem.vue';
 import FeedTitle from 'components/rss/FeedTitle.vue';
-import {useFeedStore} from 'stores/feedStore';
+import { useFeedStore } from 'stores/feedStore';
 
-const store = useRssStore()
-const folderOptionsRef = ref<string[]>([])
-const folderRef = ref('All Folders')
-const pagination = ref(8)
-const feedStore = useFeedStore()
+const store = useRssStore();
+const folderOptionsRef = ref<string[]>([]);
+const folderRef = ref('All Folders');
+const pagination = ref(8);
+const feedStore = useFeedStore();
 let searchData = '';
 
-updateData()
+updateData();
 
-function updateData(){
+function updateData() {
   folderOptionsRef.value = store.categories.map((value) => {
-    return value.title
-  })
-  folderOptionsRef.value.push('All Folders')
-  feedStore.updateAllFeeds(folderRef.value,searchData)
+    return value.title;
+  });
+  folderOptionsRef.value.push('All Folders');
+  feedStore.updateAllFeeds(folderRef.value, searchData);
 }
 
 function folderChanged(title: string) {
   folderRef.value = title;
-  feedStore.updateAllFeeds(folderRef.value,searchData)
+  feedStore.updateAllFeeds(folderRef.value, searchData);
 }
 
 function searchChanged(data: string) {
-  searchData = data
-  feedStore.updateAllFeeds(folderRef.value,searchData)
+  searchData = data;
+  feedStore.updateAllFeeds(folderRef.value, searchData);
 }
 
-watch(() => [store.categories,store.feeds],()=> {
-  updateData()
-},{
-  deep : true,
-  immediate : true
-})
-
+watch(
+  () => [store.categories, store.feeds],
+  () => {
+    updateData();
+  },
+  {
+    deep: true,
+    immediate: true,
+  }
+);
 </script>
 
 <style lang="scss" scoped>
 .folder-setting-root {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   height: 100vh;
   width: 100%;
 
@@ -97,7 +170,7 @@ watch(() => [store.categories,store.feeds],()=> {
       font-weight: 500;
       font-size: 16px;
       line-height: 20px;
-      color: #1A130F;
+      color: #1a130f;
     }
 
     .icon-end {
@@ -106,7 +179,6 @@ watch(() => [store.categories,store.feeds],()=> {
       margin-right: 16px;
       margin-top: 22px;
     }
-
   }
 
   .selected-layout {
@@ -116,9 +188,17 @@ watch(() => [store.categories,store.feeds],()=> {
       height: 32px;
       width: 200px;
       margin-left: 16px;
-      border: 1px solid #E0E0E0;
+      border: 1px solid #e0e0e0;
       border-radius: 6px;
-      color: red;
+
+      .select-title-item {
+        font-family: 'Roboto';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 12px;
+        color: #1a130f;
+      }
     }
 
     .search-view {
@@ -126,6 +206,23 @@ watch(() => [store.categories,store.feeds],()=> {
       margin-left: 12px;
     }
   }
+}
 
+.selected-item {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 12px;
+  color: #FF8642;
+}
+
+.normal-item {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 12px;
+  color: #1a130f;
 }
 </style>

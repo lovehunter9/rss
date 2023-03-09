@@ -2,12 +2,12 @@
   <div class="feed-root row items-center">
     <q-checkbox dense indeterminate-value="null" size="md" class="check-box" v-model="selection" color="orange"
                 @update:model-value="onSelected"/>
-    <div class="text-layout row items-center" v-if="!feedStore.status">
+    <div class="text-layout row items-center" v-if="feedStore.status === false">
       <span class="text col">Feed</span>
       <span class="col text">Folder</span>
       <span class="col-3 text">Last Update</span>
     </div>
-    <div class="text-end" v-if="!feedStore.status">Option</div>
+    <div class="text-end" v-if="feedStore.status === false">Option</div>
     <div class="selection-layout row justify-between items-center" v-else>
       <span class="text col">Selected {{ feedStore.getSelectedFeeds().length }} of {{ feedStore.allFeeds.length }}</span>
       <div class="row">
