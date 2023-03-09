@@ -301,29 +301,6 @@ export default defineComponent({
         });
     };
 
-    const formatIconName = (type:MenuType) => {
-      let nameTypeName = menuTypeName(type)
-      nameTypeName = nameTypeName.toLowerCase()
-      nameTypeName = nameTypeName.replace(/\s*/g,'');
-      if (type === store.menu_choice.type || (willchangeType.value === type)) {
-        nameTypeName = nameTypeName + '_hover'
-      }
-      return `img:/imgs/${nameTypeName}.svg`
-    }
-
-    const willchangeType = ref(MenuType.Empty);
-
-
-    const willChange = (type: MenuType) => {
-      willchangeType.value = type
-    }
-
-    const changeBack = (type: MenuType) => {
-      if (willchangeType.value === type) {
-        willchangeType.value = MenuType.Empty
-      }
-    }
-
     addFeed;
     return {
       MenuType,
@@ -343,10 +320,7 @@ export default defineComponent({
       tags,
       searchTxt,
       addFolder,
-      addFeed,
-      formatIconName,
-      willChange,
-      changeBack
+      addFeed
     };
   }
 });
@@ -372,8 +346,6 @@ export default defineComponent({
     margin: 16px 16px 8px;
     width : calc(100% - 32px)
   }
-
-
 }
 
 
@@ -456,42 +428,6 @@ export default defineComponent({
     border-radius: 8px;
   }
 
-.tagExpansion {
-  border-radius: 8px;
-  overflow: hidden;
-
-  >.q-item:hover {
-    background: #f3f8fe;
-    color: #2787ff;
-  }
-
-  .q-item {
-    padding: 0 5px 0 16px;
-  }
-
-  .q-expansion-item__toggle-icon {
-    margin-right: -30px !important;
-  }
-}
-
-.biIcon {
-  margin-right: 30px;
-  padding: 2px 6px;
-  cursor: pointer;
-  border-radius: 5px;
-
-  i {
-    font-size: 20px;
-  }
-
-  &:first-child {
-    margin-left: 18px;
-  }
-
-  &:hover {
-    background-color: #d8d8d8;
-  }
-}
 
 .rotate {
   animation: aniRotate 0.8s linear infinite;
@@ -540,11 +476,6 @@ export default defineComponent({
   line-height: 14px;
 }
 
-
-.item-title-margin-left {
-  margin-left: -15px;
-}
-
 .folder-extension-margin-left {
   margin-left: -25px;
   width: 228px;
@@ -565,20 +496,6 @@ export default defineComponent({
   // margin-top: 10px;
   // margin-bottom: 10px;
   // height: 36px;
-}
-
-.left-menu-title-normal {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 14px;
-  // color: #1A130F;
-}
-
-.left-menu-add-folder {
-  @extend .left-menu-title-normal;
-  font-size: 12px;
 }
 
 </style>
