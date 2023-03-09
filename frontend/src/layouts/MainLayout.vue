@@ -420,7 +420,7 @@ export default defineComponent({
       tags,
       searchTxt,
       addFolder,
-      addFeed,
+      addSelectedFeed: addFeed,
       splitterModel: ref(400)
     };
   }
