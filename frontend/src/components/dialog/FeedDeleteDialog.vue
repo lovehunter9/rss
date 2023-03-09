@@ -5,6 +5,7 @@
     @hide="onDialogHide">
     <q-card class="q-dialog-plugin">
       <div class="text-title">Delete Feed</div>
+      <img class="icon-close" src="../../assets/menu/close.svg" @click="onDialogCancel">
       <div class="text-content">Do you want to remove the selected RSS feeds？</div>
 
       <div class="row justify-end items-end" style="width: 100%">
@@ -22,7 +23,7 @@
 
 import {useDialogPluginComponent} from 'quasar';
 
-const {dialogRef, onDialogHide, onDialogOK} = useDialogPluginComponent();
+const {dialogRef, onDialogHide, onDialogOK, onDialogCancel} = useDialogPluginComponent();
 
 </script>
 
@@ -34,11 +35,11 @@ const {dialogRef, onDialogHide, onDialogOK} = useDialogPluginComponent();
 
   .q-dialog-plugin {
     width: 500px;
+    padding: 24px;
     border-radius: 12px;
   }
 
   .text-title {
-    margin-top: 24px;
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 500;
@@ -46,13 +47,12 @@ const {dialogRef, onDialogHide, onDialogOK} = useDialogPluginComponent();
     line-height: 20px;
     text-align: center;
     color: #1A130F;
-
   }
 
   .text-content {
     margin-top: 48px;
-    margin-left: 32px;
-    margin-right: 32px;
+    margin-left: 8px;
+    margin-right: 8px;
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 400;
@@ -62,16 +62,21 @@ const {dialogRef, onDialogHide, onDialogOK} = useDialogPluginComponent();
     color: #857C77;
   }
 
+  .icon-close {
+    position: absolute;
+    right: 24px;
+    top: 26px;
+    height: 16px;
+    width: 16px
+  }
+
   .btn-confirm {
     text-transform: capitalize;
     width: 92px;
     height: 32px;
     background: #FF8642;
     border-radius: 6px;
-    margin-right: 16px;
-    margin-bottom: 24px;
     margin-top: 50px;
-
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 500;

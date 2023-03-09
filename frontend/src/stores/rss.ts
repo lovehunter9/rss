@@ -20,7 +20,7 @@ import {
   get_entry_content,
   get_feed_icon,
   get_feeds,
-  get_today,
+  get_today, remove_feed,
   update_entry_status,
 } from 'src/api/api';
 
@@ -177,6 +177,15 @@ export const useRssStore = defineStore('rss', {
 
     get_local_feed(id: number): Feed | undefined {
       return this.feeds.find((feed) => feed.id == id);
+    },
+
+    async remove_local_feed(id : number){
+      try {
+        await remove_feed(id.toString());
+        await this.refresh_category_and_feeds()
+      } catch (e) {
+        console.log(e);
+      }
     },
 
     async get_entries(q: EntriesQueryRequest) {

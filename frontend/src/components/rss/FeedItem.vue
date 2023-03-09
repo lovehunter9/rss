@@ -1,6 +1,6 @@
 <template>
   <div class="feed-root row items-center">
-    <q-checkbox size="xs" class="check-box" v-model="selection" color="orange" @update:model-value="onSelected"/>
+    <q-checkbox dense size="md" class="check-box" v-model="selection" color="orange" @update:model-value="onSelected"/>
     <div class="text-layout row items-center">
       <div class="col row">
         <img class="feed-icon" :src="store.feeds_icon[feed.id].data">
@@ -9,7 +9,7 @@
       <span class="col text">{{ feed.category.title }}</span>
       <span class="col-3 text">{{ getLatestEntryTime() }}</span>
     </div>
-    <img class="modify-icon" src="../../assets/menu/modify.svg">
+    <img class="modify-icon" src="../../assets/menu/modify.svg" @click="editFeed">
     <img class="delete-icon" src="../../assets/menu/delete.svg" @click="deleteFeed">
   </div>
 </template>
@@ -23,6 +23,7 @@ import {useQuasar} from 'quasar';
 import FeedDeleteDialog from 'components/dialog/FeedDeleteDialog.vue';
 import {getPastTime, utcToStamp} from 'src/utils/utils';
 import {Entry, Feed} from 'src/types';
+import FeedEditDialog from 'components/dialog/FeedEditDialog.vue';
 
 
 const props = defineProps({
@@ -48,11 +49,24 @@ function onSelected(value: boolean) {
   if (!props.feed) {
     return
   }
-  if (value) {
-    feedStore.addSelectedFeed(props.feed)
-  } else {
-    feedStore.removeSelectedFeed(props.feed)
-  }
+  feedStore.updateOneFeedStatus(props.feed.id,value)
+}
+
+function editFeed(){
+  console.log('edit')
+  $q.dialog({
+    component: FeedEditDialog,
+    componentProps: {
+      feed : props.feed
+    }
+  }).onOk(() => {
+    //Do Nothing
+  }).onCancel(() => {
+    console.log('Cancel');
+  })
+    .onDismiss(() => {
+      console.log('Dismiss');
+    });
 }
 
 function deleteFeed() {
@@ -60,9 +74,9 @@ function deleteFeed() {
   $q.dialog({
     component: FeedDeleteDialog,
     componentProps: {}
-  }).onOk(() => {
+  }).onOk(async() => {
     if (props.feed) {
-      feedStore.removeFeed(props.feed)
+      await feedStore.removeFeed(props.feed.id)
     }
   }).onCancel(() => {
     console.log('Cancel');
@@ -99,11 +113,11 @@ function getLatestEntryTime(): string {
   height: 44px;
 
   .check-box {
-    margin-left: 8px;
+    margin-left: 16px;
   }
 
   .text-layout {
-    padding-left: 9px;
+    padding-left: 17px;
     padding-right: 9px;
     width: calc(100% - 120px);
 

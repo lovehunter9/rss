@@ -70,6 +70,16 @@ export async function remove_category(categoryID: string) {
   }
 }
 
+export async function remove_feed(feedID: string) {
+  const rssStore = useRssStore();
+  try {
+    await axios.delete(rssStore.url + '/api/feeds/' + feedID, {});
+    return true;
+  } catch (e) {
+    return null;
+  }
+}
+
 export async function category_mark_all_as_read(categoryID: string) {
   const rssStore = useRssStore();
   try {
