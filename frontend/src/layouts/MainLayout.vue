@@ -5,9 +5,9 @@
       'mainlayout-ios': $q.platform.is.ios
     }">
       <q-drawer v-model="leftDrawerOpen" @update:model-value="updateLeftDrawer" show-if-above bordered height="100%"
-        class="drawer">
+                class="drawer">
         <q-list class="margin-bottom-safe-area">
-          <search-view class="search-view" @onSearch="onSearch" />
+          <search-view class="search-view" @onSearch="onSearch"/>
           <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false" @item-on-click="changeItemMenu(MenuType.Discover)"></layout-left-item-menu>
           <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="`${todayCount}`" @item-on-click="changeItemMenu(MenuType.Today)"></layout-left-item-menu>
           <layout-left-item-menu :menu-type="MenuType.Unread" :unread-count="`${store.allUnRead}`" @item-on-click="changeItemMenu(MenuType.Unread)"></layout-left-item-menu>
@@ -17,17 +17,20 @@
         <q-separator style="margin-top:6px;margin-bottom: 11px;" inset/>
 
         <div class="row justify-between items-center folderInfo"
-          @click="goFolderSetting">
+             @click="goFolderSetting">
           <span class="folder">Folder</span>
           <img style="width: 16px;height: 16px" src="../assets/menu/setting.svg">
         </div>
 
         <q-item class="item" dense v-for="(category, index) in store.categories"
-          :key="'ct' + index" style="padding: 0;">
-          <q-expansion-item dense switchToggleSide  :disable="category.feeds.length == 0">
+                :key="'ct' + index" style="padding: 0;">
+          <q-expansion-item dense switchToggleSide :disable="category.feeds.length == 0">
             <template v-slot:header>
-              <q-item class="menuItem" :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && category.feeds.find(e => e.id === store.menu_choice.value) !== undefined" active-class="itemActiveStyle" dense :class="category.feeds.length > 0 ? 'folder-extension-margin-left' : 'folder-extension-margin-none'"
-                @click="changeItemMenu(MenuType.Category, category.id)">
+              <q-item class="menuItem"
+                      :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && category.feeds.find(e => e.id === store.menu_choice.value) !== undefined"
+                      active-class="itemActiveStyle" dense
+                      :class="category.feeds.length > 0 ? 'folder-extension-margin-left' : 'folder-extension-margin-none'"
+                      @click="changeItemMenu(MenuType.Category, category.id)">
                 <q-item-section class="folderTitle">
                   {{ category.title }}
                 </q-item-section>
@@ -38,19 +41,23 @@
                 </q-item-section>
               </q-item>
             </template>
-            <q-item dense class="menuItem feed-select-item" clickable v-for="(feed, fi) in category.feeds" :key="'ft' + fi"
-              @click="changeItemMenu(MenuType.Feed, feed.id)" :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && store.menu_choice.value === feed.id" active-class="itemActiveStyle">
+            <q-item dense class="menuItem feed-select-item" clickable v-for="(feed, fi) in category.feeds"
+                    :key="'ft' + fi"
+                    @click="changeItemMenu(MenuType.Feed, feed.id)"
+                    :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && store.menu_choice.value === feed.id"
+                    active-class="itemActiveStyle">
               <q-item-section avatar>
                 <!-- <q-icon :name="formatIconName(MenuType.Discover)" size="14px"></q-icon> -->
-                <img v-if="store.feeds_icon[feed.id] && store.feeds_icon[feed.id].data" :src="store.feeds_icon[feed.id].data" :width="14" :height="14"/>
+                <img v-if="store.feeds_icon[feed.id] && store.feeds_icon[feed.id].data"
+                     :src="store.feeds_icon[feed.id].data" :width="14" :height="14"/>
               </q-item-section>
               <q-item-section class="folderTitle" style="margin-left:-30px;padding-top: 10px;padding-bottom: 10px;">
-                {{ feed.title  }}
+                {{ feed.title }}
               </q-item-section>
               <q-item-section side>
                 <div class="unreadCount">
-                {{ feed.unread ?? 0 }}
-              </div>
+                  {{ feed.unread ?? 0 }}
+                </div>
               </q-item-section>
             </q-item>
           </q-expansion-item>
@@ -64,7 +71,8 @@
           <q-item-section class="text-subtitle1">Add Folder</q-item-section>
         </q-item> -->
 
-        <layout-left-item-menu :menu-type="MenuType.CreateNewFolder" :show-un-read-count="false" :dense="true" @item-on-click="addFolder()"></layout-left-item-menu>
+        <layout-left-item-menu :menu-type="MenuType.CreateNewFolder" :show-un-read-count="false" :dense="true"
+                               @item-on-click="addFolder()"></layout-left-item-menu>
         <div class="row justify-between items-center folderInfo">
           <span class="folder">Boards</span>
         </div>
@@ -72,7 +80,7 @@
         <layout-left-item-menu :menu-type="MenuType.Innovation" :show-un-read-count="false"></layout-left-item-menu>
 
         <div class="row justify-between items-center"
-          style="height: 48px;width : 100%;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px;position: absolute;bottom: 0">
+             style="height: 48px;width : 100%;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px;position: absolute;bottom: 0">
           <div class="row justify-start items-center">
             <img style="margin-right: 8px;width: 12px;height: 12px" src="../assets/menu/setting.svg">
 
@@ -85,7 +93,7 @@
       </q-drawer>
 
       <q-page-container class="container">
-        <router-view />
+        <router-view/>
       </q-page-container>
 
     </div>
@@ -93,11 +101,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onUnmounted, watch } from 'vue';
-import { useQuasar } from 'quasar';
-import { useRouter, useRoute } from 'vue-router';
-import { useIsMobile } from '../utils/utils';
-import { useRssStore } from '../stores/rss';
+import {defineComponent, ref, onMounted, onUnmounted, watch} from 'vue';
+import {useQuasar} from 'quasar';
+import {useRouter, useRoute} from 'vue-router';
+import {useIsMobile} from '../utils/utils';
+import {useRssStore} from 'stores/rss';
 
 import AddFeedDialog from '../components/AddFeedDialog.vue';
 import {
@@ -107,12 +115,13 @@ import {
   EntriesQueryRequest,
   Feed
 } from '../types';
-import { create_category } from '../api/api';
-import { EntryStatus } from '../types';
-import { getPageRSSHub } from '../utils/radar'
-import { defaultRules } from '../utils/radar-rules';
+import {create_category} from '../api/api';
+import {EntryStatus} from '../types';
+import {getPageRSSHub} from '../utils/radar'
+import {defaultRules} from '../utils/radar-rules';
 import SearchView from 'components/rss/SearchView.vue';
 import LayoutLeftItemMenu from 'components/LayoutLeftItemMenu.vue'
+
 export default defineComponent({
   name: 'MainLayout',
 
@@ -249,12 +258,12 @@ export default defineComponent({
       console.log(store.menu_choice)
       if (type == MenuType.Feed) {
         store.get_entries(
-          new EntriesQueryRequest({ limit: 50, offset: 0, feed_id: value })
+          new EntriesQueryRequest({limit: 50, offset: 0, feed_id: value})
         );
         goto('/')
       } else if (type == MenuType.Category) {
         store.get_entries(
-          new EntriesQueryRequest({ limit: 50, offset: 0, category_id: value })
+          new EntriesQueryRequest({limit: 50, offset: 0, category_id: value})
         );
         goto('/')
       } else if (type == MenuType.Today) {
@@ -285,7 +294,7 @@ export default defineComponent({
       }).onOk(async (data: string) => {
         console.log('>>>> OK, received', data);
 
-        await create_category({ title: data } as CategoryRequest);
+        await create_category({title: data} as CategoryRequest);
         await store.refresh_category_and_feeds();
       });
     };
@@ -358,24 +367,24 @@ export default defineComponent({
 .mainlayout {
   position: absolute;
 
-  .search-view{
+  .search-view {
     margin: 16px 16px 8px;
-    width : calc(100% - 32px)
+    width: calc(100% - 32px)
   }
 }
 
 
 .itemActiveStyle {
-    color: #FF8642;
-    // background: #F2C037
-  }
+  color: #FF8642;
+  // background: #F2C037
+}
 
 .showDialog {
   filter: blur(2px);
   transform: translate3d(0px, 0px, -10px) rotateX(5deg);
   transform-origin: 0px center;
   transition: transform 0.4s cubic-bezier(0.6, 0, 0.2, 1) 0s,
-    filter 0.4s ease 0s;
+  filter 0.4s ease 0s;
 }
 
 // @media (min-width: 1200px) {
@@ -431,19 +440,18 @@ export default defineComponent({
 }
 
 .unreadCount {
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 12px;
-    text-align: center;
-    color: #847C77;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 12px;
+  text-align: center;
+  color: #847C77;
 
-    background: rgba(26, 19, 15, 0.05);
-    padding:2px 8px;
-    border-radius: 8px;
-  }
-
+  background: rgba(26, 19, 15, 0.05);
+  padding: 2px 8px;
+  border-radius: 8px;
+}
 
 .rotate {
   animation: aniRotate 0.8s linear infinite;
@@ -500,7 +508,7 @@ export default defineComponent({
 }
 
 .folder-extension-margin-none {
-  width:260px;
+  width: 260px;
   height: 36px;
   padding: 0;
   // background-color: red;

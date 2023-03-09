@@ -2,19 +2,19 @@
   <div class="folder-setting-root justify-start items-center">
     <div class="top-layout row justify-between items-center">
       <span class="text-title">Organize Folders</span>
-      <div class="row justify-end items-center">
-        <img class="icon-end" src="../assets/menu/input.svg">
-        <img class="icon-end" src="../assets/menu/output.svg">
-      </div>
+<!--      <div class="row justify-end items-center">-->
+<!--        <img class="icon-end" src="../assets/menu/input.svg">-->
+<!--        <img class="icon-end" src="../assets/menu/output.svg">-->
+<!--      </div>-->
     </div>
     <div class="selected-layout row justify-start items-center">
-      <q-select borderless dense class="select-view" v-model="folderRef" :options="folderOptions"
+      <q-select borderless dense class="select-view" v-model="folderRef" :options="folderOptionsRef"
                 @update:model-value="folderChanged"/>
       <search-view class="search-view" placeholder="Search Feeds Name/URL" @onSearch="searchChanged"/>
     </div>
     <feed-title/>
     <q-list>
-      <feed-item :key="item.id" v-for="item in feedStore.allFeeds" :feed="item"/>
+      <feed-item :key="item.feed.id" v-for="item in feedStore.allFeeds" :feed="item.feed"/>
     </q-list>
     <div style="position: absolute;bottom: 20px;width: 100%" class="row justify-center items-center">
       <q-pagination
@@ -38,43 +38,41 @@
 <script lang="ts" setup>
 
 import SearchView from 'components/rss/SearchView.vue';
-import {watch, onUnmounted, ref} from 'vue';
+import {watch, ref} from 'vue';
 import {useRssStore} from 'stores/rss';
 import FeedItem from 'components/rss/FeedItem.vue';
 import FeedTitle from 'components/rss/FeedTitle.vue';
 import {useFeedStore} from 'stores/feedStore';
 
 const store = useRssStore()
-const folderOptions: string[] = store.categories.map((value) => {
-  return value.title
-})
-folderOptions.push('All Folders')
+const folderOptionsRef = ref<string[]>([])
 const folderRef = ref('All Folders')
 const pagination = ref(8)
 const feedStore = useFeedStore()
 let searchData = '';
 
-feedStore.updateAllFeeds(folderRef.value,searchData)
+updateData()
 
-onUnmounted(() => {
-  feedStore.clear()
-})
+function updateData(){
+  folderOptionsRef.value = store.categories.map((value) => {
+    return value.title
+  })
+  folderOptionsRef.value.push('All Folders')
+  feedStore.updateAllFeeds(folderRef.value,searchData)
+}
 
 function folderChanged(title: string) {
   folderRef.value = title;
   feedStore.updateAllFeeds(folderRef.value,searchData)
-  feedStore.unselectedAll()
 }
 
 function searchChanged(data: string) {
   searchData = data
   feedStore.updateAllFeeds(folderRef.value,searchData)
-  feedStore.unselectedAll()
 }
 
-watch(() => feedStore.selectedFeeds, () => {
-  console.log(feedStore.selectedFeeds)
-  console.log(feedStore.allFeeds)
+watch(() => [store.categories,store.feeds],()=> {
+  updateData()
 },{
   deep : true,
   immediate : true

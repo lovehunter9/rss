@@ -2,10 +2,23 @@ import {defineStore} from 'pinia';
 import {Feed,} from 'src/types';
 import {useRssStore} from 'stores/rss';
 
+export class SelectedFeed{
+  feed : Feed
+  selected : boolean;
+
+  constructor(feed: Feed) {
+    this.feed = feed;
+    this.selected = false;
+  }
+
+  setSelected(isSelected : boolean){
+    this.selected = isSelected;
+  }
+}
+
 export type FeedTemp = {
   status: boolean | null;
-  allFeeds: Feed[];
-  selectedFeeds: Feed[];
+  allFeeds: SelectedFeed[];
 };
 
 export const useFeedStore = defineStore('feedStore', {
@@ -22,87 +35,80 @@ export const useFeedStore = defineStore('feedStore', {
   actions: {
     updateAllFeeds(feedTitle: string, searchData: string) {
       const ssrStore = useRssStore()
-      if (feedTitle === 'All Folders'){
-        this.allFeeds = ssrStore.feeds;
-        console.log(this.allFeeds)
-        return;
-      }
-      const selectedFeeds = ssrStore.feeds.filter((feed) => {
-        return feed.category.title == feedTitle;
-      })
-      if (searchData) {
-        const finalFeeds = selectedFeeds.filter((feed) => {
-          return feed.title.concat(searchData) || feed.feed_url.concat(searchData);
+      let filterFeeds = []
+      if (feedTitle === 'All Folders') {
+        filterFeeds = ssrStore.feeds;
+      } else {
+        filterFeeds = ssrStore.feeds.filter((feed) => {
+          return feed.category.title == feedTitle;
         })
-        this.allFeeds = finalFeeds ? finalFeeds : []
-        return
       }
-      this.allFeeds = selectedFeeds ? selectedFeeds : []
+      if (searchData && filterFeeds) {
+        const finalFeeds = filterFeeds.filter((feed) => {
+          return feed.title.search(searchData) !== -1 || feed.feed_url.search(searchData) !== -1;
+        })
+        this.allFeeds = finalFeeds ? finalFeeds.map((feed) => {
+          return new SelectedFeed(feed)
+        }) : []
+      } else {
+        this.allFeeds = filterFeeds ? filterFeeds.map((feed) => {
+          return new SelectedFeed(feed)
+        }) : []
+      }
     },
-    addSelectedFeed(feed: Feed) {
-      console.log('add')
-      const find = this.selectedFeeds.find((value) => {
-        return value.id === feed.id
+    updateOneFeedStatus(feedId: number,status : boolean) {
+      const find = this.allFeeds.find((value) => {
+        return value.feed.id === feedId
       });
-      if (!find){
-        this.selectedFeeds.push(feed)
+      if (find) {
+        find.setSelected(status)
         this._updateState()
       }
     },
-    removeSelectedFeed(feed: Feed) {
-      console.log('remove')
+    async removeFeed(feedId: number) {
       let feedIndex = -1;
-      this.selectedFeeds.forEach((value,index) => {
-        if (value.id === feed.id) {
+      this.allFeeds.forEach((value, index) => {
+        if (value.feed.id === feedId) {
           feedIndex = index
         }
       });
       console.log(feedIndex)
-      if (feedIndex != -1){
-        this.selectedFeeds.splice(feedIndex, 1);
-        this._updateState()
-      }
-    },
-    removeFeed(feed: Feed){
-      let feedIndex = -1;
-      this.allFeeds.forEach((value,index) => {
-        if (value.id === feed.id) {
-          feedIndex = index
-        }
-      });
-      console.log(feedIndex)
-      if (feedIndex != -1){
+      if (feedIndex != -1) {
         this.allFeeds.splice(feedIndex, 1);
         this._updateState()
+        const store = useRssStore()
+        await store.remove_local_feed(feedId)
       }
-      this.removeSelectedFeed(feed)
     },
     _updateState() {
-      if (this.selectedFeeds.length === 0) {
+      const list = this.allFeeds.filter((feed) => {
+        return feed.selected
+      })
+      if (list.length === 0){
         this.status = false
         console.log(this.status)
-        return
+        return;
       }
-      if (this.selectedFeeds.length === this.allFeeds.length) {
-        this.status = true
+      if (list.length === this.allFeeds.length){
+        this.status = true;
         console.log(this.status)
         return;
       }
       this.status = null
       console.log(this.status)
     },
+    getSelectedFeeds() : Feed[]{
+      return this.allFeeds.filter((feed) => feed.selected).map((feed) => feed.feed)
+    },
     clear() {
-      this.selectedFeeds = []
       this.allFeeds = []
       this.status = false;
     },
-    unselectedAll() {
-      this.selectedFeeds = []
-      this.status = false;
+    updateAllFeedStatus(status : boolean) {
+      this.allFeeds.forEach((feed) => {
+        feed.setSelected(status)
+      })
+      this._updateState()
     },
-    selectedAll() {
-      this.selectedFeeds= this.allFeeds.concat([]);
-      this.status = true;
-    }
   }
 });
