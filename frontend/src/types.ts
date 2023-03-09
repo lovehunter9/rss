@@ -7,7 +7,36 @@ export enum MenuType {
   Unread = 5,
   Today = 6,
   ReadLater = 7,
+  CreateNewFolder = 8,
+  Innovation = 9
 }
+
+export const menuTypeName = (menuType: MenuType) => {
+  let menuTypeName = '';
+  switch (menuType) {
+    case MenuType.Discover:
+      menuTypeName = 'Discover';
+      break;
+    case MenuType.Today:
+      menuTypeName = 'Today';
+      break;
+    case MenuType.Unread:
+      menuTypeName = 'Unread';
+      break;
+    case MenuType.ReadLater:
+      menuTypeName = 'Read Later';
+      break;
+    case MenuType.CreateNewFolder:
+      menuTypeName = 'Create New Folder';
+      break
+    case MenuType.Innovation:
+      menuTypeName = 'Innovation';
+      break
+    default:
+      break;
+  }
+  return menuTypeName;
+};
 
 export class MenuChoice {
   type: MenuType = MenuType.Empty;

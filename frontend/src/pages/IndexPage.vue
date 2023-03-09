@@ -36,7 +36,7 @@ import { EntryStatus, MenuType, Entry } from 'src/types';
 import { onMounted, ref, watch } from 'vue';
 import EntryView from 'components/rss/EntryView.vue';
 import { newsBus, newsBusMessage } from 'src/utils/utils';
-import { useRouter,useRoute } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import ItemView from 'components/rss/NewsView.vue';
 
 const store = useRssStore();
@@ -58,6 +58,7 @@ watch(() => store.menu_choice, (newValue) => {
 
 onMounted(() => {
   updateUI();
+
   newsBus.on(newsBusMessage.pre, () => {
     if (selectIndex.value <= 0) {
       return
@@ -136,26 +137,29 @@ const splitterModel = ref(400)
 const item = ref<Entry | undefined>()
 
 watch(
-      () => Route.params.entry_id,
-      (newValue, oldValue) => {
-        console.log('newValue:', newValue, oldValue);
-        console.log(Route.params);
-        if (newValue == oldValue) {
-          return;
-        }
+  () => Route.params.entry_id,
+  (newValue, oldValue) => {
+    console.log('newValue:', newValue, oldValue);
+    console.log(Route.params);
+    if (newValue == oldValue) {
+      return;
+    }
 
-        let entry_id = Number(newValue);
-        let entry = store.get_local_entry(entry_id);
-        if (entry) {
-          if (entry.status != EntryStatus.Read) {
-            store.mark_entry_read(entry_id);
-          }
-          item.value = entry;
-        } else {
-          item.value = undefined
-        }
+    let entry_id = Number(newValue);
+    let entry = store.get_local_entry(entry_id);
+    item.value = undefined
+    if (entry) {
+      if (entry.status != EntryStatus.Read) {
+        store.mark_entry_read(entry_id);
       }
-    );
+      setTimeout(() => {
+        item.value = entry;
+      }, 0);
+    } else {
+      selectIndex.value = -1
+    }
+  }
+);
 
 </script>
 
