@@ -1,5 +1,5 @@
 <template>
-  <div class="feed-root row items-center" @click="onClick">
+  <div class="feed-root row items-center">
     <q-checkbox size="xs" class="check-box" v-model="selection" color="orange" @update:model-value="onSelected"/>
     <div class="text-layout row items-center">
       <div class="col row">
@@ -38,10 +38,6 @@ watch(() => feedStore.status, (value) => {
     selection.value = value
   }
 })
-
-function onClick() {
-  selection.value = !selection.value
-}
 
 function onSelected(value: boolean) {
   console.log('onSelected onSelected')
