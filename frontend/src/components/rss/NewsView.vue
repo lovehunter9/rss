@@ -40,7 +40,7 @@ import {
 } from 'vue';
 import { useRssStore } from 'stores/rss';
 import { Entry } from 'src/types';
-import { formatContentHtml, newsBus, newsBusMessage } from '../../utils/utils'
+import { formatContentHtml, newsBus, newsBusMessage } from 'src/utils/utils'
 
 export default defineComponent({
   name: 'ItemView',

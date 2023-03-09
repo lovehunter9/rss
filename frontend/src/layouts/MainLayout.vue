@@ -113,7 +113,6 @@ import { getPageRSSHub } from '../utils/radar'
 import { defaultRules } from '../utils/radar-rules';
 import SearchView from 'components/rss/SearchView.vue';
 import LayoutLeftItemMenu from 'components/LayoutLeftItemMenu.vue'
-
 export default defineComponent({
   name: 'MainLayout',
 
