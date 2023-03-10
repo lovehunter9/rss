@@ -55,6 +55,7 @@ export const useFeedStore = defineStore('feedStore', {
           return new SelectedFeed(feed)
         }) : []
       }
+      this._updateState()
     },
     updateOneFeedStatus(feedId: number,status : boolean) {
       const find = this.allFeeds.find((value) => {
