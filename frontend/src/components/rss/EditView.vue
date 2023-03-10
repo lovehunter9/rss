@@ -9,6 +9,7 @@
       debounce="500"
       :placeholder="placeholder"
       autocomplete="off"
+      :readonly = 'isReadOnly'
     />
   </div>
 </template>
@@ -22,6 +23,11 @@ const  props = defineProps({
     type : String,
     default : '',
     require : false
+  },
+  isReadOnly : {
+    type : Boolean,
+    default : false,
+    require : false,
   },
   placeholder: {
     type: String,

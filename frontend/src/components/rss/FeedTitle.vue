@@ -29,7 +29,7 @@
 
 import {ref, watch} from 'vue';
 import {useFeedStore} from 'stores/feedStore';
-import FeedEditDialog from 'components/dialog/FeedEditDialog.vue';
+import MultiFeedEditDialog from 'components/dialog/MultiFeedEditDialog.vue';
 import FeedDeleteDialog from 'components/dialog/FeedDeleteDialog.vue';
 import {useQuasar} from 'quasar';
 
@@ -42,8 +42,10 @@ const feedStore = useFeedStore()
 function editFeed() {
   console.log('edit')
   $q.dialog({
-    component: FeedEditDialog,
-    componentProps: {}
+    component: MultiFeedEditDialog,
+    componentProps: {
+      feeds : feedStore.getSelectedFeeds()
+    }
   }).onOk(() => {
     //Do Nothing
   }).onCancel(() => {
