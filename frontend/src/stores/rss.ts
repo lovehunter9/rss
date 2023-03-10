@@ -43,7 +43,7 @@ export type DataState = {
 export const useRssStore = defineStore('rss', {
   state: () => {
     return {
-      url: 'http://127.0.0.1:8080',
+      url: '',//'http://127.0.0.1:8080',
       menu_choice: {
         type: MenuType.Empty,
         value: 0,
@@ -253,5 +253,9 @@ export const useRssStore = defineStore('rss', {
       this.clear_entries();
       this.menu_choice = choice;
     },
+
+    setUrl (new_url:string) {
+      this.url = new_url;
+    }
   },
 });

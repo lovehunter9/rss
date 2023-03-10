@@ -92,7 +92,19 @@ module.exports = configure(function (ctx) {
         type: 'http'
       },
       port: 8100,
-      open: true // opens browser window automatically
+      open: true, // opens browser window automatically
+      proxy: {
+        '/api':{
+          target: 'http://127.0.0.1:8080',//代理地址，这里设置的地址会代替axios中设置的baseURL
+          changeOrigin: true,// 如果接口跨域，需要进行这个参数配置
+          pathRewrite:{
+            '^/api': 'api'
+          }
+          //ws: true, // proxy websockets
+          //pathRewrite方法重写url
+
+      }
+      }
     },
 
     // https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js#Property%3A-framework
