@@ -1,63 +1,90 @@
 <template>
   <div class="feed-root row items-center">
-    <q-checkbox dense size="md" class="check-box" v-model="selection" color="orange" @update:model-value="onSelected"/>
+    <q-checkbox dense size="md" v-model="selection" color="orange" @update:model-value="onSelected"/>
+
     <div class="text-layout row items-center">
       <div class="col row">
-        <img class="feed-icon" :src="store.feeds_icon[feed.id].data">
-        <span class="text" style="margin-left: 9px">{{ feed.title }}</span>
+        <q-img class="feed-icon" :src="imgRef" v-show="imgRef"/>
+        <div class="column justify-start items-start"  style="margin-left: 10px">
+          <span class="text-title">{{ first }}</span>
+          <span class="text-url" v-show="second">{{ second }}</span>
+        </div>
       </div>
-      <span class="col text">{{ feed.category.title }}</span>
-      <span class="col-3 text">{{ getLatestEntryTime() }}</span>
+      <span class="col text" style="margin-left:8px">{{ third }}</span>
+      <span class="col-3 text">{{ fourth }}</span>
     </div>
+
     <img class="modify-icon" src="../../assets/menu/modify.svg" @click="editFeed">
     <img class="delete-icon" src="../../assets/menu/delete.svg" @click="deleteFeed">
   </div>
+  <q-separator inset/>
 </template>
 
 <script setup lang="ts">
 
 import {PropType, ref, watch} from 'vue';
 import {useRssStore} from 'stores/rss';
-import {useFeedStore} from 'stores/feedStore';
+import {useOrganizeStore} from 'stores/organize';
 import {useQuasar} from 'quasar';
 import FeedDeleteDialog from 'components/dialog/FeedDeleteDialog.vue';
-import {getPastTime, utcToStamp} from 'src/utils/utils';
-import {Feed} from 'src/types';
 import FeedEditDialog from 'components/dialog/FeedEditDialog.vue';
-
+import {BaseOption, ORGANIZE_TYPE} from 'stores/organizeConfig';
+import {Feed,Category} from 'src/types';
 
 const props = defineProps({
-  feed: {
-    type: Object as PropType<Feed>,
+  data: {
+    type: Object as PropType<BaseOption<any>>,
     require: true
   }
 })
 
 const $q = useQuasar()
 const store = useRssStore()
-const feedStore = useFeedStore()
+const organizeStore = useOrganizeStore()
+const isFeed = ref(organizeStore.organizeData.type === ORGANIZE_TYPE.FEED);
+const first = ref();
+const second = ref();
+const third = ref();
+const fourth = ref();
+const imgRef = ref()
+if (props.data) {
+  if (isFeed.value) {
+    imgRef.value = store.feeds_icon[(props.data.data as Feed).id].data;
+    first.value = (props.data.data as Feed).title
+    second.value =  (props.data.data as Feed).feed_url
+    third.value =  (props.data.data as Feed).category.title
+    fourth.value = (props.data.data as Feed).id
+  }else {
+    first.value = (props.data.data as Category).title
+    third.value =  (props.data.data as Category).feeds.length
+    fourth.value = (props.data.data as Category).id
+  }
+}
 
 const selection = ref<boolean>(false)
 
-watch(() => feedStore.status, (value) => {
+watch(() => organizeStore.organizeData.status, (value) => {
   if (value != null) {
     selection.value = value
   }
+}, {
+  deep: true,
+  immediate: true
 })
 
 function onSelected(value: boolean) {
-  if (!props.feed) {
+  if (!props.data) {
     return
   }
-  feedStore.updateOneFeedStatus(props.feed.id,value)
+  organizeStore.setSelected(props.data.getId(), value)
 }
 
-function editFeed(){
+function editFeed() {
   console.log('edit')
   $q.dialog({
     component: FeedEditDialog,
     componentProps: {
-      feed : props.feed
+      feed: props.data
     }
   }).onOk(() => {
     //Do Nothing
@@ -74,9 +101,9 @@ function deleteFeed() {
   $q.dialog({
     component: FeedDeleteDialog,
     componentProps: {}
-  }).onOk(async() => {
-    if (props.feed) {
-      await feedStore.removeFeed(props.feed.id)
+  }).onOk(async () => {
+    if (props.data) {
+      await organizeStore.delete(props.data.getId())
     }
   }).onCancel(() => {
     console.log('Cancel');
@@ -87,7 +114,7 @@ function deleteFeed() {
 }
 
 function getLatestEntryTime(): string {
-  if (props.feed) {
+  if (props.data) {
     // let list : Entry[] = props.feed.entries
     // console.log(props.feed)
     // for (let i = 0; i < list.length; i++) {
@@ -99,7 +126,7 @@ function getLatestEntryTime(): string {
     // }
     // return getPastTime(new Date, utcToStamp(list[0].created_at));
 
-    return props.feed.id.toString()
+    return 'sss'
   }
   return 'error'
 }
@@ -110,33 +137,38 @@ function getLatestEntryTime(): string {
 
 .feed-root {
   width: 100%;
-  height: 44px;
-
-  .check-box {
-    margin-left: 16px;
-  }
+  height: auto;
+  padding: 16px;
 
   .text-layout {
-    padding-left: 17px;
-    padding-right: 9px;
-    width: calc(100% - 120px);
+    width: calc(100% - 90px);
+    padding-left: 8px;
 
     .feed-icon {
-      width: 16px;
-      height: 16px;
+      margin-left: 10px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%
     }
 
-    .text {
+    .text-title {
       font-family: 'Roboto';
       font-style: normal;
       font-weight: 400;
       font-size: 12px;
+      max-width: 400px;
       line-height: 14px;
       color: #1A130F;
       white-space: nowrap;
       text-overflow: ellipsis;
       text-overflow: ellipsis;
       overflow: hidden;
+    }
+
+    .text-url {
+      @extend .text-title;
+      color: #857C77;
+      margin-top: 4px;
     }
   }
 
@@ -147,7 +179,6 @@ function getLatestEntryTime(): string {
   }
 
   .delete-icon {
-    margin-right: 16px;
     width: 20px;
     height: 20px;
   }

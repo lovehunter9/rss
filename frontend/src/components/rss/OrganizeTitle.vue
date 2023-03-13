@@ -1,16 +1,16 @@
 <template>
-  <div class="feed-root row items-center">
-    <q-checkbox dense indeterminate-value="null" size="md" class="check-box" v-model="selection" color="orange"
+  <div class="feed-root row justify-start items-center">
+    <q-checkbox dense indeterminate-value="null" size="md" v-model="selection" color="orange"
                 @update:model-value="onSelected"/>
-    <div class="text-layout row items-center" v-if="feedStore.status === false">
-      <span class="text col">Feed</span>
-      <span class="col text">Folder</span>
+    <div class="text-layout row items-center" v-if="organizeStore.organizeData.status === false">
+      <span class="text-type col">{{ organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'Feeds' : 'Folders' }}</span>
+      <span class="col text">{{ organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'Folders' : 'Feeds' }}</span>
       <span class="col-3 text">Last Update</span>
     </div>
-    <div class="text-end" v-if="feedStore.status === false">Option</div>
+    <div class="text-end" v-if="organizeStore.organizeData.status === false">Option</div>
     <div class="selection-layout row justify-between items-center" v-else>
-      <span class="text col">Selected {{ feedStore.getSelectedFeeds().length }} of {{ feedStore.allFeeds.length }}</span>
-      <div class="row">
+      <span class="text col">Selected {{ organizeStore.getSelectedList().length }} of {{ organizeStore.organizeData.dataList.length }}</span>
+      <div class="row items-center">
         <q-btn flat dense class="selected-button row justify-start items-center" @click="editFeed">
           <img class="button-icon" src="../../assets/menu/reorganize.svg"/>
           <div class="button-text">Reorganize</div>
@@ -28,23 +28,24 @@
 <script setup lang="ts">
 
 import {ref, watch} from 'vue';
-import {useFeedStore} from 'stores/feedStore';
+import {useOrganizeStore} from 'stores/organize';
 import MultiFeedEditDialog from 'components/dialog/MultiFeedEditDialog.vue';
 import FeedDeleteDialog from 'components/dialog/FeedDeleteDialog.vue';
 import {useQuasar} from 'quasar';
+import {ORGANIZE_TYPE} from 'stores/organizeConfig';
 
 const $q = useQuasar()
 
 const selection = ref<boolean | null>(false)
 
-const feedStore = useFeedStore()
+const organizeStore = useOrganizeStore()
 
 function editFeed() {
   console.log('edit')
   $q.dialog({
     component: MultiFeedEditDialog,
     componentProps: {
-      feeds : feedStore.getSelectedFeeds()
+      feeds : organizeStore.getSelectedList()
     }
   }).onOk(() => {
     //Do Nothing
@@ -62,8 +63,8 @@ function deleteFeed() {
     component: FeedDeleteDialog,
     componentProps: {}
   }).onOk(async () => {
-    await feedStore.getSelectedFeeds().forEach((feed) => {
-       feedStore.removeFeed(feed.id)
+    await organizeStore.getSelectedList().forEach((value) => {
+       organizeStore.delete(value.id)
     })
   }).onCancel(() => {
     console.log('Cancel');
@@ -74,11 +75,14 @@ function deleteFeed() {
 }
 
 function onSelected(value: boolean) {
-  feedStore.updateAllFeedStatus(value)
+  organizeStore.setListSelected(value)
 }
 
-watch(() => feedStore.status, (value) => {
+watch(() => organizeStore.organizeData.status, (value) => {
   selection.value = value
+},{
+  deep : true,
+  immediate : true
 })
 
 </script>
@@ -88,19 +92,16 @@ watch(() => feedStore.status, (value) => {
 .feed-root {
   width: 100%;
   height: 53px;
-
-  .check-box {
-    margin-left: 16px;
-  }
+  padding-left: 16px;
+  padding-right: 16px;
 
   .text-layout {
-    padding-left: 17px;
-    padding-right: 9px;
-    width: calc(100% - 120px);
+    width: calc(100% - 90px);
 
-    .feed-icon {
-      width: 16px;
-      height: 16px;
+    .text-type{
+      @extend .text;
+      margin-left:10px;
+      padding-left:8px;
     }
 
     .text {
@@ -112,21 +113,14 @@ watch(() => feedStore.status, (value) => {
       color: #847C77;
       white-space: nowrap;
       text-overflow: ellipsis;
-      text-overflow: ellipsis;
       overflow: hidden;
     }
 
   }
 
   .selection-layout {
-    padding-left: 17px;
-    padding-right: 9px;
-    width: calc(100% - 40px);
-
-    .feed-icon {
-      width: 16px;
-      height: 16px;
-    }
+    width: calc(100% - 25px);
+    padding-left: 18px;
 
     .text {
       font-family: 'Roboto';
@@ -175,11 +169,9 @@ watch(() => feedStore.status, (value) => {
     color: #847C77;
     white-space: nowrap;
     text-overflow: ellipsis;
-    text-overflow: ellipsis;
     overflow: hidden;
     text-align: end;
-    width: 80px;
-    padding-right: 16px
+    width: 65px;
   }
 }
 
