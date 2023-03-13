@@ -1,21 +1,23 @@
 <template>
   <div class="feed-root row items-center">
-    <q-checkbox dense size="md" v-model="selection" color="orange" @update:model-value="onSelected"/>
+    <q-checkbox dense size="md" v-model="selection" color="orange" @update:model-value="onSelected"
+                v-show="data.getType() === ORGANIZE_TYPE.FEED"/>
 
-    <div class="text-layout row items-center">
-      <div class="col row">
+    <div class="row items-center"
+         :class="data.getType() === ORGANIZE_TYPE.FEED ? 'feed-text-layout' : 'folder-text-layout'">
+      <div class="row" style="flex: 15">
         <q-img class="feed-icon" :src="imgRef" v-show="imgRef"/>
-        <div class="column justify-start items-start"  style="margin-left: 10px">
+        <div class="column justify-start items-start">
           <span class="text-title">{{ first }}</span>
           <span class="text-url" v-show="second">{{ second }}</span>
         </div>
       </div>
-      <span class="col text" style="margin-left:8px">{{ third }}</span>
-      <span class="col-3 text">{{ fourth }}</span>
+      <span class="text" style="margin-left:8px;flex: 12" v-show="!parent">{{ third }}</span>
+      <span class="text" style="flex: 8" v-show="!parent">{{ fourth }}</span>
     </div>
 
-    <img class="modify-icon" src="../../assets/menu/modify.svg" @click="editFeed">
-    <img class="delete-icon" src="../../assets/menu/delete.svg" @click="deleteFeed">
+    <img class="modify-icon" src="../../assets/menu/modify.svg" @click="edit">
+    <img class="delete-icon" src="../../assets/menu/delete.svg" @click="remove">
   </div>
   <q-separator inset/>
 </template>
@@ -25,82 +27,121 @@
 import {PropType, ref, watch} from 'vue';
 import {useRssStore} from 'stores/rss';
 import {useOrganizeStore} from 'stores/organize';
-import {useQuasar} from 'quasar';
-import FeedDeleteDialog from 'components/dialog/FeedDeleteDialog.vue';
+import {QDialogOptions, useQuasar} from 'quasar';
+import FeedDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import FeedEditDialog from 'components/dialog/FeedEditDialog.vue';
-import {BaseOption, ORGANIZE_TYPE} from 'stores/organizeConfig';
-import {Feed,Category} from 'src/types';
+import {BaseOption, OptionalCategory, ORGANIZE_TYPE} from 'stores/organizeConfig';
+import {Category, Feed} from 'src/types';
+import FolderEditDialog from 'components/dialog/FolderEditDialog.vue';
 
 const props = defineProps({
   data: {
     type: Object as PropType<BaseOption<any>>,
     require: true
+  },
+  parent: {
+    type: Object as PropType<OptionalCategory>,
+    require: false,
+    default: null
   }
 })
 
 const $q = useQuasar()
 const store = useRssStore()
 const organizeStore = useOrganizeStore()
-const isFeed = ref(organizeStore.organizeData.type === ORGANIZE_TYPE.FEED);
-const first = ref();
-const second = ref();
-const third = ref();
-const fourth = ref();
+const first = ref()
+const second = ref()
+const third = ref()
+const fourth = ref()
 const imgRef = ref()
+
 if (props.data) {
-  if (isFeed.value) {
+  if (props.data.getType() === ORGANIZE_TYPE.FEED) {
     imgRef.value = store.feeds_icon[(props.data.data as Feed).id].data;
     first.value = (props.data.data as Feed).title
-    second.value =  (props.data.data as Feed).feed_url
-    third.value =  (props.data.data as Feed).category.title
+    second.value = (props.data.data as Feed).feed_url
+    third.value = (props.data.data as Feed).category.title
     fourth.value = (props.data.data as Feed).id
-  }else {
+  } else {
     first.value = (props.data.data as Category).title
-    third.value =  (props.data.data as Category).feeds.length
+    third.value = (props.data.data as Category).feeds.length
     fourth.value = (props.data.data as Category).id
   }
 }
 
 const selection = ref<boolean>(false)
 
-watch(() => organizeStore.organizeData.status, (value) => {
-  if (value != null) {
-    selection.value = value
-  }
-}, {
-  deep: true,
-  immediate: true
-})
+if (props.parent) {
+  watch(() => props.parent.status, (value) => {
+    if (value != null) {
+      selection.value = value
+    }
+  }, {
+    deep: true,
+    immediate: true
+  })
+} else {
+  watch(() => organizeStore.organizeData.status, (value) => {
+    if (value != null) {
+      selection.value = value
+    }
+  }, {
+    deep: true,
+    immediate: true
+  })
+}
 
 function onSelected(value: boolean) {
   if (!props.data) {
     return
   }
-  organizeStore.setSelected(props.data.getId(), value)
+  if (props.parent) {
+    props.parent.setFeedSelected(props.data.getId(),value)
+  } else {
+    organizeStore.setSelected(props.data.getId(), value)
+  }
 }
 
-function editFeed() {
+function edit() {
   console.log('edit')
-  $q.dialog({
-    component: FeedEditDialog,
-    componentProps: {
-      feed: props.data
+  if (props.data) {
+
+    let opts: QDialogOptions;
+    if (organizeStore.organizeData.type === ORGANIZE_TYPE.FEED || props.parent) {
+      opts = {
+        component: FeedEditDialog,
+        componentProps: {
+          feed: props.data.data
+        }
+      }
+    } else {
+      opts = {
+        component: FolderEditDialog,
+        componentProps: {
+          folder: props.data
+        }
+      }
     }
-  }).onOk(() => {
-    //Do Nothing
-  }).onCancel(() => {
-    console.log('Cancel');
-  })
-    .onDismiss(() => {
-      console.log('Dismiss');
-    });
+
+    $q.dialog(opts).onOk(() => {
+      //Do Nothing
+    }).onCancel(() => {
+      console.log('Cancel');
+    })
+      .onDismiss(() => {
+        console.log('Dismiss');
+      });
+  }
+
 }
 
-function deleteFeed() {
+function remove() {
   console.log('delete')
   $q.dialog({
     component: FeedDeleteDialog,
-    componentProps: {}
+    componentProps: {
+      isFeed: props.parent ? true : organizeStore.organizeData.type === ORGANIZE_TYPE.FEED
+    }
   }).onOk(async () => {
     if (props.data) {
       await organizeStore.delete(props.data.getId())
@@ -140,16 +181,42 @@ function getLatestEntryTime(): string {
   height: auto;
   padding: 16px;
 
-  .text-layout {
+  .feed-text-layout {
     width: calc(100% - 90px);
-    padding-left: 8px;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: row;
 
     .feed-icon {
-      margin-left: 10px;
       width: 32px;
       height: 32px;
       border-radius: 50%
     }
+
+    .text-title {
+      font-family: 'Roboto';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 12px;
+      max-width: 260px;
+      line-height: 14px;
+      margin-left: 10px;
+      color: #1A130F;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .text-url {
+      @extend .text-title;
+      color: #857C77;
+      margin-top: 4px;
+    }
+  }
+
+  .folder-text-layout {
+    width: calc(100% - 65px);
 
     .text-title {
       font-family: 'Roboto';
@@ -163,12 +230,6 @@ function getLatestEntryTime(): string {
       text-overflow: ellipsis;
       text-overflow: ellipsis;
       overflow: hidden;
-    }
-
-    .text-url {
-      @extend .text-title;
-      color: #857C77;
-      margin-top: 4px;
     }
   }
 

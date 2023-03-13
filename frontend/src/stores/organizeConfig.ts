@@ -24,11 +24,70 @@ export class BaseOption<T> {
 }
 
 export class OptionalCategory extends BaseOption<Category> {
+
+  status : boolean | null;
+  feeds : OptionalFeed[];
+
+  constructor(data: Category) {
+    super(data);
+    this.status = false;
+    this.feeds = this.data.feeds.map((value) => {
+      return new OptionalFeed(value)
+    })
+  }
+
+  setSelected(isSelected: boolean) {
+    super.setSelected(isSelected);
+  }
+
+  setFeedSelected(id: number,isSelected: boolean) {
+    const find = this.getOptionalFeeds().find((value) => {
+      return value.getId() === id
+    });
+    if (find) {
+      find.setSelected(isSelected)
+      this._updateStatus()
+    }
+  }
+
+  setListSelected(isSelected: boolean): void {
+    this.getOptionalFeeds().forEach((value) => {
+      value.setSelected(isSelected)
+    })
+    this._updateStatus()
+  }
+
+  getSelectedFeed(): Feed[] {
+    return this.getOptionalFeeds().filter((value) => value.selected).map((value) => value.data)
+  }
+
+  protected _updateStatus(): void {
+    const list = this.getOptionalFeeds().filter((value) => {
+      return value.selected
+    })
+    if (list.length === 0) {
+      this.status = false
+      console.log(this.status)
+      return;
+    }
+    if (list.length === this.getOptionalFeeds().length) {
+      this.status = true;
+      console.log(this.status)
+      return;
+    }
+    this.status = null
+    console.log(this.status)
+  }
+
   getId(): number {
     return (this.data as Category).id;
   }
   getType(): string {
     return ORGANIZE_TYPE.CATEGORY
+  }
+
+  getOptionalFeeds() : OptionalFeed[]{
+    return this.feeds;
   }
 }
 

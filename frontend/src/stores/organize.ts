@@ -44,7 +44,6 @@ export const useOrganizeStore = defineStore('organizeStore', {
         this.organizeData = new OrganizeCategory([])
       }
       this.organizeData.updateList(feedTitle,searchData)
-      console.log(this.organizeData.dataList)
     },
   }
 });

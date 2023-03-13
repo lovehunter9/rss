@@ -63,9 +63,9 @@
         @onSearch="searchChanged"
       />
     </div>
-    <feed-title/>
+    <organize-title/>
     <q-list>
-      <feed-item
+      <organize-item
         :key="item.getType() + item.getId()"
         v-for="item in organizeStore.organizeData.dataList"
         :data="item"
@@ -97,8 +97,8 @@
 import SearchView from 'components/rss/SearchView.vue';
 import {ref, watch} from 'vue';
 import {useRssStore} from 'stores/rss';
-import FeedItem from 'components/rss/OrganizeItem.vue';
-import FeedTitle from 'components/rss/OrganizeTitle.vue';
+import OrganizeItem from 'components/rss/OrganizeItem.vue';
+import OrganizeTitle from 'components/rss/OrganizeTitle.vue';
 import {useOrganizeStore} from 'stores/organize';
 import {ORGANIZE_TYPE} from 'stores/organizeConfig';
 
