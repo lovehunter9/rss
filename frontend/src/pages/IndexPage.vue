@@ -3,7 +3,7 @@
     <template v-slot:before>
       <div class="item-list">
         <div class="row justify-end items-center">
-          <img class="icon-read-all" src="../assets/menu/readAll.svg">
+          <img class="icon-read-all" src="../assets/menu/unread.svg">
           <img class="icon-refresh" src="../assets/menu/refresh.svg">
         </div>
         <div class="text-label">{{ labelRef }}</div>
@@ -18,7 +18,7 @@
 
     <template v-slot:after>
       <div class="column items-center justify-center" style="height: 100vh;">
-        <ItemView v-if="item" :item="item" />
+        <news-view v-if="item" :item="item" />
         <div class="text-7A7A7A column items-center justify-center" v-else>
           <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148" />
           {{ 'No item selected.' }}
@@ -37,7 +37,7 @@ import { onMounted, ref, watch } from 'vue';
 import EntryView from 'components/rss/EntryView.vue';
 import { newsBus, newsBusMessage } from 'src/utils/utils';
 import { useRouter, useRoute } from 'vue-router';
-import ItemView from 'components/rss/NewsView.vue';
+import NewsView from 'components/rss/NewsView.vue';
 
 const store = useRssStore();
 const labelRef = ref('')

@@ -10,6 +10,7 @@
       :placeholder="placeholder"
       autocomplete="off"
       :readonly = 'isReadOnly'
+      @update:model-value="onInput"
     />
   </div>
 </template>
@@ -37,6 +38,12 @@ const  props = defineProps({
 })
 
 const inputValue = ref(props.text)
+
+const emit = defineEmits(['input'])
+
+function onInput(value : string){
+  emit('input',value)
+}
 
 </script>
 

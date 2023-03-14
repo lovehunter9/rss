@@ -24,13 +24,11 @@
         menu-self="top left"
         menu-anchor="bottom start"
         :menu-offset="[0, 5]"
-        unelevated
-      >
+        unelevated>
         <template v-slot:label>
           <div
             class="row items-center no-wrap justify-between"
-            style="width: 120px"
-          >
+            style="width: 120px">
             <div class="select-title-item">{{ folderRef }}</div>
           </div>
         </template>
@@ -40,17 +38,11 @@
             :key="contentMode"
             clickable
             v-close-popup
-            @click="folderChanged(contentMode)"
-          >
+            @click="folderChanged(contentMode)">
             <q-item-section>
-              <q-item-label
-                :class="
-                  contentMode === folderRef ? 'selected-item' : 'normal-item'
-                "
-              >
+              <q-item-label :class="contentMode === folderRef ? 'selected-item' : 'normal-item'">
                 {{ contentMode }}
-              </q-item-label
-              >
+              </q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
@@ -60,21 +52,20 @@
       <search-view
         class="search-view"
         placeholder="Search Feeds Name/URL"
-        @onSearch="searchChanged"
-      />
+        @onSearch="searchChanged"/>
     </div>
     <organize-title/>
-    <q-list>
-      <organize-item
-        :key="item.getType() + item.getId()"
-        v-for="item in organizeStore.organizeData.dataList"
-        :data="item"
-      />
-    </q-list>
+    <q-scroll-area :class=" organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'scroll-area-feed' : 'scroll-area-folder'">
+      <q-list>
+        <organize-item
+          :key="item.getType() + item.getId()"
+          v-for="item in organizeStore.organizeData.dataList"
+          :data="item"/>
+      </q-list>
+    </q-scroll-area>
     <div
       style="position: absolute; bottom: 20px; width: 100%"
-      class="row justify-center items-center"
-    >
+      class="row justify-center items-center">
 <!--      <q-pagination-->
 <!--        glossy-->
 <!--        gutter="10px"-->
@@ -207,6 +198,16 @@ watch(
       width: 200px;
       margin-left: 12px;
     }
+  }
+
+  .scroll-area-feed{
+    height: calc(100% - 143px);
+    width: 100%
+  }
+
+  .scroll-area-folder{
+    height: calc(100% - 94px);
+    width: 100%
   }
 }
 
