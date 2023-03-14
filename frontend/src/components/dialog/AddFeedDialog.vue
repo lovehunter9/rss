@@ -13,6 +13,7 @@
           class="select-view"
           :ripple="false"
           no-caps
+          dense
           menu-self="top left"
           menu-anchor="bottom start"
           :menu-offset="[0, 5]"
