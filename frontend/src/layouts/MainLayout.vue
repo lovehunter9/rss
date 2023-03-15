@@ -115,7 +115,7 @@ import {useRoute, useRouter} from 'vue-router';
 import {useIsMobile} from '../utils/utils';
 import {useRssStore} from 'stores/rss';
 
-import {EnteryQueryOrder, EntriesQueryRequest, Entry, EntryStatus, Feed, MenuType} from '../types';
+import {EntriesQueryRequest, Entry, EntryStatus, Feed, MenuType} from '../types';
 import {getPageRSSHub} from '../utils/radar'
 import {defaultRules} from '../utils/radar-rules';
 import SearchView from 'components/rss/SearchView.vue';
@@ -191,7 +191,7 @@ export default defineComponent({
         let entry = store.get_local_entry(entry_id);
         if (entry) {
           if (entry.status != EntryStatus.Read) {
-            store.mark_entry_read(entry_id);
+            store.mark_entry_read(entry_id,EntryStatus.Read);
           }
           item.value = entry;
         } else {

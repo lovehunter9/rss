@@ -33,7 +33,7 @@
               v-close-popup
               @click="folderChanged(folder)">
               <q-item-section>
-                <q-item-label :class="folder === folderRef ? 'selected-item' : 'normal-item'">
+                <q-item-label :class="folder.id === folderRef.id ? 'selected-item' : 'normal-item'">
                   {{ folder.title }}
                 </q-item-label>
               </q-item-section>
@@ -43,7 +43,10 @@
               v-close-popup
               @click="createFolder()">
               <q-item-section>
-                <q-item-label class="normal-item">Create New Folder</q-item-label>
+                <div class="row justify-start items-center">
+                  <img src="../../assets/menu/add.svg" class="icon-add"/>
+                  <q-item-label style="margin-left: 9px" class="selected-item">Create New Folder</q-item-label>
+                </div>
               </q-item-section>
             </q-item>
           </q-list>
@@ -191,6 +194,7 @@ function createFolder() {
     .select-view {
       height: 32px;
       width: 100%;
+      padding-left: 12px;
       border: 1px solid #e0e0e0;
       border-radius: 6px;
 
@@ -204,24 +208,11 @@ function createFolder() {
       }
     }
 
-    .selected-item {
-      font-family: 'Roboto';
-      font-style: normal;
-      font-weight: 400;
-      font-size: 12px;
-      line-height: 12px;
-      color: #FF8642;
+    .icon-add{
+      margin-left: 18px;
+      width: 12px;
+      height: 12px;
     }
-
-    .normal-item {
-      font-family: 'Roboto';
-      font-style: normal;
-      font-weight: 400;
-      font-size: 12px;
-      line-height: 12px;
-      color: #1a130f;
-    }
-
 
     .text-title {
       font-family: 'Roboto';
@@ -266,6 +257,24 @@ function createFolder() {
       color: #7a7a7a;
     }
   }
+}
+
+.selected-item {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 12px;
+  color: #FF8642;
+}
+
+.normal-item {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 12px;
+  color: #1a130f;
 }
 </style>
 

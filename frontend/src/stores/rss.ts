@@ -242,16 +242,16 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async mark_entry_read(entry_id: number) {
+    async mark_entry_read(entry_id: number,status : EntryStatus) {
       try {
         await update_entry_status({
           entry_ids: [entry_id],
-          status: EntryStatus.Read,
+          status,
         });
 
         for (const entry of this.entries) {
           if (entry.id === entry_id) {
-            entry.status = EntryStatus.Read;
+            entry.status = status;
           }
         }
         await this.refresh_feeds_counter();
