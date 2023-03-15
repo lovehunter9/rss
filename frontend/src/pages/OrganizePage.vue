@@ -56,13 +56,14 @@
         @onSearch="searchChanged"/>
     </div>
     <organize-title/>
-    <q-scroll-area :class=" organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'scroll-area-feed' : 'scroll-area-folder'">
-      <q-list>
+    <q-scroll-area :class="organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'scroll-area-feed' : 'scroll-area-folder'">
+      <q-list v-if="organizeStore.organizeData.dataList.length > 0">
         <organize-item
           :key="item.getType() + item.getId()"
           v-for="item in organizeStore.organizeData.dataList"
           :data="item"/>
       </q-list>
+      <empty-view :class="organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'scroll-area-feed' : 'scroll-area-folder'" v-else/>
     </q-scroll-area>
     <div
       style="position: absolute; bottom: 20px; width: 100%"
@@ -93,6 +94,7 @@ import OrganizeItem from 'components/rss/OrganizeItem.vue';
 import OrganizeTitle from 'components/rss/OrganizeTitle.vue';
 import {useOrganizeStore} from 'stores/organize';
 import {ORGANIZE_TYPE} from 'stores/organizeConfig';
+import EmptyView from "components/rss/EmptyView.vue";
 
 const store = useRssStore();
 const folderOptionsRef = ref<string[]>([]);

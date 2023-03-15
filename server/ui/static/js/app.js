@@ -1,6 +1,4 @@
 // OnClick attaches a listener to the elements that match the selector.
-import {updateEntriesStatus} from './updateEntriesStatus'
-
 function onClick(selector, callback, noPreventDefault) {
     let elements = document.querySelectorAll(selector);
     elements.forEach((element) => {
@@ -216,6 +214,25 @@ function handleRefreshAllFeeds() {
     request.execute();
 }
 
+export function updateEntriesStatus(entryIDs, status, callback) {
+    let url = document.body.dataset.entriesStatusUrl;
+    let request = new RequestBuilder(url);
+    request.withBody({entry_ids: entryIDs, status: status});
+    request.withCallback((resp) => {
+        resp.json().then(count => {
+            if (callback) {
+                callback(resp);
+            }
+
+            if (status === 'read') {
+                decrementUnreadCounter(count);
+            } else {
+                incrementUnreadCounter(count);
+            }
+        });
+    });
+    request.execute();
+}
 // Handle save entry from list view and entry view.
 function handleSaveEntry(element) {
     let toasting = !element;
