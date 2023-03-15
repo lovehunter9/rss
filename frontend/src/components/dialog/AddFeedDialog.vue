@@ -53,7 +53,7 @@
         </q-btn-dropdown>
 
         <div class="edit-title">RSS URL</div>
-        <edit-view class="edit-view" placeholder="Enter Rss URL" @input="onInput"/>
+        <edit-view class="edit-view" placeholder="Enter Rss URL" :text="props.text" @input="onInput"/>
       </div>
 
       <div class="row justify-end items-end" style="width: 100%">
@@ -71,7 +71,7 @@
 
 import {Loading, Notify, useDialogPluginComponent, useQuasar} from 'quasar';
 import EditView from 'components/rss/EditView.vue';
-import {ref} from 'vue';
+import {ref,onMounted} from 'vue';
 import {useRssStore} from 'stores/rss';
 import AddFolderDialog from 'components/dialog/AddFolderDialog.vue';
 import {create_feed, get_feeds} from 'src/api/api';
@@ -84,6 +84,19 @@ const $q = useQuasar()
 
 const folderOptionsRef = ref<Category[]>(store.categories ? store.categories : [])
 const folderRef = ref<Category | null>(store.categories ? store.categories[0] : null)
+
+const props = defineProps({
+  text : {
+    type : String,
+    default : '',
+    require : false
+  }
+})
+
+
+onMounted(() => {
+  onInput(props.text)
+})
 
 function onInput(input: string) {
   inputRef.value = input

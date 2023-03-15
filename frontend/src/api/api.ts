@@ -10,6 +10,8 @@ import {
   EntryContent,
   EntriesStatusUpdateRequest,
   FeedIconResponse,
+  SDKQueryRequest,
+  SDKSearchPathResponse,
 } from 'src/types';
 import { useRssStore } from 'src/stores/rss';
 
@@ -252,5 +254,15 @@ export async function get_today(): Promise<EntriesQueryResponse> {
     rssStore.url + '/api/today'
   );
 
+  return data;
+}
+
+// sdk api
+
+export async function sdkSearchFeedsByPath(q:SDKQueryRequest) {
+  const rssStore = useRssStore();
+  const data: SDKSearchPathResponse = await axios.get(
+    rssStore.sdkUrl + '/rss' + q.build()
+  );
   return data;
 }

@@ -461,7 +461,51 @@ export class EntriesQueryRequest {
   }
 }
 
+
+
+export class SDKQueryRequest {
+
+  path?: string
+
+  constructor(props?: Partial<SDKQueryRequest>) {
+    props && Object.assign(this, props);
+  }
+
+  public build(): string {
+    let url = '';
+    if (this.path) {
+      if (url) {
+        url += '&';
+      } else {
+        url += '?';
+      }
+      url += `path=${this.path}`;
+    }
+
+    return url;
+  }
+}
+
 export interface EntriesQueryResponse {
   entries: Entry[];
   total: number;
+}
+
+export interface SDKSearchPathResponse {
+  atomlink: string
+  item: SDKSearchPathItem[]
+  lastBuildDate: string
+  link: string
+  title: string
+  ttl: number
+  updated: string
+  logo?: string
+}
+
+export interface SDKSearchPathItem {
+  author: string
+  description: string
+  link: string
+  pubDate: string
+  title: string
 }

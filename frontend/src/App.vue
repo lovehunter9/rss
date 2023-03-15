@@ -17,6 +17,7 @@ export default defineComponent({
     const base_url = window.location.origin
     console.log(base_url);
     rootStore.setUrl(base_url);
+    rootStore.setSDKUrl(base_url);
 
     console.log('login setup 2');
     return {}

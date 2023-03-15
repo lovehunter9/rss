@@ -2,10 +2,10 @@
   <div class="discover-detail-root">
     <title-commonent backTitle="#blockchain" @back-action="backAction()"/>
     <title-commonent backTitle="#blockchain" v-show="titleViewFixedRef" class="model2" @back-action="backAction()"/>
-    <div class="section-title" style="margin-top:2px">
+    <div class="section-title" style="margin-top:2px" v-if="reletedTopics.length > 0">
       Releted Topics
     </div>
-    <div class="row justify-start">
+    <div class="row justify-start" v-if="reletedTopics.length > 0">
       <q-intersection v-for="item, index in reletedTopics" :key="index">
         <div class="relate-topic-item">
           {{ item.title }}
@@ -22,7 +22,7 @@
         <div class="item-header">
           <div class="row justify-between items-center" style="width:100%;height:48px">
             <div class="item-total-info row items-center justify-start">
-              <img src="../../assets/examples/blocchain_example.png" :width="48" :height="48" />
+              <img :src="getRequireImage(item.logo)" :width="48" :height="48" />
               <div class="item-total">
                 <div class="item-name">
                   {{ item.title }}
@@ -32,11 +32,14 @@
                 </div>
               </div>
             </div>
-            <div class="row justify-center items-center subscribe-btn">
+            <div v-if="!item.isSubsribe" class="row justify-center items-center subscribe-btn" @click="addToFeed(item.subsribeUrl)">
               <img src="../../assets/menu/subsribe.svg" :width="16" :height="16"/>
               <div class="subscribe-title">
                 Subscribe
               </div>
+            </div>
+            <div class="subscribe-title" v-if="item.isSubsribe">
+                Subscribed
             </div>
           </div>
         </div>
@@ -61,8 +64,16 @@
 </template>
 
 <script setup lang='ts'>
+
+import { SDKSearchPathResponse } from 'src/types';
 import { ref } from 'vue';
 import TitleCommonent from '../../components/TitleCommonent.vue'
+import { getRequireImage } from 'src/utils/utils'
+import { useQuasar } from 'quasar';
+import AddFeedDialog from 'components/dialog/AddFeedDialog.vue';
+import { useRssStore } from 'src/stores/rss';
+
+const rssStore = useRssStore()
 
 const emit = defineEmits(['backAction'])
 
@@ -98,96 +109,9 @@ const searchResults = ref([
   {
     title: 'Blockchain News',
     url: 'www.sspai.com',
-    details:[
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      },
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      },
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      }
-    ]
-  },
-  {
-    title: 'Blockchain News',
-    url: 'www.sspai.com',
-    details:[
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      },
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      },
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      }
-    ]
-  },
-  {
-    title: 'Blockchain News',
-    url: 'www.sspai.com',
-    details:[
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      },
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      },
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      }
-    ]
-  },
-  {
-    title: 'Blockchain News',
-    url: 'www.sspai.com',
-    details:[
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      },
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      },
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      }
-    ]
-  },
-  {
-    title: 'Blockchain News',
-    url: 'www.sspai.com',
-    details:[
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      },
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      },
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      }
-    ]
-  },
-  {
-    title: 'Blockchain News',
-    url: 'www.sspai.com',
+    logo: 'examples/blocchain_example.png',
+    subsribeUrl: '',
+    isSubsribe: false,
     details:[
       {
         content: 'Leading source for news, information & resources for the Connected Generation.',
@@ -213,7 +137,49 @@ const floatTitleView = (floatValue: boolean) => {
   titleViewFixedRef.value = floatValue
 }
 
-defineExpose({ floatTitleView });
+const reloadFeed = (feed: SDKSearchPathResponse) => {
+  reletedTopics.value = []
+  const details = feed.item.length > 3 ? feed.item.slice(0,3) : feed.item
+  searchResults.value = [
+   {
+    title: feed.title,
+    url: feed.link,
+    logo: feed.logo ? feed.logo : 'examples/blocchain_example.png',
+    subsribeUrl: feed.atomlink,
+    isSubsribe: rssStore.get_local_feed_by_feed_url(feed.atomlink) !== undefined,
+    details: details.map(e => {
+      return {
+        content: e.title,
+        time: e.pubDate
+      }
+    })
+   }
+  ]
+}
+
+const $q = useQuasar()
+const addToFeed = (url: string) => {
+  $q.dialog({
+        component: AddFeedDialog,
+        componentProps: {
+          text: url
+        }
+      })
+        .onOk(() => {
+          console.log('OK');
+          emit('backAction')
+        })
+        .onCancel(() => {
+          console.log('Cancel');
+        })
+        .onDismiss(() => {
+          console.log('Called on OK or Cancel');
+          //     });
+        })
+}
+
+
+defineExpose({ floatTitleView, reloadFeed});
 
 </script>
 

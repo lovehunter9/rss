@@ -11,6 +11,7 @@ import {
   FeedIconResponse,
   MenuChoice,
   MenuType,
+  SDKQueryRequest,
 } from 'src/types';
 
 import {
@@ -23,10 +24,12 @@ import {
   get_feeds,
   get_today, remove_category, remove_feed,
   update_entry_status,
+  sdkSearchFeedsByPath,
 } from 'src/api/api';
 
 export type DataState = {
   url: string;
+  sdkUrl: string;
   menu_choice: MenuChoice;
   categories: Category[];
   feeds: Feed[];
@@ -45,6 +48,7 @@ export const useRssStore = defineStore('rss', {
   state: () => {
     return {
       url: '',//'http://127.0.0.1:8080',
+      sdkUrl: '',
       menu_choice: {
         type: MenuType.Empty,
         value: 0,
@@ -187,6 +191,10 @@ export const useRssStore = defineStore('rss', {
       return this.feeds.find((feed) => feed.id == id);
     },
 
+    get_local_feed_by_feed_url(feed_url: string): Feed | undefined {
+      return this.feeds.find((feed) => feed.feed_url == feed_url);
+    },
+
     async remove_local_feed(id : number){
       try {
         await remove_feed(id.toString());
@@ -285,8 +293,23 @@ export const useRssStore = defineStore('rss', {
       this.menu_choice = choice;
     },
 
-    setUrl (new_url:string) {
+    setUrl(new_url:string) {
       this.url = new_url;
+    },
+
+    setSDKUrl(new_sdkUrl: string) {
+      this.sdkUrl = new_sdkUrl;
+    },
+
+    async sdkSearchFeed(path: string) {
+      try {
+        const request = new SDKQueryRequest({path})
+        const result = await sdkSearchFeedsByPath(request)
+        console.log(result);
+
+        return result
+      } catch (error) {
+      }
     }
   },
 });

@@ -12,7 +12,7 @@
     <!-- <div class="search-detail"> -->
 
       <!-- <search-view placeholder="Search by topic,website,Rss URL" class="detail-width search-view" @onSearch="onSearch"/> -->
-      <discover-search-view class="detail-width search-view"></discover-search-view>
+      <discover-search-view class="detail-width search-view" @show-detail="showSearchResultDetail"></discover-search-view>
       <!-- <q-scroll-area v-if="!showDetail" class="confirmDialogArea"> -->
         <div class="row justify-start confirmDialogArea" v-if="!showDetail">
           <q-intersection v-for="item, index in searchDetails" :key="index" class="example-item">
@@ -26,7 +26,7 @@
         </div>
       <!-- </q-scroll-area> -->
 
-    <discover-detail v-if="showDetail" class="descover-detail detail-width" ref="discoverDetailRef" @back-action="backAction()" />
+    <discover-detail v-show="showDetail" class="descover-detail detail-width" ref="discoverDetailRef" @back-action="backAction()" />
     <!-- </div> -->
   </div>
   <q-scroll-observer @scroll="onScroll" />
@@ -38,6 +38,7 @@
 
 // import {ref} from 'vue';
 // import SearchView from 'components/rss/SearchView.vue';
+import { SDKSearchPathResponse } from 'src/types';
 import { ref } from 'vue';
 import './discover/css/discover.scss'
 import DiscoverDetail from './discover/DiscoverDetail.vue';
@@ -115,6 +116,13 @@ const backAction = ()=> {
   showDetail.value = false
 }
 
+const showSearchResultDetail = (detail:SDKSearchPathResponse) => {
+  console.log(detail);
+  console.log(discoverDetailRef);
+  discoverDetailRef.value.reloadFeed(detail)
+  showContentDetail()
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -131,8 +139,8 @@ const backAction = ()=> {
 
   .confirmDialogArea {
 
-    width :calc(100% - 230px);
-    margin-left: 115px;
+    width :calc(100% - 224px);
+    margin-left: 112px;
     margin-top: 24px;
     // background-color: red;
     .example-item {

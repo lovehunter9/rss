@@ -10,7 +10,7 @@
         <q-item v-bind="scope.itemProps" @click="itemClick(scope.opt)">
           <q-item-section>
             <q-item-label>
-              <span class="optimized_itmes">{{ scope.opt }}</span>
+              <span class="optimized_itmes">{{ scope.opt.title }}</span>
             </q-item-label>
           </q-item-section>
         </q-item>
@@ -29,15 +29,19 @@
 
 <script lang="ts" setup>
 // import { Feed } from 'src/types';
+import { useRssStore } from 'src/stores/rss';
+import { SDKSearchPathResponse } from 'src/types';
 import { ref } from 'vue';
 
 const loading = ref(false);
 
-const options = ref<any[]>([]);
+const options = ref<SDKSearchPathResponse[]>([]);
 
 const model = ref<string>('');
 
 const placeholder = ref('Search by topic,website,Rss URL')
+
+const rssStore = useRssStore()
 
 const filterFn = async (val: string, update: (arg0: () => void) => void, abort: () => void) => {
   if (model.value.length === 0) {
@@ -45,22 +49,30 @@ const filterFn = async (val: string, update: (arg0: () => void) => void, abort: 
     abort()
     return
   }
-  update(() => {
-    options.value = ['111', '222', '333']
+  update(async () => {
+    // options.value = ['111', '222', '333']
+    const result = await rssStore.sdkSearchFeed(model.value)
+    if (result) {
+      options.value = [result]
+    }
+    console.log(result);
   })
 };
 
-const itemClick = (name: string) => {
+const itemClick = (value: SDKSearchPathResponse) => {
   console.log(model.value);
 
-  model.value = name;
+  model.value = '';
   // model.value = undefined
+  emit('showDetail',value)
 }
 
 const setModel = (v: any) => {
   console.log(1111);
   model.value = v
 }
+
+const emit = defineEmits(['showDetail'])
 
 
 </script>
