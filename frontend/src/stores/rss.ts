@@ -14,6 +14,7 @@ import {
 } from 'src/types';
 
 import {
+  entry_bookmark,
   fetch_feed_counter,
   get_categories,
   get_entries,
@@ -204,15 +205,22 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async get_entries(q: EntriesQueryRequest) {
+    async get_entries(q: EntriesQueryRequest,filter ?: (entriesQueryResponse : EntriesQueryResponse) => EntriesQueryResponse ) {
       const rssStore = useRssStore();
 
       try {
         console.log('get_entries ' + rssStore.url + '/api/entries' + q.build());
         const data: EntriesQueryResponse = await get_entries(q);
-
-        this.entries = data.entries;
-        this.entries_total = data.total;
+        if (filter){
+          const response = filter({ entries : data.entries, total : data.total})
+          this.entries = response.entries;
+          this.entries_total = response.total;
+        }else {
+          this.entries = data.entries;
+          this.entries_total = data.total;
+        }
+        console.log(this.entries)
+        console.log(this.entries_total)
       } catch (e) {
         console.log(e);
       }
@@ -234,16 +242,30 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async mark_entry_read(entry_id: number) {
+    async mark_entry_read(entry_id: number,status : EntryStatus) {
       try {
         await update_entry_status({
           entry_ids: [entry_id],
-          status: EntryStatus.Read,
+          status,
         });
 
         for (const entry of this.entries) {
           if (entry.id === entry_id) {
-            entry.status = EntryStatus.Read;
+            entry.status = status;
+          }
+        }
+        await this.refresh_feeds_counter();
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
+    async mark_entry_starred(entry_id: number){
+      try {
+        await entry_bookmark(entry_id);
+        for (const entry of this.entries) {
+          if (entry.id === entry_id) {
+            entry.starred = !entry.starred
           }
         }
         await this.refresh_feeds_counter();

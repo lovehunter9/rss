@@ -33,7 +33,7 @@
               v-close-popup
               @click="folderChanged(folder)">
               <q-item-section>
-                <q-item-label :class="folder === folderRef ? 'selected-item' : 'normal-item'">
+                <q-item-label :class="folder.id === folderRef.id ? 'selected-item' : 'normal-item'">
                   {{ folder.title }}
                 </q-item-label>
               </q-item-section>
@@ -43,14 +43,17 @@
               v-close-popup
               @click="createFolder()">
               <q-item-section>
-                <q-item-label class="normal-item">Create New Folder</q-item-label>
+                <div class="row justify-start items-center">
+                  <img src="../../assets/menu/add.svg" class="icon-add"/>
+                  <q-item-label style="margin-left: 9px" class="selected-item">Create New Folder</q-item-label>
+                </div>
               </q-item-section>
             </q-item>
           </q-list>
         </q-btn-dropdown>
 
         <div class="edit-title">RSS URL</div>
-        <edit-view class="edit-view" placeholder="input feed url" @input="onInput"/>
+        <edit-view class="edit-view" placeholder="Enter Rss URL" @input="onInput"/>
       </div>
 
       <div class="row justify-end items-end" style="width: 100%">
@@ -71,8 +74,8 @@ import EditView from 'components/rss/EditView.vue';
 import {ref} from 'vue';
 import {useRssStore} from 'stores/rss';
 import AddFolderDialog from 'components/dialog/AddFolderDialog.vue';
-import {create_category, create_feed, get_feeds} from 'src/api/api';
-import {Category, CategoryRequest, FeedCreationRequest} from 'src/types';
+import {create_feed, get_feeds} from 'src/api/api';
+import {Category, FeedCreationRequest} from 'src/types';
 
 const inputRef = ref()
 const {dialogRef, onDialogHide, onDialogOK} = useDialogPluginComponent();
@@ -136,8 +139,7 @@ function createFolder() {
     componentProps: {}
   })
     .onOk(async (data: string) => {
-      await create_category({title: data} as CategoryRequest);
-      await store.refresh_category_and_feeds();
+      console.log(data)
       folderOptionsRef.value = store.categories ? store.categories : []
       const find = store.categories.find((value) => {
         return value.title === data
@@ -192,6 +194,7 @@ function createFolder() {
     .select-view {
       height: 32px;
       width: 100%;
+      padding-left: 12px;
       border: 1px solid #e0e0e0;
       border-radius: 6px;
 
@@ -205,24 +208,11 @@ function createFolder() {
       }
     }
 
-    .selected-item {
-      font-family: 'Roboto';
-      font-style: normal;
-      font-weight: 400;
-      font-size: 12px;
-      line-height: 12px;
-      color: #FF8642;
+    .icon-add{
+      margin-left: 18px;
+      width: 12px;
+      height: 12px;
     }
-
-    .normal-item {
-      font-family: 'Roboto';
-      font-style: normal;
-      font-weight: 400;
-      font-size: 12px;
-      line-height: 12px;
-      color: #1a130f;
-    }
-
 
     .text-title {
       font-family: 'Roboto';
@@ -267,6 +257,24 @@ function createFolder() {
       color: #7a7a7a;
     }
   }
+}
+
+.selected-item {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 12px;
+  color: #FF8642;
+}
+
+.normal-item {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 12px;
+  color: #1a130f;
 }
 </style>
 
