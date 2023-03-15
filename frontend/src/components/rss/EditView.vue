@@ -3,13 +3,16 @@
     <q-input
       class="innerInput"
       v-model="inputValue"
-      borderless
+      standout
+      outlined
       dense
       name="search"
       debounce="500"
       :placeholder="placeholder"
       autocomplete="off"
       :readonly = 'isReadOnly'
+      :disable=" isReadOnly"
+      @update:model-value="onInput"
     />
   </div>
 </template>
@@ -38,20 +41,27 @@ const  props = defineProps({
 
 const inputValue = ref(props.text)
 
+const emit = defineEmits(['input'])
+
+function onInput(value : string){
+  emit('input',value)
+}
+
 </script>
 
 <style lang="scss" scoped>
 .inputItem {
   height: 32px;
   width: 100%;
-  border: 1px solid #E0E0E0;
-  border-radius: 6px;
+  // border: 1px solid #E0E0E0;
+  // border-radius: 6px;
 
   .innerInput {
-    margin-left: 10px;
-    margin-top: -5px;
-    margin-right: 20px;
-    width: calc(100% - 60px);
+    // margin-left: 10px;
+    width: 100%;
+    // margin-top: -5px;
+    // margin-right: 20px;
+    // width: calc(100% - 60px);
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 400;

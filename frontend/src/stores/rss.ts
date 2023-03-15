@@ -20,7 +20,7 @@ import {
   get_entry_content,
   get_feed_icon,
   get_feeds,
-  get_today, remove_feed,
+  get_today, remove_category, remove_feed,
   update_entry_status,
 } from 'src/api/api';
 
@@ -189,6 +189,15 @@ export const useRssStore = defineStore('rss', {
     async remove_local_feed(id : number){
       try {
         await remove_feed(id.toString());
+        await this.refresh_category_and_feeds()
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
+    async remove_local_category(id : number){
+      try {
+        await remove_category(id.toString());
         await this.refresh_category_and_feeds()
       } catch (e) {
         console.log(e);

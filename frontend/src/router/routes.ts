@@ -16,7 +16,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'folderSetting',
-        component: () => import('pages/FolderSettingPage.vue'),
+        component: () => import('pages/OrganizePage.vue'),
       },
     ],
   },

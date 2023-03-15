@@ -6,8 +6,8 @@
         <img class="icon-start" :src="nextImage()" @click="nextAction">
       </div>
       <div class="row justify-end items-center">
+        <img class="icon-end" src="../../assets/menu/read.svg">
         <img class="icon-end" src="../../assets/menu/bookmark.svg">
-        <img class="icon-end" src="../../assets/menu/save.svg">
         <img class="icon-end" src="../../assets/menu/share.svg">
       </div>
     </div>
@@ -38,7 +38,7 @@ import {
   PropType
 } from 'vue';
 import { useRssStore } from 'stores/rss';
-import { EntriesQueryRequest, Entry,MenuType } from '../../types';
+import { EntriesQueryRequest, Entry,MenuType } from 'src/types';
 import { formatContentHtml, newsBus, newsBusMessage } from 'src/utils/utils'
 import { useRouter } from 'vue-router';
 

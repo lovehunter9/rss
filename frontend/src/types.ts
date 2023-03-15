@@ -8,8 +8,7 @@ export enum MenuType {
   Today = 6,
   ReadLater = 7,
   CreateNewFolder = 8,
-  CreateNewFeed = 9,
-  Innovation = 10
+  Innovation = 9
 }
 
 export const menuTypeName = (menuType: MenuType) => {
@@ -29,9 +28,6 @@ export const menuTypeName = (menuType: MenuType) => {
       break;
     case MenuType.CreateNewFolder:
       menuTypeName = 'Create New Folder';
-      break
-    case MenuType.CreateNewFeed:
-      menuTypeName = 'Create New Feed';
       break
     case MenuType.Innovation:
       menuTypeName = 'Innovation';

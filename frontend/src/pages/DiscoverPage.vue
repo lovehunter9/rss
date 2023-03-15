@@ -11,7 +11,8 @@
 
     <!-- <div class="search-detail"> -->
 
-      <search-view placeholder="Search by topic,website,Rss URL" class="detail-width search-view" @onSearch="onSearch"/>
+      <!-- <search-view placeholder="Search by topic,website,Rss URL" class="detail-width search-view" @onSearch="onSearch"/> -->
+      <discover-search-view class="detail-width search-view"></discover-search-view>
       <!-- <q-scroll-area v-if="!showDetail" class="confirmDialogArea"> -->
         <div class="row justify-start confirmDialogArea" v-if="!showDetail">
           <q-intersection v-for="item, index in searchDetails" :key="index" class="example-item">
@@ -36,10 +37,11 @@
 <script lang="ts" setup>
 
 // import {ref} from 'vue';
-import SearchView from 'components/rss/SearchView.vue';
+// import SearchView from 'components/rss/SearchView.vue';
 import { ref } from 'vue';
 import './discover/css/discover.scss'
 import DiscoverDetail from './discover/DiscoverDetail.vue';
+import DiscoverSearchView from './discover/DiscoverSearchView.vue'
 
 function onSearch(vault : string){
   console.log(vault)

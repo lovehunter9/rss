@@ -72,7 +72,7 @@ function onEntryClick() {
 
 function getTime() {
   if (props.entry) {
-    return getPastTime(new Date, utcToStamp(props.entry.created_at))
+    return getPastTime(new Date, utcToStamp(props.entry.changed_at))
   }
   return '';
 }

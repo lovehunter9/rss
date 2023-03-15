@@ -1,22 +1,28 @@
 <template>
-  <div class="feed-root row items-center">
-    <q-checkbox dense indeterminate-value="null" size="md" class="check-box" v-model="selection" color="orange"
-                @update:model-value="onSelected"/>
-    <div class="text-layout row items-center" v-if="feedStore.status === false">
-      <span class="text col">Feed</span>
-      <span class="col text">Folder</span>
-      <span class="col-3 text">Last Update</span>
+  <div class="feed-root row justify-start items-center">
+    <q-checkbox dense indeterminate-value="null" size="md" v-model="selection" color="orange"
+                @update:model-value="onSelected" v-show="organizeStore.organizeData.type === ORGANIZE_TYPE.FEED"/>
+    <div :class="organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'feed-text-layout' : 'folder-text-layout'"
+         v-if="organizeStore.organizeData.status === false">
+      <span class="text-type" style="flex: 15">{{
+          organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'Feeds' : 'Folders'
+        }}</span>
+      <span class="text" style="flex : 12">{{ organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'Folders' : 'Feeds' }}</span>
+      <span class="text" style="flex: 8">Last Update</span>
     </div>
-    <div class="text-end" v-if="feedStore.status === false">Option</div>
+    <div class="text-end" v-if="organizeStore.organizeData.status === false">Option</div>
     <div class="selection-layout row justify-between items-center" v-else>
-      <span class="text col">Selected {{ feedStore.getSelectedFeeds().length }} of {{ feedStore.allFeeds.length }}</span>
-      <div class="row">
-        <q-btn flat dense class="selected-button row justify-start items-center" @click="editFeed">
+      <span class="text">Selected {{
+          organizeStore.getSelectedList().length
+        }} of {{ organizeStore.organizeData.dataList.length }}</span>
+      <div class="row items-center">
+        <q-btn flat dense class="selected-button row justify-start items-center"
+               @click="edit">
           <img class="button-icon" src="../../assets/menu/reorganize.svg"/>
           <div class="button-text">Reorganize</div>
         </q-btn>
         <q-btn flat dense class="selected-button row justify-start items-center" style="margin-left: 8px"
-               @click="deleteFeed">
+               @click="remove">
           <img class="button-icon" src="../../assets/menu/delete2.svg"/>
           <div class="button-text">Delete</div>
         </q-btn>
@@ -28,23 +34,24 @@
 <script setup lang="ts">
 
 import {ref, watch} from 'vue';
-import {useFeedStore} from 'stores/feedStore';
+import {useOrganizeStore} from 'stores/organize';
 import MultiFeedEditDialog from 'components/dialog/MultiFeedEditDialog.vue';
-import FeedDeleteDialog from 'components/dialog/FeedDeleteDialog.vue';
+import FeedDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import {useQuasar} from 'quasar';
+import {ORGANIZE_TYPE} from 'stores/organizeConfig';
 
 const $q = useQuasar()
 
 const selection = ref<boolean | null>(false)
 
-const feedStore = useFeedStore()
+const organizeStore = useOrganizeStore()
 
-function editFeed() {
+function edit() {
   console.log('edit')
   $q.dialog({
     component: MultiFeedEditDialog,
     componentProps: {
-      feeds : feedStore.getSelectedFeeds()
+      feeds: organizeStore.getSelectedList()
     }
   }).onOk(() => {
     //Do Nothing
@@ -56,14 +63,16 @@ function editFeed() {
     });
 }
 
-function deleteFeed() {
+function remove() {
   console.log('delete')
   $q.dialog({
     component: FeedDeleteDialog,
-    componentProps: {}
+    componentProps: {
+      isFeed : organizeStore.organizeData.type === ORGANIZE_TYPE.FEED
+    }
   }).onOk(async () => {
-    await feedStore.getSelectedFeeds().forEach((feed) => {
-       feedStore.removeFeed(feed.id)
+    await organizeStore.getSelectedList().forEach((value) => {
+      organizeStore.delete(value.id)
     })
   }).onCancel(() => {
     console.log('Cancel');
@@ -74,11 +83,14 @@ function deleteFeed() {
 }
 
 function onSelected(value: boolean) {
-  feedStore.updateAllFeedStatus(value)
+  organizeStore.setListSelected(value)
 }
 
-watch(() => feedStore.status, (value) => {
+watch(() => organizeStore.organizeData.status, (value) => {
   selection.value = value
+}, {
+  deep: true,
+  immediate: true
 })
 
 </script>
@@ -88,19 +100,18 @@ watch(() => feedStore.status, (value) => {
 .feed-root {
   width: 100%;
   height: 53px;
+  padding-left: 16px;
+  padding-right: 16px;
 
-  .check-box {
-    margin-left: 16px;
-  }
+  .feed-text-layout {
+    width: calc(100% - 90px);
+    display: flex;
+    flex-direction: row;
 
-  .text-layout {
-    padding-left: 17px;
-    padding-right: 9px;
-    width: calc(100% - 120px);
-
-    .feed-icon {
-      width: 16px;
-      height: 16px;
+    .text-type {
+      @extend .text;
+      margin-left: 10px;
+      padding-left: 8px;
     }
 
     .text {
@@ -112,6 +123,28 @@ watch(() => feedStore.status, (value) => {
       color: #847C77;
       white-space: nowrap;
       text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+  }
+
+  .folder-text-layout {
+    width: calc(100% - 65px);
+    display: flex;
+    flex-direction: row;
+
+    .text-type {
+      @extend .text;
+    }
+
+    .text {
+      font-family: 'Roboto';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 12px;
+      color: #847C77;
+      white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
     }
@@ -119,14 +152,8 @@ watch(() => feedStore.status, (value) => {
   }
 
   .selection-layout {
-    padding-left: 17px;
-    padding-right: 9px;
-    width: calc(100% - 40px);
-
-    .feed-icon {
-      width: 16px;
-      height: 16px;
-    }
+    width: calc(100% - 25px);
+    padding-left: 18px;
 
     .text {
       font-family: 'Roboto';
@@ -175,11 +202,9 @@ watch(() => feedStore.status, (value) => {
     color: #847C77;
     white-space: nowrap;
     text-overflow: ellipsis;
-    text-overflow: ellipsis;
     overflow: hidden;
     text-align: end;
-    width: 80px;
-    padding-right: 16px
+    width: 65px;
   }
 }
 

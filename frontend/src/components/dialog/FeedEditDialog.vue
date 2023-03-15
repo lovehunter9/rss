@@ -120,10 +120,10 @@
 
 import {useDialogPluginComponent, useQuasar} from 'quasar';
 import {PropType, ref} from 'vue';
-import {Category, CategoryRequest, Feed, FeedCreationRequest} from 'src/types';
+import {Category, CategoryRequest, Feed} from 'src/types';
 import {useRssStore} from 'stores/rss';
 import EditView from 'components/rss/EditView.vue';
-import {create_category, create_feed, get_feeds} from 'src/api/api';
+import {create_category} from 'src/api/api';
 
 const props = defineProps({
   feed: {
@@ -181,15 +181,6 @@ function addFolder() {
     await store.refresh_category_and_feeds();
     updateCategories();
   });
-}
-
-async function addFeed(feedUrl: string, categoryId: number) {
-  await create_feed({
-    category_id: categoryId,
-    feed_url: feedUrl
-  } as FeedCreationRequest);
-  await get_feeds();
-  await store.refresh_category_and_feeds();
 }
 
 function onConfirm() {
