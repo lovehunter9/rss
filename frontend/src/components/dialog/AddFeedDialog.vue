@@ -50,7 +50,7 @@
         </q-btn-dropdown>
 
         <div class="edit-title">RSS URL</div>
-        <edit-view class="edit-view" placeholder="input feed url" @input="onInput"/>
+        <edit-view class="edit-view" placeholder="Enter Rss URL" @input="onInput"/>
       </div>
 
       <div class="row justify-end items-end" style="width: 100%">
@@ -71,8 +71,8 @@ import EditView from 'components/rss/EditView.vue';
 import {ref} from 'vue';
 import {useRssStore} from 'stores/rss';
 import AddFolderDialog from 'components/dialog/AddFolderDialog.vue';
-import {create_category, create_feed, get_feeds} from 'src/api/api';
-import {Category, CategoryRequest, FeedCreationRequest} from 'src/types';
+import {create_feed, get_feeds} from 'src/api/api';
+import {Category, FeedCreationRequest} from 'src/types';
 
 const inputRef = ref()
 const {dialogRef, onDialogHide, onDialogOK} = useDialogPluginComponent();
@@ -136,8 +136,7 @@ function createFolder() {
     componentProps: {}
   })
     .onOk(async (data: string) => {
-      await create_category({title: data} as CategoryRequest);
-      await store.refresh_category_and_feeds();
+      console.log(data)
       folderOptionsRef.value = store.categories ? store.categories : []
       const find = store.categories.find((value) => {
         return value.title === data

@@ -28,13 +28,15 @@ import {useDialogPluginComponent, useQuasar} from 'quasar';
 import EditView from 'components/rss/EditView.vue';
 import {ref} from 'vue';
 import {useRssStore} from 'stores/rss';
+import {create_category} from 'src/api/api';
+import {CategoryRequest} from 'src/types';
 
 const inputRef = ref()
 const {dialogRef, onDialogHide, onDialogOK} = useDialogPluginComponent();
 const store = useRssStore()
 const $q = useQuasar()
 
-function onConfirm() {
+async function onConfirm() {
   if (!inputRef.value) {
     $q.notify('folder name is empty')
     return
@@ -43,6 +45,8 @@ function onConfirm() {
     return value.title === inputRef.value
   })
   if (!find) {
+    await create_category({title: inputRef.value} as CategoryRequest);
+    await store.refresh_category_and_feeds();
     onDialogOK(inputRef.value)
   } else {
     $q.notify('folder name is exist')

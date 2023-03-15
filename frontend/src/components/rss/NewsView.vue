@@ -6,8 +6,8 @@
         <img class="icon-start" :src="nextImage()" @click="nextAction">
       </div>
       <div class="row justify-end items-center">
-        <img class="icon-end" src="../../assets/menu/read.svg">
-        <img class="icon-end" src="../../assets/menu/bookmark.svg">
+        <q-img class="icon-end" :src="readRef"/>
+        <img class="icon-end" :src="markRef" @click="bookmark">
         <img class="icon-end" src="../../assets/menu/share.svg">
       </div>
     </div>
@@ -18,7 +18,7 @@
         <div class="author">
           <a href="javascript:;" @click="jumpToFeed()">{{ item.feed.title }}</a>
         </div>
-      <img class="entry-icon" :src="store.feeds_icon[item.feed_id].data">
+        <img class="entry-icon" :src="store.feeds_icon[item.feed_id].data">
       </div>
       <q-separator style="margin-top:16px"/>
       <!-- <h1 v-if="!entry.startsWith('<h')"> {{ item.title }} </h1> -->
@@ -37,10 +37,10 @@ import {
   onMounted,
   PropType
 } from 'vue';
-import { useRssStore } from 'stores/rss';
-import { EntriesQueryRequest, Entry,MenuType } from 'src/types';
-import { formatContentHtml, newsBus, newsBusMessage } from 'src/utils/utils'
-import { useRouter } from 'vue-router';
+import {useRssStore} from 'stores/rss';
+import {EntriesQueryRequest, Entry, EntryStatus, MenuType} from 'src/types';
+import {formatContentHtml, newsBus, newsBusMessage} from 'src/utils/utils'
+import {useRouter} from 'vue-router';
 
 export default defineComponent({
   name: 'ItemView',
@@ -56,6 +56,8 @@ export default defineComponent({
     }
     const store = useRssStore();
     const router = useRouter()
+    const readRef = ref(require('../../assets/menu/unread.svg'));
+    const markRef = ref(require('../../assets/menu/unbookmark.svg'))
 
     let entry = ref<string>('');
 
@@ -70,18 +72,46 @@ export default defineComponent({
       if (k != undefined) {
         entry.value = formatContentHtml(k);
       }
+
+      updateUI();
     }
+
+    function updateUI() {
+      if (props.item) {
+        if (props.item.status === EntryStatus.Read) {
+          readRef.value = require('../../assets/menu/read.svg')
+        } else {
+          readRef.value = require('../../assets/menu/unread.svg')
+        }
+        if (props.item.starred) {
+          markRef.value = require('../../assets/menu/bookmark.svg')
+        } else {
+          markRef.value = require('../../assets/menu/unbookmark.svg')
+        }
+      }
+    }
+
+    function bookmark(){
+      if (props.item){
+        store.mark_entry_starred(props.item.id)
+      }
+    }
+
     // const showSelfTitle = ref(false)
     watch(
       () => props.item,
       async (newVal: Entry) => {
+        console.log(newVal)
         if (!newVal) {
           entry.value = '';
           return;
         }
         updateEntry(newVal);
       }
-    );
+    ,{
+        deep : true,
+        immediate : true
+      });
 
     onMounted(async () => {
       updateEntry(props.item);
@@ -125,7 +155,7 @@ export default defineComponent({
       };
       console.log(store.menu_choice)
       store.get_entries(
-        new EntriesQueryRequest({ limit: 50, offset: 0, feed_id: props.item.id })
+        new EntriesQueryRequest({limit: 50, offset: 0, feed_id: props.item.id})
       );
       router.push('/')
     }
@@ -133,6 +163,9 @@ export default defineComponent({
     return {
       entry,
       store,
+      readRef,
+      bookmark,
+      markRef,
       preAction,
       nextAction,
       preImage,
@@ -175,9 +208,15 @@ export default defineComponent({
     padding-left: 32px;
     padding-right: 32px;
 
-    .author  {
-      a:link{text-decoration:none; color:#1A130F;}
-      a:hover{color:blue}
+    .author {
+      a:link {
+        text-decoration: none;
+        color: #1A130F;
+      }
+
+      a:hover {
+        color: blue
+      }
     }
 
 

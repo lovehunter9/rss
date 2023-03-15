@@ -109,21 +109,13 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref, onMounted, onUnmounted, watch} from 'vue';
+import {defineComponent, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useQuasar} from 'quasar';
-import {useRouter, useRoute} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 import {useIsMobile} from '../utils/utils';
 import {useRssStore} from 'stores/rss';
 
-import {
-  MenuType,
-  CategoryRequest,
-  Entry,
-  EntriesQueryRequest,
-  Feed
-} from '../types';
-import {create_category} from '../api/api';
-import {EntryStatus} from '../types';
+import {EnteryQueryOrder, EntriesQueryRequest, Entry, EntryStatus, Feed, MenuType} from '../types';
 import {getPageRSSHub} from '../utils/radar'
 import {defaultRules} from '../utils/radar-rules';
 import SearchView from 'components/rss/SearchView.vue';
@@ -284,10 +276,28 @@ export default defineComponent({
       } else if (type == MenuType.Discover) {
         goto('/discover')
       } else if (type == MenuType.Unread) {
-        store.entries = []
+        store.get_entries(new EntriesQueryRequest({limit : 50,offset : 0}),(response) => {
+           const entries = response.entries.filter((entry) => {
+             return entry.status === EntryStatus.Unread;
+           })
+          if (entries){
+            return { entries : entries,total : entries.length}
+          }else {
+            return  response
+          }
+        })
         goto('/')
       } else if (type == MenuType.ReadLater) {
-        store.entries = []
+        store.get_entries(new EntriesQueryRequest({limit : 50,offset : 0}),(response) => {
+          const entries = response.entries.filter((entry) => {
+            return entry.starred;
+          })
+          if (entries){
+            return { entries : entries,total : entries.length}
+          }else {
+            return  response
+          }
+        })
         goto('/')
       }
     }
@@ -298,8 +308,7 @@ export default defineComponent({
         componentProps: {}
       })
         .onOk(async (data : string) => {
-          await create_category({title: data} as CategoryRequest);
-          await store.refresh_category_and_feeds();
+          console.log(data)
         })
         .onCancel(() => {
           console.log('Cancel');

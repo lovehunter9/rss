@@ -47,7 +47,7 @@ const selectIndex = ref(-1)
 const router = useRouter()
 const Route = useRoute()
 
-watch(() => store.menu_choice, (newValue) => {
+watch(() => [store.menu_choice,store.entries], (newValue) => {
   if (newValue) {
     updateUI();
   }
@@ -57,7 +57,6 @@ watch(() => store.menu_choice, (newValue) => {
 })
 
 onMounted(() => {
-  updateUI();
 
   newsBus.on(newsBusMessage.pre, () => {
     if (selectIndex.value <= 0) {

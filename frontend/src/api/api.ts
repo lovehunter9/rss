@@ -92,6 +92,19 @@ export async function category_mark_all_as_read(categoryID: string) {
   }
 }
 
+export async function entry_bookmark(entryId: number) {
+  const rssStore = useRssStore();
+  try {
+    await axios.put(
+      rssStore.url + '/api/entries/' + entryId + '/bookmark',
+      {}
+    );
+    return true;
+  } catch (e) {
+    return null;
+  }
+}
+
 export async function category_feeds(categoryID: string) {
   const rssStore = useRssStore();
   try {
