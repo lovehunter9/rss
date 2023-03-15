@@ -332,27 +332,21 @@ defineExpose({ floatTitleView });
 
       .item-content-content {
         font-family: 'Roboto';
-font-style: normal;
-font-weight: 400;
-font-size: 14px;
-line-height: 20px;
-/* or 143% */
-
-
-color: #847C77;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 20px;
+        color: #847C77;
       }
 
       .item-conente-time {
         font-family: 'Roboto';
-font-style: normal;
-font-weight: 400;
-font-size: 12px;
-line-height: 16px;
-/* identical to box height, or 133% */
-
-
-color: #847C77;
-margin-top: 8px;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 16px;
+        color: #847C77;
+        margin-top: 8px;
       }
     }
   }
@@ -360,11 +354,11 @@ margin-top: 8px;
 
 .no-more-result {
   font-family: 'Roboto';
-font-style: normal;
-font-weight: 400;
-font-size: 12px;
-line-height: 16px;
-color: #1A130F;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  color: #1A130F;
 }
 
 

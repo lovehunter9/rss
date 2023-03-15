@@ -122,8 +122,8 @@ import {
 } from '../types';
 import {create_category} from '../api/api';
 import {EntryStatus} from '../types';
-import {getPageRSSHub} from '../utils/radar'
-import {defaultRules} from '../utils/radar-rules';
+// import {getPageRSSHub} from '../utils/radar'
+// import {defaultRules} from '../utils/radar-rules';
 import SearchView from 'components/rss/SearchView.vue';
 import LayoutLeftItemMenu from 'components/LayoutLeftItemMenu.vue'
 
@@ -235,10 +235,10 @@ export default defineComponent({
 
       todayCount.value = await store.get_today(true) || 0
 
-      await console.log(getPageRSSHub({
-        url: 'https://space.bilibili.com/65125803',
-        rules: defaultRules
-      }))
+      // await console.log(getPageRSSHub({
+      //   url: 'https://www.bilibili.com/video/av479863545/',
+      //   rules: defaultRules
+      // }))
     });
 
     onUnmounted(() => {
