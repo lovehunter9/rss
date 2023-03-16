@@ -200,6 +200,12 @@ export default defineComponent({
 
     watch(() => Route.path,(value) => {
       isFolderManager.value = value.includes('/folderSetting');
+      if (isFolderManager.value) {
+        store.menu_choice = {
+          type : MenuType.Empty,
+          value : 0
+        }
+      }
     })
 
     watch(

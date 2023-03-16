@@ -56,15 +56,16 @@
         @onSearch="searchChanged"/>
     </div>
     <organize-title/>
-    <q-scroll-area :class="organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'scroll-area-feed' : 'scroll-area-folder'">
-      <q-list v-if="organizeStore.organizeData.dataList.length > 0">
+    <q-scroll-area :class="organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'scroll-area-feed' : 'scroll-area-folder'" v-if="!forceRefresh && organizeStore.organizeData.dataList.length > 0">
+      <q-list>
         <organize-item
           :key="item.getType() + item.getId()"
           v-for="item in organizeStore.organizeData.dataList"
           :data="item"/>
       </q-list>
-      <empty-view :class="organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'scroll-area-feed' : 'scroll-area-folder'" v-else/>
     </q-scroll-area>
+
+    <empty-view :class="organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'scroll-area-feed' : 'scroll-area-folder'"  v-else/>
     <div
       style="position: absolute; bottom: 20px; width: 100%"
       class="row justify-center items-center">
@@ -95,6 +96,7 @@ import OrganizeTitle from 'components/rss/OrganizeTitle.vue';
 import {useOrganizeStore} from 'stores/organize';
 import {ORGANIZE_TYPE} from 'stores/organizeConfig';
 import EmptyView from "components/rss/EmptyView.vue";
+import { newsBus,newsBusMessage } from 'src/utils/utils'
 
 const store = useRssStore();
 const folderOptionsRef = ref<string[]>([]);
@@ -128,11 +130,16 @@ function searchChanged(data: string) {
   organizeStore.updateList(folderRef.value, searchData);
 }
 
+const forceRefresh = ref(false)
+
 watch(
   () => [store.categories, store.feeds],
   () => {
+    console.log(2223332);
+
     setTimeout(() => {
       updateData()
+      forceRefresh.value = false
     }, 500);
   },
   {
@@ -141,6 +148,9 @@ watch(
   }
 );
 
+newsBus.on(newsBusMessage.feedRefresh,() => {
+  forceRefresh.value = true
+})
 
 onMounted(async ()=> {
   await store.refresh_category_and_feeds()
@@ -213,7 +223,7 @@ onMounted(async ()=> {
 
   .scroll-area-feed{
     height: calc(100% - 143px);
-    width: 100%
+    width: 100%;
   }
 
   .scroll-area-folder{

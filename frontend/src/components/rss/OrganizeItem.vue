@@ -33,6 +33,7 @@ import FeedEditDialog from 'components/dialog/FeedEditDialog.vue';
 import {BaseOption, OptionalCategory, ORGANIZE_TYPE} from 'stores/organizeConfig';
 import {Category, Feed} from 'src/types';
 import FolderEditDialog from 'components/dialog/FolderEditDialog.vue';
+import { newsBus, newsBusMessage } from 'src/utils/utils';
 
 const props = defineProps({
   data: {
@@ -128,6 +129,9 @@ function edit() {
 
     $q.dialog(opts).onOk(() => {
       //Do Nothing
+
+      newsBus.emit(newsBusMessage.feedRefresh)
+
     }).onCancel(() => {
       console.log('Cancel');
     })
