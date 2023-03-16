@@ -94,7 +94,7 @@ import OrganizeItem from 'components/rss/OrganizeItem.vue';
 import OrganizeTitle from 'components/rss/OrganizeTitle.vue';
 import {useOrganizeStore} from 'stores/organize';
 import {ORGANIZE_TYPE} from 'stores/organizeConfig';
-import EmptyView from "components/rss/EmptyView.vue";
+import EmptyView from 'components/rss/EmptyView.vue';
 
 const store = useRssStore();
 const folderOptionsRef = ref<string[]>([]);
@@ -130,7 +130,8 @@ function searchChanged(data: string) {
 
 watch(
   () => [store.categories, store.feeds],
-  () => {
+  (value) => {
+    console.log(value)
     updateData();
   },
   {
