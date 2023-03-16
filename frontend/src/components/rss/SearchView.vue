@@ -1,20 +1,19 @@
 <template>
-  <div class="searchItem row justify-start items-center">
-    <q-img
-      class="searchImg"
-      src="../../assets/search.svg"
-    />
     <q-input
       class="searchInput"
       v-model="searchValue"
-      borderless
+      standout
+      outlined
       dense
       name="search"
       debounce="500"
       :placeholder="placeholder"
       autocomplete="off"
-    />
-  </div>
+    >
+    <template v-slot:prepend>
+        <q-icon size="16px" name="search" />
+      </template>
+  </q-input>
 </template>
 
 <script setup lang="ts">
@@ -40,22 +39,9 @@ watch(() => searchValue.value, () => {
 </script>
 
 <style lang="scss" scoped>
-.searchItem {
-  height: 32px;
-  width: 100%;
-  border: 1px solid #E0E0E0;
-  border-radius: 6px;
 
-  .searchImg {
-    width: 16px;
-    margin-left:10px ;
-    margin-top: -5px;
-    height: 16px;
-  }
-
-  .searchInput {
+.searchInput {
     margin-left: 10px;
-    margin-top: -5px;
     margin-right: 20px;
     width: calc(100% - 60px);
     font-family: 'Roboto';
@@ -65,7 +51,5 @@ watch(() => searchValue.value, () => {
     line-height: 12px;
     color: #BDBDBD;
   }
-
-}
 
 </style>

@@ -11,21 +11,25 @@ import {
   FeedIconResponse,
   MenuChoice,
   MenuType,
+  SDKQueryRequest,
 } from 'src/types';
 
 import {
+  entry_bookmark,
   fetch_feed_counter,
   get_categories,
   get_entries,
   get_entry_content,
   get_feed_icon,
   get_feeds,
-  get_today, remove_feed,
+  get_today, remove_category, remove_feed,
   update_entry_status,
+  sdkSearchFeedsByPath,
 } from 'src/api/api';
 
 export type DataState = {
   url: string;
+  sdkUrl: string;
   menu_choice: MenuChoice;
   categories: Category[];
   feeds: Feed[];
@@ -43,7 +47,8 @@ export type DataState = {
 export const useRssStore = defineStore('rss', {
   state: () => {
     return {
-      url: 'http://127.0.0.1:8080',
+      url: '',//'http://127.0.0.1:8080',
+      sdkUrl: '',
       menu_choice: {
         type: MenuType.Empty,
         value: 0,
@@ -186,6 +191,10 @@ export const useRssStore = defineStore('rss', {
       return this.feeds.find((feed) => feed.id == id);
     },
 
+    get_local_feed_by_feed_url(feed_url: string): Feed | undefined {
+      return this.feeds.find((feed) => feed.feed_url == feed_url);
+    },
+
     async remove_local_feed(id : number){
       try {
         await remove_feed(id.toString());
@@ -195,15 +204,31 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async get_entries(q: EntriesQueryRequest) {
+    async remove_local_category(id : number){
+      try {
+        await remove_category(id.toString());
+        await this.refresh_category_and_feeds()
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
+    async get_entries(q: EntriesQueryRequest,filter ?: (entriesQueryResponse : EntriesQueryResponse) => EntriesQueryResponse ) {
       const rssStore = useRssStore();
 
       try {
         console.log('get_entries ' + rssStore.url + '/api/entries' + q.build());
         const data: EntriesQueryResponse = await get_entries(q);
-
-        this.entries = data.entries;
-        this.entries_total = data.total;
+        if (filter){
+          const response = filter({ entries : data.entries, total : data.total})
+          this.entries = response.entries;
+          this.entries_total = response.total;
+        }else {
+          this.entries = data.entries;
+          this.entries_total = data.total;
+        }
+        console.log(this.entries)
+        console.log(this.entries_total)
       } catch (e) {
         console.log(e);
       }
@@ -225,16 +250,30 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async mark_entry_read(entry_id: number) {
+    async mark_entry_read(entry_id: number,status : EntryStatus) {
       try {
         await update_entry_status({
           entry_ids: [entry_id],
-          status: EntryStatus.Read,
+          status,
         });
 
         for (const entry of this.entries) {
           if (entry.id === entry_id) {
-            entry.status = EntryStatus.Read;
+            entry.status = status;
+          }
+        }
+        await this.refresh_feeds_counter();
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
+    async mark_entry_starred(entry_id: number){
+      try {
+        await entry_bookmark(entry_id);
+        for (const entry of this.entries) {
+          if (entry.id === entry_id) {
+            entry.starred = !entry.starred
           }
         }
         await this.refresh_feeds_counter();
@@ -253,5 +292,24 @@ export const useRssStore = defineStore('rss', {
       this.clear_entries();
       this.menu_choice = choice;
     },
+
+    setUrl(new_url:string) {
+      this.url = new_url;
+    },
+
+    setSDKUrl(new_sdkUrl: string) {
+      this.sdkUrl = new_sdkUrl;
+    },
+
+    async sdkSearchFeed(path: string) {
+      try {
+        const request = new SDKQueryRequest({path})
+        const result = await sdkSearchFeedsByPath(request)
+        console.log(result);
+
+        return result
+      } catch (error) {
+      }
+    }
   },
 });

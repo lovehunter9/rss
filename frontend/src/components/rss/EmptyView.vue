@@ -6,10 +6,32 @@
       class="label">{{
         'The most interesting articles published by the feeds you personally follow will be here'
       }}</span>
+    <q-btn class="add-btn" flat dense label="Add feeds" @click="addFeed"/>
   </div>
 </template>
 
 <script lang="ts" setup>
+
+import AddFeedDialog from 'components/dialog/AddFeedDialog.vue';
+import {useQuasar} from 'quasar';
+
+const $q = useQuasar()
+
+const addFeed = () => {
+  $q.dialog({
+    component: AddFeedDialog,
+    componentProps: {}
+  })
+    .onOk(() => {
+      console.log('OK');
+    })
+    .onCancel(() => {
+      console.log('Cancel');
+    })
+    .onDismiss(() => {
+      console.log('Called on OK or Cancel');
+    });
+};
 
 </script>
 
@@ -46,6 +68,20 @@
     line-height: 20px;
     text-align: center;
     color: #857C77;
+  }
+
+  .add-btn{
+    margin-top: 24px;
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 14px;
+    text-align: center;
+    color: #FFFFFF;
+    text-transform: capitalize;
+    padding: 8px 16px;
+    background: #FF8642;
   }
 }
 

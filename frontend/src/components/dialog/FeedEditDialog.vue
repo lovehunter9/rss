@@ -7,36 +7,103 @@
       <div class="text-title">Edit Feed</div>
       <img class="icon-close" src="../../assets/menu/close.svg" @click="onDialogCancel">
 
-      <div class="column justify-start items-start">
+      <q-scroll-area style="height: 478px">
 
-        <div class="selected-button row justify-start items-center">
-          <img class="button-icon" :src="store.feeds_icon[feed.id].data"/>
-          <div class="button-text">{{ feed.title }}</div>
+        <div class="column justify-start items-start">
+
+          <div class="selected-button row justify-start items-center">
+            <img class="button-icon" :src="store.feeds_icon[feed.id].data"/>
+            <div class="button-text">{{ feed.title }}</div>
+          </div>
+
+          <div class="edit-label">Added in</div>
+          <q-checkbox dense size="md" class="check-box" v-model="categoryRef" :label="feed.category.title"
+                      color="orange"/>
+
+          <div class="edit-label">Folders</div>
+          <q-checkbox v-for="item in categoriesRef" v-model="item.selected" :key="item.id" dense size="md"
+                      class="check-box" color="orange"
+                      :label="item.title"/>
+
+          <div class="folder-layout row justify-start items-center" @click="addFolder">
+            <q-icon name="img:/imgs/createnewfolder.svg" size="16px"/>
+            <div class="text-folder">Create New Folder</div>
+          </div>
+
+          <div class="edit-title">Title</div>
+          <edit-view class="edit-view" :text="feed.title" :is-read-only="true"/>
+
+          <div class="edit-title">External URL</div>
+          <edit-view class="edit-view" :text="feed.site_url" :is-read-only="true"/>
+
+          <div class="edit-title">RSS URL</div>
+          <edit-view class="edit-view" :text="feed.feed_url" :is-read-only="true"/>
+
+          <q-expansion-item dense class="expansion-layout">
+
+            <template v-slot:header>
+              <div class="text-more row justify-start items-center">
+                <div>Advanced Settings</div>
+              </div>
+            </template>
+
+            <div class="column justify-start items-start" style="width: 100%;">
+
+              <div class="edit-title">Feed username</div>
+              <edit-view class="edit-view" :text="feed.username" :is-read-only="true" placeholder="Feed username"/>
+
+              <div class="edit-title">Feed Password</div>
+              <edit-view class="edit-view" :text="feed.password" :is-read-only="true" placeholder="Feed Password"/>
+
+              <div class="edit-title">Override Default User Agent</div>
+              <edit-view class="edit-view" :text="feed.user_agent" :is-read-only="true" placeholder="Override Default User Agent"/>
+
+              <div class="edit-title">Set Cookies</div>
+              <edit-view class="edit-view" :text="feed.cookie" :is-read-only="true" placeholder="Set Cookies"/>
+
+              <div class="edit-title">Scraper Rules</div>
+              <edit-view class="edit-view" :text="feed.scraper_rules" :is-read-only="true" placeholder="Scraper Rules"/>
+
+              <div class="edit-title">Rewrite Rules</div>
+              <edit-view class="edit-view" :text="feed.rewrite_rules" :is-read-only="true" placeholder="Rewrite Rules"/>
+
+              <div class="edit-title">Block Rules</div>
+              <edit-view class="edit-view" :text="feed.blocklist_rules" :is-read-only="true" placeholder="Block Rules"/>
+
+              <div class="edit-title">Keep Rules</div>
+              <edit-view class="edit-view" :text="feed.keeplist_rules" :is-read-only="true" placeholder="Keep Rules"/>
+
+              <div class="edit-title">URL Rewrite Rules</div>
+              <edit-view class="edit-view" :text="feed.urlrewrite_rules" :is-read-only="true" placeholder="URL Rewrite Rules"/>
+
+              <q-checkbox dense size="md" class="check-box" v-model="fetchOriginalRef" label="Fetch original content"
+                          color="orange"/>
+
+              <q-checkbox dense size="md" class="check-box" v-model="httpCacheRef" label="Ignore HTTP cache"
+                          color="orange"/>
+
+              <q-checkbox dense size="md" class="check-box" v-model="selfSignedRef"
+                          label="Allow self-signed or invalid certificates"
+                          color="orange"/>
+
+              <q-checkbox dense size="md" class="check-box" v-model="notRefreshFeedRef" label="Do not refresh this feed"
+                          color="orange"/>
+
+              <q-checkbox dense size="md" class="check-box" v-model="hideEntriesRef"
+                          label="Hide entries in global unread lists"
+                          color="orange"/>
+
+              <div class="bottom-background">
+                <div class="text-bottom">·Etag header:{{feed.etag_header}}</div>
+                <div class="text-bottom">·LastModified header:{{feed.last_modified_header}}</div>
+              </div>
+
+            </div>
+          </q-expansion-item>
+
         </div>
 
-        <div class="edit-label">Added in</div>
-        <q-checkbox dense size="md" class="check-box" v-model="categoryRef" :label="feed.category.title"
-                    color="orange"/>
-
-        <div class="edit-label">Folders</div>
-        <q-checkbox v-for="item in categoriesRef" v-model="item.selected" :key="item.id" dense size="md" class="check-box" color="orange"
-                    :label="item.title"/>
-
-        <div class="folder-layout row justify-start items-center" @click="addFolder">
-          <q-icon name="img:/imgs/createnewfolder.svg" size="16px"/>
-          <div class="text-folder">Create New Folder</div>
-        </div>
-
-        <div class="edit-title">Title</div>
-        <edit-view class="edit-view" :text="feed.title"/>
-
-        <div class="edit-title">External URL</div>
-        <edit-view class="edit-view" :text="feed.site_url"/>
-
-        <div class="edit-title">RSS URL</div>
-        <edit-view class="edit-view" :text="feed.feed_url"/>
-
-      </div>
+      </q-scroll-area>
 
       <div class="row justify-end items-end" style="width: 100%">
         <q-btn
@@ -51,12 +118,12 @@
 
 <script setup lang="ts">
 
-import {Loading, useDialogPluginComponent, useQuasar} from 'quasar';
+import {useDialogPluginComponent, useQuasar} from 'quasar';
 import {PropType, ref} from 'vue';
-import {Category, CategoryRequest, Feed, FeedCreationRequest} from 'src/types';
+import {Category, CategoryRequest, Feed} from 'src/types';
 import {useRssStore} from 'stores/rss';
 import EditView from 'components/rss/EditView.vue';
-import {create_category, create_feed, get_feeds} from 'src/api/api';
+import {create_category} from 'src/api/api';
 
 const props = defineProps({
   feed: {
@@ -69,6 +136,13 @@ const store = useRssStore();
 const $q = useQuasar();
 const categoryRef = ref(true)
 const categoriesRef = ref<any[]>([])
+
+const fetchOriginalRef = ref(false)
+const httpCacheRef = ref(false)
+const selfSignedRef = ref(false)
+const notRefreshFeedRef = ref(false)
+const hideEntriesRef = ref(false)
+
 const {dialogRef, onDialogHide, onDialogOK, onDialogCancel} = useDialogPluginComponent();
 
 updateCategories();
@@ -89,7 +163,7 @@ function updateCategories() {
   console.log(categoriesRef.value)
 }
 
-function addFolder () {
+function addFolder() {
   $q.dialog({
     title: 'Add New Folder',
     message: 'What is folder name',
@@ -109,21 +183,12 @@ function addFolder () {
   });
 }
 
-async function addFeed(feedUrl : string,categoryId : number){
-  await create_feed({
-    category_id: categoryId,
-    feed_url: feedUrl
-  } as FeedCreationRequest);
-  await get_feeds();
-  await store.refresh_category_and_feeds();
-}
-
-function onConfirm(){
+function onConfirm() {
   console.log(categoriesRef.value)
-  categoriesRef.value.forEach((value)=> {
-    if(value.selected){
+  categoriesRef.value.forEach((value) => {
+    if (value.selected) {
 
-    }else {
+    } else {
 
     }
   })
@@ -146,6 +211,7 @@ function onConfirm(){
 
   .text-title {
     font-family: 'Roboto';
+    margin-bottom: 24px;
     font-style: normal;
     font-weight: 500;
     font-size: 16px;
@@ -163,7 +229,6 @@ function onConfirm(){
   }
 
   .selected-button {
-    margin-top: 24px;
     padding: 8px 16px;
     height: 32px;
     width: fit-content;
@@ -231,6 +296,42 @@ function onConfirm(){
     margin-top: 4px;
   }
 
+  .expansion-layout{
+    width: 100%;
+    margin-top: 12px;
+    padding-left: 0;
+
+    .text-more{
+      font-family: 'Roboto';
+      margin-left: -14px;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 14px;
+      text-decoration-line: underline;
+      color: #1B87F4;
+    }
+
+    .bottom-background{
+      width: 100%;
+      text-align: left;
+      padding: 16px;
+      margin-top: 23px;
+      background: rgba(26, 19, 15, 0.05);
+      border-radius: 6px;
+
+      .text-bottom{
+        font-family: 'Roboto';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 20px;
+        /* or 167% */
+        color: #1A130F;
+      }
+    }
+  }
+
   .btn-confirm {
     text-transform: capitalize;
     width: 92px;
@@ -249,11 +350,6 @@ function onConfirm(){
     &::before {
       box-shadow: none;
     }
-  }
-
-  .btn-vc[disabled] {
-    background: #ececec;
-    color: #7a7a7a;
   }
 
 }

@@ -6,14 +6,19 @@
     }">
       <q-drawer v-model="leftDrawerOpen" @update:model-value="updateLeftDrawer" show-if-above bordered height="100%"
                 class="drawer">
-        <search-view class="search-view" @onSearch="onSearch"/>
+        <div class="row" style="width: 100%">
+          <search-view class="search-view" @onSearch="onSearch"/>
+          <div class="btn-add row justify-center items-center" @click="addFeed">
+            <q-img style="width: 12px;height: 12px" src="../assets/menu/add.svg"/>
+          </div>
+        </div>
         <q-scroll-area style="height:calc(100% - 110px);">
           <q-list class="margin-bottom-safe-area">
 
-          <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false" @item-on-click="changeItemMenu(MenuType.Discover)"></layout-left-item-menu>
-          <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="`${todayCount}`" @item-on-click="changeItemMenu(MenuType.Today)"></layout-left-item-menu>
-          <layout-left-item-menu :menu-type="MenuType.Unread" :unread-count="`${store.allUnRead}`" @item-on-click="changeItemMenu(MenuType.Unread)"></layout-left-item-menu>
-          <layout-left-item-menu :menu-type="MenuType.ReadLater" :unread-count="count.total" @item-on-click="changeItemMenu(MenuType.ReadLater)"></layout-left-item-menu>
+          <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false" @item-on-click="changeItemMenu(MenuType.Discover)"/>
+          <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="`${todayCount}`" @item-on-click="changeItemMenu(MenuType.Today)"/>
+          <layout-left-item-menu :menu-type="MenuType.Unread" :unread-count="`${store.allUnRead}`" @item-on-click="changeItemMenu(MenuType.Unread)"/>
+          <layout-left-item-menu :menu-type="MenuType.ReadLater" :unread-count="count.total" @item-on-click="changeItemMenu(MenuType.ReadLater)"/>
         </q-list>
 
         <q-separator style="margin-top:6px;margin-bottom: 11px;" inset/>
@@ -21,12 +26,12 @@
         <div class="row justify-between items-center folderInfo"
              @click="goFolderSetting">
           <span class="folder">Folder</span>
-          <img style="width: 16px;height: 16px" src="../assets/menu/setting.svg">
+          <q-img style="width: 16px;height: 16px" :src="isFolderManager ? require('../assets/menu/activeSetting.svg') : require('../assets/menu/setting.svg')"/>
         </div>
 
         <q-item class="item" dense v-for="(category, index) in store.categories"
                 :key="'ct' + index" style="padding: 0;">
-          <q-expansion-item dense switchToggleSide :disable="category.feeds.length == 0">
+          <q-expansion-item dense switchToggleSide :disable="category.feeds.length === 0">
             <template v-slot:header>
               <q-item class="menuItem"
                       :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && category.feeds.find(e => e.id === store.menu_choice.value) !== undefined"
@@ -75,13 +80,11 @@
 
         <layout-left-item-menu :menu-type="MenuType.CreateNewFolder" :show-un-read-count="false" :dense="true"
                                @item-on-click="addFolder()"/>
-        <layout-left-item-menu :menu-type="MenuType.CreateNewFeed" :show-un-read-count="false" :dense="true"
-                               @item-on-click="addFeed()"/>
         <div class="row justify-between items-center folderInfo">
           <span class="folder">Boards</span>
         </div>
 
-        <layout-left-item-menu :menu-type="MenuType.Innovation" :show-un-read-count="false"></layout-left-item-menu>
+        <layout-left-item-menu :menu-type="MenuType.Innovation" :show-un-read-count="false"/>
         </q-scroll-area>
 
         <div class="row justify-between items-center"
@@ -106,34 +109,23 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref, onMounted, onUnmounted, watch} from 'vue';
+import {defineComponent, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useQuasar} from 'quasar';
-import {useRouter, useRoute} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 import {useIsMobile} from '../utils/utils';
 import {useRssStore} from 'stores/rss';
 
-import AddFeedDialog from '../components/AddFeedDialog.vue';
-import {
-  MenuType,
-  CategoryRequest,
-  Entry,
-  EntriesQueryRequest,
-  Feed
-} from '../types';
-import {create_category} from '../api/api';
-import {EntryStatus} from '../types';
-import {getPageRSSHub} from '../utils/radar'
-import {defaultRules} from '../utils/radar-rules';
+import {EntriesQueryRequest, Entry, EntryStatus, Feed, MenuType} from '../types';
 import SearchView from 'components/rss/SearchView.vue';
 import LayoutLeftItemMenu from 'components/LayoutLeftItemMenu.vue'
+import AddFolderDialog from 'components/dialog/AddFolderDialog.vue';
+import AddFeedDialog from 'components/dialog/AddFeedDialog.vue';
 
 export default defineComponent({
   name: 'MainLayout',
 
   components: {
     SearchView,
-    // SvgIcon,
-    // ItemView
     LayoutLeftItemMenu
   },
 
@@ -144,6 +136,7 @@ export default defineComponent({
     const item = ref<Entry | undefined>(undefined);
     const settingMode = ref();
     const dialogShow = ref(false);
+    const isFolderManager = ref(false);
 
     let active = ref('vault');
 
@@ -196,7 +189,7 @@ export default defineComponent({
         let entry = store.get_local_entry(entry_id);
         if (entry) {
           if (entry.status != EntryStatus.Read) {
-            store.mark_entry_read(entry_id);
+            store.mark_entry_read(entry_id,EntryStatus.Read);
           }
           item.value = entry;
         } else {
@@ -204,6 +197,10 @@ export default defineComponent({
         }
       }
     );
+
+    watch(() => Route.path,(value) => {
+      isFolderManager.value = value.includes('/folderSetting');
+    })
 
     watch(
       () => screenWidth.value,
@@ -235,10 +232,10 @@ export default defineComponent({
 
       todayCount.value = await store.get_today(true) || 0
 
-      await console.log(getPageRSSHub({
-        url: 'https://space.bilibili.com/65125803',
-        rules: defaultRules
-      }))
+      // await console.log(getPageRSSHub({
+      //   url: 'https://www.bilibili.com/video/av479863545/',
+      //   rules: defaultRules
+      // }))
     });
 
     onUnmounted(() => {
@@ -277,31 +274,47 @@ export default defineComponent({
       } else if (type == MenuType.Discover) {
         goto('/discover')
       } else if (type == MenuType.Unread) {
-        store.entries = []
+        store.get_entries(new EntriesQueryRequest({limit : 50,offset : 0}),(response) => {
+           const entries = response.entries.filter((entry) => {
+             return entry.status === EntryStatus.Unread;
+           })
+          if (entries){
+            return { entries : entries,total : entries.length}
+          }else {
+            return  response
+          }
+        })
         goto('/')
       } else if (type == MenuType.ReadLater) {
-        store.entries = []
+        store.get_entries(new EntriesQueryRequest({limit : 50,offset : 0}),(response) => {
+          const entries = response.entries.filter((entry) => {
+            return entry.starred;
+          })
+          if (entries){
+            return { entries : entries,total : entries.length}
+          }else {
+            return  response
+          }
+        })
         goto('/')
       }
     }
 
     const addFolder = () => {
       $q.dialog({
-        title: 'Add New Folder',
-        message: 'What is folder name',
-        prompt: {
-          model: '',
-          isValid: (val) => val.length > 0, // << here is the magic
-          type: 'text' // optional
-        },
-        cancel: true,
-        persistent: true
-      }).onOk(async (data: string) => {
-        console.log('>>>> OK, received', data);
-
-        await create_category({title: data} as CategoryRequest);
-        await store.refresh_category_and_feeds();
-      });
+        component: AddFolderDialog,
+        componentProps: {}
+      })
+        .onOk(async (data : string) => {
+          console.log(data)
+        })
+        .onCancel(() => {
+          console.log('Cancel');
+        })
+        .onDismiss(() => {
+          console.log('Called on OK or Cancel');
+          //     });
+        });
     };
 
     const addFeed = () => {
@@ -338,6 +351,7 @@ export default defineComponent({
       onSearch,
       store,
       active,
+      isFolderManager,
       innerWidth,
       updateLeftDrawer,
       goFolderSetting,
@@ -373,8 +387,17 @@ export default defineComponent({
   position: absolute;
 
   .search-view {
-    margin: 16px 16px 8px;
-    width: calc(100% - 32px)
+    margin: 16px 8px 8px 16px;
+    width: calc(100% - 72px)
+  }
+
+  .btn-add{
+    margin-top: 16px;
+    margin-right: 16px;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #FF8642;
+    border-radius: 6px;
   }
 }
 
@@ -525,6 +548,35 @@ export default defineComponent({
   // margin-top: 10px;
   // margin-bottom: 10px;
   // height: 36px;
+}
+
+:global(.q-field__marginal) {
+  height: 32px !important;
+  font-size: 12px !important;
+}
+
+:global(.q-field--auto-height .q-field__control) {
+  min-height: 32px;
+  // padding-top: 0;
+}
+
+:global(.q-field__native) {
+  height: 32px;
+  min-height: 32px !important;
+  // font-size: 12px;
+  padding: 0;
+}
+
+:global(body.desktop .q-checkbox:not(.disabled) .q-checkbox__inner:before) {
+  background: transparent;
+}
+
+:global(.q-field--dense) {
+  height: 32px;
+}
+:global(.q-field__control) {
+  height: 32px !important;
+  min-height: 32px !important;
 }
 
 </style>

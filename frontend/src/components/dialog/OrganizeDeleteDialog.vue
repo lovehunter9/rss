@@ -4,9 +4,15 @@
     ref="dialogRef"
     @hide="onDialogHide">
     <q-card class="q-dialog-plugin">
-      <div class="text-title">Delete Feed</div>
+      <div class="text-title">Delete {{ isFeed ? 'Feed' : 'Folder' }}
+      </div>
       <img class="icon-close" src="../../assets/menu/close.svg" @click="onDialogCancel">
-      <div class="text-content">Do you want to remove the selected RSS feeds？</div>
+      <div class="text-label">
+        {{ isFeed ? 'Do you want to remove the selected RSS feeds？' : 'Do you want to delete this folder?' }}
+      </div>
+      <div class="text-content" v-show="!isFeed">This will cause
+        removal of all feeds under this folder.
+      </div>
 
       <div class="row justify-end items-end" style="width: 100%">
         <q-btn
@@ -22,6 +28,13 @@
 <script setup lang="ts">
 
 import {useDialogPluginComponent} from 'quasar';
+
+defineProps({
+  isFeed: {
+    type: Boolean,
+    require: true
+  }
+})
 
 const {dialogRef, onDialogHide, onDialogOK, onDialogCancel} = useDialogPluginComponent();
 
@@ -60,6 +73,11 @@ const {dialogRef, onDialogHide, onDialogOK, onDialogCancel} = useDialogPluginCom
     line-height: 20px;
     text-align: center;
     color: #857C77;
+  }
+
+  .text-label {
+    @extend .text-content;
+    color: #1A130F;
   }
 
   .icon-close {

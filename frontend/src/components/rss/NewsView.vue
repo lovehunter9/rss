@@ -2,12 +2,12 @@
   <div class="news-root">
     <div class="row justify-between items-center detail-header">
       <div class="row justify-start">
-        <img class="icon-start" :src="preImage()" @click="preAction">
-        <img class="icon-start" :src="nextImage()" @click="nextAction">
+        <img class="icon-start" :src="preImage()" title="back" @click="preAction">
+        <img class="icon-start" :src="nextImage()" title="next" @click="nextAction">
       </div>
       <div class="row justify-end items-center">
-        <img class="icon-end" src="../../assets/menu/bookmark.svg">
-        <img class="icon-end" src="../../assets/menu/save.svg">
+        <img class="icon-end" :src="readRef" :title="readTextRef" @click="readChange"/>
+        <img class="icon-end" :src="markRef" :title="markTextRef" @click="bookmark">
         <img class="icon-end" src="../../assets/menu/share.svg">
       </div>
     </div>
@@ -18,7 +18,7 @@
         <div class="author">
           <a href="javascript:;" @click="jumpToFeed()">{{ item.feed.title }}</a>
         </div>
-      <img class="entry-icon" :src="store.feeds_icon[item.feed_id].data">
+        <img class="entry-icon" :src="store.feeds_icon[item.feed_id].data">
       </div>
       <q-separator style="margin-top:16px"/>
       <!-- <h1 v-if="!entry.startsWith('<h')"> {{ item.title }} </h1> -->
@@ -29,7 +29,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import {
   defineComponent,
   ref,
@@ -37,110 +37,154 @@ import {
   onMounted,
   PropType
 } from 'vue';
-import { useRssStore } from 'stores/rss';
-import { EntriesQueryRequest, Entry,MenuType } from '../../types';
-import { formatContentHtml, newsBus, newsBusMessage } from 'src/utils/utils'
-import { useRouter } from 'vue-router';
+import {useRssStore} from 'stores/rss';
+import {EntriesQueryRequest, Entry, EntryStatus, MenuType} from 'src/types';
+import {formatContentHtml, newsBus, newsBusMessage} from 'src/utils/utils'
+import {useRouter} from 'vue-router';
 
-export default defineComponent({
-  name: 'ItemView',
-  props: {
-    item: {
-      type: Object as PropType<Entry>,
-      required: true
-    }
-  },
-  components: {},
-  setup(props, context) {
-    if (context) {
-    }
-    const store = useRssStore();
-    const router = useRouter()
 
-    let entry = ref<string>('');
+const store = useRssStore();
+const router = useRouter()
+const readRef = ref();
+const markRef = ref()
+const readTextRef = ref('Click to convert the current article as unread');
+const markTextRef = ref('Read later');
+const readStatus = ref(true);
+const markStatus = ref(false);
 
-    async function updateEntry(newVal: Entry) {
-      entry.value = formatContentHtml(newVal.content);
-      store.update_entry_content(newVal.id, newVal.content);
+let entry = ref<string>('');
 
-      let id = newVal.id;
-
-      let k = await store.fetch_entry_content(id);
-      console.log(k);
-      if (k != undefined) {
-        entry.value = formatContentHtml(k);
-      }
-    }
-    // const showSelfTitle = ref(false)
-    watch(
-      () => props.item,
-      async (newVal: Entry) => {
-        if (!newVal) {
-          entry.value = '';
-          return;
-        }
-        updateEntry(newVal);
-      }
-    );
-
-    onMounted(async () => {
-      updateEntry(props.item);
-      //store.get_local_entry(1);
-    });
-
-    const preAction = () => {
-      if (!store.can_pre_route(props.item)) {
-        return
-      }
-      newsBus.emit(newsBusMessage.pre)
-    }
-
-    const nextAction = () => {
-      if (!store.can_next_route(props.item)) {
-        return
-      }
-      newsBus.emit(newsBusMessage.next)
-    }
-
-    const preImage = () => {
-      if (!store.can_pre_route(props.item)) {
-        return require('../../assets/menu/backward_disable.svg')
-      }
-      return require('../../assets/menu/backward.svg')
-    }
-
-    const nextImage = () => {
-      if (!store.can_next_route(props.item)) {
-        return require('../../assets/menu/forward_disable.svg')
-      }
-      return require('../../assets/menu/forward.svg')
-    }
-
-    const jumpToFeed = () => {
-      // store.
-
-      store.menu_choice = {
-        type: MenuType.Feed,
-        value: props.item.id
-      };
-      console.log(store.menu_choice)
-      store.get_entries(
-        new EntriesQueryRequest({ limit: 50, offset: 0, feed_id: props.item.id })
-      );
-      router.push('/')
-    }
-
-    return {
-      entry,
-      store,
-      preAction,
-      nextAction,
-      preImage,
-      nextImage,
-      jumpToFeed
-    };
+const props = defineProps({
+  item: {
+    type: Object as PropType<Entry>,
+    required: true
   }
+})
+
+watch(() => [store.menu_choice,store.entries], (newValue) => {
+  if (newValue) {
+    updateUI();
+  }
+}, {
+  deep: true,
+  immediate: true
+})
+
+updateUI()
+
+async function updateEntry(newVal: Entry) {
+  entry.value = formatContentHtml(newVal.content);
+  store.update_entry_content(newVal.id, newVal.content);
+
+  let id = newVal.id;
+
+  let k = await store.fetch_entry_content(id);
+  console.log(k);
+  if (k != undefined) {
+    entry.value = formatContentHtml(k);
+  }
+
+  updateUI();
+}
+
+function updateUI() {
+  if (props.item) {
+    readStatus.value = props.item.status === EntryStatus.Read;
+    markStatus.value = props.item.starred;
+  }
+
+  if (markStatus.value){
+    markRef.value = require('../../assets/menu/bookmark.svg')
+    markTextRef.value ='Cancel read later'
+  } else {
+    markRef.value = require('../../assets/menu/unbookmark.svg')
+    markTextRef.value ='Read later'
+  }
+
+  if (readStatus.value){
+    readRef.value = require('../../assets/menu/read.svg')
+    readTextRef.value ='Click to convert the current article as unread'
+  } else {
+    readRef.value = require('../../assets/menu/unread.svg')
+    readTextRef.value ='Click to convert the current article as read'
+  }
+}
+
+function bookmark(){
+  if (props.item){
+    store.mark_entry_starred(props.item.id)
+  }
+}
+
+function readChange(){
+  if (props.item){
+    store.mark_entry_read(props.item.id,readStatus.value ? EntryStatus.Unread : EntryStatus.Read)
+  }
+}
+
+// const showSelfTitle = ref(false)
+watch(
+  () => props.item,
+  async (newVal: Entry) => {
+    console.log(newVal)
+    if (!newVal) {
+      entry.value = '';
+      return;
+    }
+    updateEntry(newVal);
+  }
+  ,{
+    deep : true,
+    immediate : true
+  });
+
+onMounted(async () => {
+  updateEntry(props.item);
+  //store.get_local_entry(1);
 });
+
+const preAction = () => {
+  if (!store.can_pre_route(props.item)) {
+    return
+  }
+  newsBus.emit(newsBusMessage.pre)
+}
+
+const nextAction = () => {
+  if (!store.can_next_route(props.item)) {
+    return
+  }
+  newsBus.emit(newsBusMessage.next)
+}
+
+const preImage = () => {
+  if (!store.can_pre_route(props.item)) {
+    return require('../../assets/menu/backward_disable.svg')
+  }
+  return require('../../assets/menu/backward.svg')
+}
+
+const nextImage = () => {
+  if (!store.can_next_route(props.item)) {
+    return require('../../assets/menu/forward_disable.svg')
+  }
+  return require('../../assets/menu/forward.svg')
+}
+
+const jumpToFeed = () => {
+  // store.
+
+  store.menu_choice = {
+    type: MenuType.Feed,
+    value: props.item.id
+  };
+  console.log(store.menu_choice)
+  store.get_entries(
+    new EntriesQueryRequest({limit: 50, offset: 0, feed_id: props.item.id})
+  );
+  router.push('/')
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -175,9 +219,15 @@ export default defineComponent({
     padding-left: 32px;
     padding-right: 32px;
 
-    .author  {
-      a:link{text-decoration:none; color:#1A130F;}
-      a:hover{color:blue}
+    .author {
+      a:link {
+        text-decoration: none;
+        color: #1A130F;
+      }
+
+      a:hover {
+        color: blue
+      }
     }
 
 

@@ -3,7 +3,7 @@
     <template v-slot:before>
       <div class="item-list">
         <div class="row justify-end items-center">
-          <img class="icon-read-all" src="../assets/menu/readAll.svg">
+          <img class="icon-read-all" :src="readRef" @click="readAll" :title="readTextRef">
           <img class="icon-refresh" src="../assets/menu/refresh.svg">
         </div>
         <div class="text-label">{{ labelRef }}</div>
@@ -18,7 +18,7 @@
 
     <template v-slot:after>
       <div class="column items-center justify-center" style="height: 100vh;">
-        <ItemView v-if="item" :item="item" />
+        <news-view v-if="item" :item="item" />
         <div class="text-7A7A7A column items-center justify-center" v-else>
           <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148" />
           {{ 'No item selected.' }}
@@ -31,13 +31,13 @@
 </template>
 
 <script lang="ts" setup>
-import { useRssStore } from 'stores/rss';
-import { EntryStatus, MenuType, Entry } from 'src/types';
-import { onMounted, ref, watch } from 'vue';
+import {useRssStore} from 'stores/rss';
+import {Entry, EntryStatus, MenuType} from 'src/types';
+import {onMounted, ref, watch} from 'vue';
 import EntryView from 'components/rss/EntryView.vue';
-import { newsBus, newsBusMessage } from 'src/utils/utils';
-import { useRouter, useRoute } from 'vue-router';
-import ItemView from 'components/rss/NewsView.vue';
+import {newsBus, newsBusMessage} from 'src/utils/utils';
+import {useRoute, useRouter} from 'vue-router';
+import NewsView from 'components/rss/NewsView.vue';
 
 const store = useRssStore();
 const labelRef = ref('')
@@ -46,8 +46,11 @@ const subLabelRef = ref('0 Unread Feeds')
 const selectIndex = ref(-1)
 const router = useRouter()
 const Route = useRoute()
+const readRef = ref(require('../assets/menu/unread.svg'));
+const readTextRef = ref('Click to convert all articles to read');
+const readStatus = ref(false);
 
-watch(() => store.menu_choice, (newValue) => {
+watch(() => [store.menu_choice,store.entries], (newValue) => {
   if (newValue) {
     updateUI();
   }
@@ -56,8 +59,17 @@ watch(() => store.menu_choice, (newValue) => {
   immediate: true
 })
 
+watch(() => readStatus.value,() => {
+  if (readStatus.value){
+    readRef.value = require('../assets/menu/read.svg')
+    readTextRef.value ='Click to convert all articles to unread'
+  } else {
+    readRef.value = require('../assets/menu/unread.svg')
+    readTextRef.value ='Click to convert all articles to read'
+  }
+})
+
 onMounted(() => {
-  updateUI();
 
   newsBus.on(newsBusMessage.pre, () => {
     if (selectIndex.value <= 0) {
@@ -131,6 +143,24 @@ function updateUI() {
       labelRef.value = feed.title
       break;
   }
+  if (store.entries.length > 0) {
+    const find = store.entries.find(entry => {
+      return entry.status === EntryStatus.Unread
+    })
+    readStatus.value = !find;
+  }
+}
+
+function readAll(){
+  if (readStatus.value){
+    store.entries.forEach(entry => {
+      store.mark_entry_read(entry.id,EntryStatus.Unread)
+    })
+  }else {
+    store.entries.forEach(entry => {
+      store.mark_entry_read(entry.id,EntryStatus.Read)
+    })
+  }
 }
 
 const splitterModel = ref(400)
@@ -150,7 +180,7 @@ watch(
     item.value = undefined
     if (entry) {
       if (entry.status != EntryStatus.Read) {
-        store.mark_entry_read(entry_id);
+        store.mark_entry_read(entry_id,EntryStatus.Read);
       }
       setTimeout(() => {
         item.value = entry;

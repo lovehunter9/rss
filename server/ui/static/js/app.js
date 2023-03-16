@@ -214,18 +214,17 @@ function handleRefreshAllFeeds() {
     request.execute();
 }
 
-// Send the Ajax request to change entries statuses.
-function updateEntriesStatus(entryIDs, status, callback) {
+export function updateEntriesStatus(entryIDs, status, callback) {
     let url = document.body.dataset.entriesStatusUrl;
     let request = new RequestBuilder(url);
     request.withBody({entry_ids: entryIDs, status: status});
     request.withCallback((resp) => {
         resp.json().then(count => {
-        if (callback) {
-            callback(resp);
-        }
+            if (callback) {
+                callback(resp);
+            }
 
-            if (status === "read") {
+            if (status === 'read') {
                 decrementUnreadCounter(count);
             } else {
                 incrementUnreadCounter(count);
@@ -234,7 +233,6 @@ function updateEntriesStatus(entryIDs, status, callback) {
     });
     request.execute();
 }
-
 // Handle save entry from list view and entry view.
 function handleSaveEntry(element) {
     let toasting = !element;
