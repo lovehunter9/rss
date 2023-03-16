@@ -77,4 +77,14 @@ func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
 	sr.HandleFunc("/entries/{entryID}/fetch-content", handler.fetchContent).Methods(http.MethodGet)
 
 	sr.HandleFunc("/entry/status", handler.updateEntriesStatus).Name("updateEntriesStatus").Methods(http.MethodPost) //add 当前页设置已读
+
+	sr.HandleFunc("/boards", handler.createBoard).Methods(http.MethodPost)
+	sr.HandleFunc("/boards", handler.getBoards).Methods(http.MethodGet)
+	sr.HandleFunc("/boards/{boardID}", handler.updateBoard).Methods(http.MethodPut)
+	sr.HandleFunc("/boards/{boardID}", handler.removeBoard).Methods(http.MethodDelete)
+	sr.HandleFunc("/entries/addEntryToBoard", handler.addEntryToBoard).Methods(http.MethodPut)
+	sr.HandleFunc("/entries/removeEntryFromBoard", handler.removeEntryToBoard).Methods(http.MethodPut)
+	sr.HandleFunc("/boards/{boardID}/entries", handler.getBoardEntries).Methods(http.MethodGet)
+	sr.HandleFunc("/entries/{entryID}/readlater", handler.readlater).Methods(http.MethodPut)
+	sr.HandleFunc("/readlater", handler.getReadLaterEntries).Methods(http.MethodGet)
 }

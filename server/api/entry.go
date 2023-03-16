@@ -316,3 +316,111 @@ func (h *handler) updateEntriesStatus(w http.ResponseWriter, r *http.Request) {
 
 	json.OK(w, r, count)
 }
+
+func (h *handler) readlater(w http.ResponseWriter, r *http.Request) {
+	entryID := request.RouteInt64Param(r, "entryID")
+	if err := h.store.ReadLater(request.UserID(r), entryID); err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
+
+	json.NoContent(w, r)
+}
+
+func (h *handler) getReadLaterEntries(w http.ResponseWriter, r *http.Request) {
+	order := request.QueryStringParam(r, "order", model.DefaultSortingOrder)
+	if err := validator.ValidateEntryOrder(order); err != nil {
+		json.BadRequest(w, r, err)
+		return
+	}
+
+	direction := request.QueryStringParam(r, "direction", model.DefaultSortingDirection)
+	if err := validator.ValidateDirection(direction); err != nil {
+		json.BadRequest(w, r, err)
+		return
+	}
+
+	limit := request.QueryIntParam(r, "limit", 100)
+	offset := request.QueryIntParam(r, "offset", 0)
+	if err := validator.ValidateRange(offset, limit); err != nil {
+		json.BadRequest(w, r, err)
+		return
+	}
+	builder := h.store.NewEntryQueryBuilder(request.UserID(r))
+	builder.WithReadLater(true)
+	builder.WithOrder(order)
+	builder.WithDirection(direction)
+	builder.WithOffset(offset)
+	builder.WithLimit(limit)
+	configureFilters(builder, r)
+
+	entries, err := builder.GetEntries()
+	if err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
+
+	count, err := builder.CountEntries()
+	if err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
+
+	for i := range entries {
+		entries[i].Content = proxy.AbsoluteImageProxyRewriter(h.router, r.Host, entries[i].Content)
+	}
+
+	json.OK(w, r, &entriesResponse{Total: count, Entries: entries})
+
+}
+
+func (h *handler) getBoardEntries(w http.ResponseWriter, r *http.Request) {
+
+	order := request.QueryStringParam(r, "order", model.DefaultSortingOrder)
+	if err := validator.ValidateEntryOrder(order); err != nil {
+		json.BadRequest(w, r, err)
+		return
+	}
+
+	direction := request.QueryStringParam(r, "direction", model.DefaultSortingDirection)
+	if err := validator.ValidateDirection(direction); err != nil {
+		json.BadRequest(w, r, err)
+		return
+	}
+
+	limit := request.QueryIntParam(r, "limit", 100)
+	offset := request.QueryIntParam(r, "offset", 0)
+	if err := validator.ValidateRange(offset, limit); err != nil {
+		json.BadRequest(w, r, err)
+		return
+	}
+
+	boardID := request.RouteInt64Param(r, "boardID")
+
+	userID := request.UserID(r)
+
+	builder := h.store.NewEntryQueryBuilder(userID)
+	builder.WithBoard(boardID)
+	builder.WithOrder(order)
+	builder.WithDirection(direction)
+	builder.WithOffset(offset)
+	builder.WithLimit(limit)
+
+	entries, err := builder.GetBoardEntries()
+	if err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
+
+	count, err := builder.CountBoardEntries(userID, boardID)
+	if err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
+
+	for i := range entries {
+		entries[i].Content = proxy.AbsoluteImageProxyRewriter(h.router, r.Host, entries[i].Content)
+	}
+
+	json.OK(w, r, &entriesResponse{Total: count, Entries: entries})
+}
