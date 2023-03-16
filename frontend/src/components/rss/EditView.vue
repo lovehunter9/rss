@@ -21,7 +21,7 @@
 
 import {ref} from 'vue';
 
-const  props = defineProps({
+const props = defineProps({
   text : {
     type : String,
     default : '',
@@ -36,6 +36,11 @@ const  props = defineProps({
     type: String,
     default: '',
     required: false
+  },
+  emitKey : {
+    type : String,
+    default : '',
+    require : false
   }
 })
 
@@ -44,7 +49,7 @@ const inputValue = ref(props.text)
 const emit = defineEmits(['input'])
 
 function onInput(value : string){
-  emit('input',value)
+  emit('input',props.emitKey,value)
 }
 
 </script>

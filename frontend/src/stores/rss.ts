@@ -8,7 +8,7 @@ import {
   EntryStatus,
   Feed,
   FeedCounters,
-  FeedIconResponse,
+  FeedIconResponse, FeedModificationRequest,
   MenuChoice,
   MenuType,
   SDKQueryRequest,
@@ -24,7 +24,7 @@ import {
   get_feeds,
   get_today, remove_category, remove_feed,
   update_entry_status,
-  sdkSearchFeedsByPath,
+  sdkSearchFeedsByPath, update_feed,
 } from 'src/api/api';
 
 export type DataState = {
@@ -132,6 +132,16 @@ export const useRssStore = defineStore('rss', {
         return this.feeds_icon[feed_id];
       } catch (e) {
         return undefined;
+      }
+    },
+
+    async updateFeed(feedID: number,request : FeedModificationRequest){
+      try {
+        const data = await update_feed(feedID.toString(),request);
+        console.log(data)
+        await this.refresh_category_and_feeds()
+      } catch (e) {
+        console.log(e);
       }
     },
 

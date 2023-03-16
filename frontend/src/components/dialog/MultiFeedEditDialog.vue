@@ -13,21 +13,21 @@
 
           <div class="edit-label">You've selected {{ props.feeds.length }} feeds</div>
 
-            <div class="row items-start">
-              <div class="selected-button row justify-start items-center" v-for="item in feeds" :key="item.id">
-                <img class="button-icon" :src="store.feeds_icon[item.id].data"/>
-                <div class="button-text">{{ item.title }}</div>
-              </div>
+          <div class="row items-start">
+            <div class="selected-button row justify-start items-center" v-for="item in feeds" :key="item.id">
+              <img class="button-icon" :src="store.feeds_icon[item.id].data"/>
+              <div class="button-text">{{ item.title }}</div>
+            </div>
           </div>
 
-          <!--          <div class="edit-label">Added in</div>-->
-          <!--          <q-checkbox dense size="md" class="check-box" v-model="categoryRef" :label="feed.category.title"-->
-          <!--                      color="orange"/>-->
+          <div class="edit-label" v-show="parentStatusRef != null">Added in</div>
+          <q-checkbox dense size="md" class="check-box" v-model="parentStatusRef" :label="parentCategoriesRef ? parentCategoriesRef.title : ''"
+                      color="orange" disable v-show="parentStatusRef != null"/>
 
           <div class="edit-label">Folders</div>
           <q-checkbox v-for="item in categoriesRef" v-model="item.selected" :key="item.id" dense size="md"
-                      class="check-box" color="orange"
-                      :label="item.title"/>
+                      class="check-box" color="orange" :label="item.data.title"
+                      @update:model-value="setSelected(item)"/>
 
           <div class="folder-layout row justify-start items-center" @click="addFolder">
             <q-icon name="img:/imgs/createnewfolder.svg" size="16px"/>
@@ -53,9 +53,10 @@
 
 import {useDialogPluginComponent, useQuasar} from 'quasar';
 import {PropType, ref} from 'vue';
-import {CategoryRequest, Feed, FeedCreationRequest} from 'src/types';
+import {Category, Feed, FeedModificationRequestImpl} from 'src/types';
 import {useRssStore} from 'stores/rss';
-import {create_category, create_feed, get_feeds} from 'src/api/api';
+import AddFolderDialog from 'components/dialog/AddFolderDialog.vue';
+import {OptionalCategory} from 'stores/organizeConfig';
 
 const props = defineProps({
   feeds: {
@@ -66,64 +67,94 @@ const props = defineProps({
 
 const store = useRssStore();
 const $q = useQuasar();
-// const categoryRef = ref(true)
-const categoriesRef = ref<any[]>([])
+const parentStatusRef = ref<boolean | null>(null)
+const parentCategoriesRef = ref<Category | undefined>(undefined)
+
+const categoriesRef = ref<OptionalCategory[]>([])
+let selectedCategory: OptionalCategory | undefined = undefined
 
 const {dialogRef, onDialogHide, onDialogOK, onDialogCancel} = useDialogPluginComponent();
 
 updateCategories();
 
+function setSelected(item: OptionalCategory) {
+  console.log(item)
+  if (item.selected) {
+    selectedCategory = item
+    categoriesRef.value.forEach((category) => {
+      if (category.data.id != item.data.id) {
+        category.setSelected(false)
+      }
+    })
+    if (parentStatusRef.value !== null){
+      parentStatusRef.value = false;
+    }
+  } else {
+    selectedCategory = undefined
+    categoriesRef.value.forEach((category) => {
+      category.setSelected(false)
+    })
+    if (parentStatusRef.value !== null){
+      parentStatusRef.value = true;
+    }
+  }
+}
+
 function updateCategories() {
-  if (props.feeds) {
-    categoriesRef.value = store.categories.map((value) => {
-      return {
-        ...value,
-        selected: false
+  categoriesRef.value = []
+  if (props.feeds){
+    const set = new Set;
+    props.feeds.forEach((feed) => {
+      set.add(feed.category.title)
+    })
+    if (set.size > 1){
+      parentStatusRef.value = null
+      parentCategoriesRef.value = undefined
+    }else {
+      parentStatusRef.value = true;
+      parentCategoriesRef.value = props.feeds[0].category
+    }
+
+    store.categories.forEach((category: Category) => {
+      if (parentStatusRef.value && props.feeds && parentCategoriesRef.value) {
+        if (category.id !== parentCategoriesRef.value.id) {
+          categoriesRef.value.push(new OptionalCategory(category))
+        }
+      }else {
+        categoriesRef.value.push(new OptionalCategory(category))
       }
     })
   }
-  console.log(categoriesRef.value)
 }
 
 function addFolder() {
   $q.dialog({
-    title: 'Add New Folder',
-    message: 'What is folder name',
-    prompt: {
-      model: '',
-      isValid: (val) => val.length > 0, // << here is the magic
-      type: 'text' // optional
-    },
-    cancel: true,
-    persistent: true
-  }).onOk(async (data: string) => {
-    console.log('>>>> OK, received', data);
-
-    await create_category({title: data} as CategoryRequest);
-    await store.refresh_category_and_feeds();
-    updateCategories();
-  });
-}
-
-async function addFeed(feedUrl: string, categoryId: number) {
-  await create_feed({
-    category_id: categoryId,
-    feed_url: feedUrl
-  } as FeedCreationRequest);
-  await get_feeds();
-  await store.refresh_category_and_feeds();
-}
-
-function onConfirm() {
-  console.log(categoriesRef.value)
-  categoriesRef.value.forEach((value) => {
-    if (value.selected) {
-
-    } else {
-
-    }
+    component: AddFolderDialog,
+    componentProps: {}
   })
-  onDialogOK()
+    .onOk(async (data: string) => {
+      console.log(data)
+    })
+    .onCancel(() => {
+      console.log('Cancel');
+    })
+    .onDismiss(() => {
+      console.log('Called on OK or Cancel');
+      //     });
+    });
+}
+
+async function onConfirm() {
+  if (props.feeds) {
+    await props.feeds.forEach((feed) => {
+      if (selectedCategory) {
+        const model = new FeedModificationRequestImpl(feed);
+        model.category_id = selectedCategory.getId()
+        store.updateFeed(feed.id,model)
+      }
+    })
+    onDialogOK()
+  }
 }
 
 </script>

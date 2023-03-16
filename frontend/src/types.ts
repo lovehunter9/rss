@@ -346,7 +346,7 @@ export interface FeedCreationRequest {
 // 	FetchViaProxy               *bool   `json:"fetch_via_proxy"`
 // 	HideGlobally                *bool   `json:"hide_globally"`
 // }
-interface FeedModificationRequest {
+export interface FeedModificationRequest {
   feed_url: string;
   site_url: string;
   title: string;
@@ -366,6 +366,52 @@ interface FeedModificationRequest {
   allow_self_signed_certificates: boolean;
   fetch_via_proxy: boolean;
   hide_globally: boolean;
+}
+
+export class FeedModificationRequestImpl implements FeedModificationRequest{
+
+  allow_self_signed_certificates: boolean;
+  blocklist_rules: string;
+  category_id: number;
+  cookie: string;
+  crawler: boolean;
+  disabled: boolean;
+  feed_url: string;
+  fetch_via_proxy: boolean;
+  hide_globally: boolean;
+  ignore_http_cache: boolean;
+  keeplist_rules: string;
+  password: string;
+  rewrite_rules: string;
+  scraper_rules: string;
+  site_url: string;
+  title: string;
+  urlrewrite_rules: string;
+  user_agent: string;
+  username: string;
+
+
+  constructor(feed : Feed) {
+    this.allow_self_signed_certificates = feed.allow_self_signed_certificates;
+    this.blocklist_rules = feed.blocklist_rules;
+    this.category_id = feed.category.id;
+    this.cookie = feed.cookie;
+    this.crawler = feed.crawler;
+    this.disabled = feed.disabled;
+    this.feed_url = feed.feed_url;
+    this.fetch_via_proxy = feed.fetch_via_proxy;
+    this.hide_globally = feed.hide_globally;
+    this.ignore_http_cache = feed.ignore_http_cache;
+    this.keeplist_rules = feed.keeplist_rules;
+    this.password = feed.password;
+    this.rewrite_rules = feed.rewrite_rules;
+    this.scraper_rules = feed.scraper_rules;
+    this.site_url = feed.site_url;
+    this.title = feed.title;
+    this.urlrewrite_rules = feed.urlrewrite_rules;
+    this.user_agent = feed.user_agent;
+    this.username = feed.username;
+  }
 }
 
 //order : "id", "status", "changed_at", "published_at", "created_at", "category_title", "category_id", "title", "author", dafault = "published_at"

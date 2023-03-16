@@ -17,13 +17,12 @@
           </div>
 
           <div class="edit-label">Added in</div>
-          <q-checkbox dense size="md" class="check-box" v-model="categoryRef" :label="feed.category.title"
-                      color="orange"/>
+          <q-checkbox dense size="md" class="check-box" v-model="parentCategoryRef" :label="feed.category.title"
+                      color="orange" disable />
 
           <div class="edit-label">Folders</div>
           <q-checkbox v-for="item in categoriesRef" v-model="item.selected" :key="item.id" dense size="md"
-                      class="check-box" color="orange"
-                      :label="item.title"/>
+                      class="check-box" color="orange" :label="item.data.title" @update:model-value="setSelected(item)"/>
 
           <div class="folder-layout row justify-start items-center" @click="addFolder">
             <q-icon name="img:/imgs/createnewfolder.svg" size="16px"/>
@@ -31,13 +30,13 @@
           </div>
 
           <div class="edit-title">Title</div>
-          <edit-view class="edit-view" :text="feed.title" :is-read-only="true"/>
+          <edit-view class="edit-view" :text="model.title" emit-key="title" @input="onInput"/>
 
           <div class="edit-title">External URL</div>
-          <edit-view class="edit-view" :text="feed.site_url" :is-read-only="true"/>
+          <edit-view class="edit-view" :text="model.site_url" emit-key="site_url" @input="onInput"/>
 
           <div class="edit-title">RSS URL</div>
-          <edit-view class="edit-view" :text="feed.feed_url" :is-read-only="true"/>
+          <edit-view class="edit-view" :text="model.feed_url" emit-key="feed_url" @input="onInput"/>
 
           <q-expansion-item dense class="expansion-layout">
 
@@ -50,31 +49,40 @@
             <div class="column justify-start items-start" style="width: 100%;">
 
               <div class="edit-title">Feed username</div>
-              <edit-view class="edit-view" :text="feed.username" :is-read-only="true" placeholder="Feed username"/>
+              <edit-view class="edit-view" :text="model.username" emit-key="username" placeholder="Feed username"
+                         @input="onInput"/>
 
               <div class="edit-title">Feed Password</div>
-              <edit-view class="edit-view" :text="feed.password" :is-read-only="true" placeholder="Feed Password"/>
+              <edit-view class="edit-view" :text="model.password" emit-key="password" placeholder="Feed Password"
+                         @input="onInput"/>
 
               <div class="edit-title">Override Default User Agent</div>
-              <edit-view class="edit-view" :text="feed.user_agent" :is-read-only="true" placeholder="Override Default User Agent"/>
+              <edit-view class="edit-view" :text="model.user_agent" emit-key="user_agent"
+                         placeholder="Override Default User Agent"/>
 
               <div class="edit-title">Set Cookies</div>
-              <edit-view class="edit-view" :text="feed.cookie" :is-read-only="true" placeholder="Set Cookies"/>
+              <edit-view class="edit-view" :text="model.cookie" emit-key="cookie" placeholder="Set Cookies"
+                         @input="onInput"/>
 
               <div class="edit-title">Scraper Rules</div>
-              <edit-view class="edit-view" :text="feed.scraper_rules" :is-read-only="true" placeholder="Scraper Rules"/>
+              <edit-view class="edit-view" :text="model.scraper_rules" emit-key="scraper_rules"
+                         placeholder="Scraper Rules" @input="onInput"/>
 
               <div class="edit-title">Rewrite Rules</div>
-              <edit-view class="edit-view" :text="feed.rewrite_rules" :is-read-only="true" placeholder="Rewrite Rules"/>
+              <edit-view class="edit-view" :text="model.rewrite_rules" emit-key="rewrite_rules"
+                         placeholder="Rewrite Rules" @input="onInput"/>
 
               <div class="edit-title">Block Rules</div>
-              <edit-view class="edit-view" :text="feed.blocklist_rules" :is-read-only="true" placeholder="Block Rules"/>
+              <edit-view class="edit-view" :text="model.blocklist_rules" emit-key="blocklist_rules"
+                         placeholder="Block Rules" @input="onInput"/>
 
               <div class="edit-title">Keep Rules</div>
-              <edit-view class="edit-view" :text="feed.keeplist_rules" :is-read-only="true" placeholder="Keep Rules"/>
+              <edit-view class="edit-view" :text="model.keeplist_rules" emit-key="keeplist_rules"
+                         placeholder="Keep Rules" @input="onInput"/>
 
               <div class="edit-title">URL Rewrite Rules</div>
-              <edit-view class="edit-view" :text="feed.urlrewrite_rules" :is-read-only="true" placeholder="URL Rewrite Rules"/>
+              <edit-view class="edit-view" :text="model.urlrewrite_rules" emit-key="urlrewrite_rules"
+                         placeholder="URL Rewrite Rules" @input="onInput"/>
 
               <q-checkbox dense size="md" class="check-box" v-model="fetchOriginalRef" label="Fetch original content"
                           color="orange"/>
@@ -94,8 +102,8 @@
                           color="orange"/>
 
               <div class="bottom-background">
-                <div class="text-bottom">·Etag header:{{feed.etag_header}}</div>
-                <div class="text-bottom">·LastModified header:{{feed.last_modified_header}}</div>
+                <div class="text-bottom">·Etag header:{{ feed.etag_header }}</div>
+                <div class="text-bottom">·LastModified header:{{ feed.last_modified_header }}</div>
               </div>
 
             </div>
@@ -120,10 +128,11 @@
 
 import {useDialogPluginComponent, useQuasar} from 'quasar';
 import {PropType, ref} from 'vue';
-import {Category, CategoryRequest, Feed} from 'src/types';
+import {Category, Feed, FeedModificationRequestImpl} from 'src/types';
 import {useRssStore} from 'stores/rss';
 import EditView from 'components/rss/EditView.vue';
-import {create_category} from 'src/api/api';
+import {OptionalCategory} from 'stores/organizeConfig';
+import AddFolderDialog from 'components/dialog/AddFolderDialog.vue';
 
 const props = defineProps({
   feed: {
@@ -134,8 +143,8 @@ const props = defineProps({
 
 const store = useRssStore();
 const $q = useQuasar();
-const categoryRef = ref(true)
-const categoriesRef = ref<any[]>([])
+const parentCategoryRef = ref(true)
+const categoriesRef = ref<OptionalCategory[]>([])
 
 const fetchOriginalRef = ref(false)
 const httpCacheRef = ref(false)
@@ -143,56 +152,90 @@ const selfSignedRef = ref(false)
 const notRefreshFeedRef = ref(false)
 const hideEntriesRef = ref(false)
 
+let selectedCategory :OptionalCategory | undefined = undefined
+let model: FeedModificationRequestImpl | undefined = undefined;
+if (props.feed) {
+  model = new FeedModificationRequestImpl(props.feed)
+  fetchOriginalRef.value = model.fetch_via_proxy
+  httpCacheRef.value = model.ignore_http_cache
+  selfSignedRef.value = model.allow_self_signed_certificates
+  notRefreshFeedRef.value = model.crawler
+  hideEntriesRef.value = model.hide_globally
+}
+
 const {dialogRef, onDialogHide, onDialogOK, onDialogCancel} = useDialogPluginComponent();
 
 updateCategories();
+
+function onInput(key: string, value: string) {
+  if (key && model) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    model[key] = value
+  }
+}
+
+function setSelected(item : OptionalCategory){
+  console.log(item)
+  if (item.selected){
+    selectedCategory =  item
+    categoriesRef.value.forEach((category) => {
+      if (category.data.id != item.data.id){
+        category.setSelected(false)
+      }
+    })
+    parentCategoryRef.value = false;
+  } else {
+    selectedCategory = undefined
+    categoriesRef.value.forEach((category) => {
+      category.setSelected(false)
+    })
+    parentCategoryRef.value = true;
+  }
+}
 
 function updateCategories() {
   categoriesRef.value = []
   store.categories.forEach((category: Category) => {
     if (props.feed) {
       if (category.id !== props.feed.category.id) {
-        categoriesRef.value.push(
-          {
-            ...category,
-            selected: false
-          })
+        categoriesRef.value.push(new OptionalCategory(category))
       }
     }
   })
-  console.log(categoriesRef.value)
 }
 
 function addFolder() {
   $q.dialog({
-    title: 'Add New Folder',
-    message: 'What is folder name',
-    prompt: {
-      model: '',
-      isValid: (val) => val.length > 0, // << here is the magic
-      type: 'text' // optional
-    },
-    cancel: true,
-    persistent: true
-  }).onOk(async (data: string) => {
-    console.log('>>>> OK, received', data);
-
-    await create_category({title: data} as CategoryRequest);
-    await store.refresh_category_and_feeds();
-    updateCategories();
-  });
+    component: AddFolderDialog,
+    componentProps: {}
+  })
+    .onOk(async (data : string) => {
+      console.log(data)
+    })
+    .onCancel(() => {
+      console.log('Cancel');
+    })
+    .onDismiss(() => {
+      console.log('Called on OK or Cancel');
+      //     });
+    });
 }
 
-function onConfirm() {
-  console.log(categoriesRef.value)
-  categoriesRef.value.forEach((value) => {
-    if (value.selected) {
-
-    } else {
-
+async function onConfirm() {
+  console.log(model)
+  if (props.feed && model) {
+    model.fetch_via_proxy = fetchOriginalRef.value
+    model.ignore_http_cache = httpCacheRef.value
+    model.allow_self_signed_certificates = selfSignedRef.value
+    model.crawler = notRefreshFeedRef.value
+    model.hide_globally = hideEntriesRef.value
+    if (selectedCategory){
+      model.category_id = selectedCategory.getId()
     }
-  })
-  onDialogOK()
+    await store.updateFeed(props.feed.id, model)
+    onDialogOK()
+  }
 }
 
 </script>
@@ -296,12 +339,12 @@ function onConfirm() {
     margin-top: 4px;
   }
 
-  .expansion-layout{
+  .expansion-layout {
     width: 100%;
     margin-top: 12px;
     padding-left: 0;
 
-    .text-more{
+    .text-more {
       font-family: 'Roboto';
       margin-left: -14px;
       font-style: normal;
@@ -312,7 +355,7 @@ function onConfirm() {
       color: #1B87F4;
     }
 
-    .bottom-background{
+    .bottom-background {
       width: 100%;
       text-align: left;
       padding: 16px;
@@ -320,7 +363,7 @@ function onConfirm() {
       background: rgba(26, 19, 15, 0.05);
       border-radius: 6px;
 
-      .text-bottom{
+      .text-bottom {
         font-family: 'Roboto';
         font-style: normal;
         font-weight: 400;

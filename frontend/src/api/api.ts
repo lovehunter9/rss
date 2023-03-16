@@ -12,6 +12,7 @@ import {
   FeedIconResponse,
   SDKQueryRequest,
   SDKSearchPathResponse,
+  FeedModificationRequest,
 } from 'src/types';
 import { useRssStore } from 'src/stores/rss';
 
@@ -65,6 +66,16 @@ export async function remove_category(categoryID: string) {
   const rssStore = useRssStore();
   try {
     await axios.delete(rssStore.url + '/api/categories/' + categoryID, {});
+    return true;
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function update_feed(feedID: string,request : FeedModificationRequest) {
+  const rssStore = useRssStore();
+  try {
+    await axios.put(rssStore.url + '/api/feeds/' + feedID, request);
     return true;
   } catch (e) {
     return null;
