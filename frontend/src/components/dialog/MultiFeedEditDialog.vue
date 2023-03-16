@@ -2,7 +2,7 @@
   <q-dialog
     class="delete-root text-center"
     ref="dialogRef"
-    @hide="onDialogHide">
+    >
     <q-card class="q-dialog-plugin">
       <div class="text-title">Reorganize Selected Feeds</div>
       <img class="icon-close" src="../../assets/menu/close.svg" @click="onDialogCancel">
@@ -73,7 +73,7 @@ const parentCategoriesRef = ref<Category | undefined>(undefined)
 const categoriesRef = ref<OptionalCategory[]>([])
 let selectedCategory: OptionalCategory | undefined = undefined
 
-const {dialogRef, onDialogHide, onDialogOK, onDialogCancel} = useDialogPluginComponent();
+const {dialogRef, onDialogOK, onDialogCancel} = useDialogPluginComponent();
 
 updateCategories();
 

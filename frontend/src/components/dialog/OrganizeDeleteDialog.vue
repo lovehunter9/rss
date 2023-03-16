@@ -2,7 +2,7 @@
   <q-dialog
     class="delete-root text-center"
     ref="dialogRef"
-    @hide="onDialogHide">
+    >
     <q-card class="q-dialog-plugin">
       <div class="text-title">Delete {{ isFeed ? 'Feed' : 'Folder' }}
       </div>
@@ -36,7 +36,7 @@ defineProps({
   }
 })
 
-const {dialogRef, onDialogHide, onDialogOK, onDialogCancel} = useDialogPluginComponent();
+const {dialogRef, onDialogOK, onDialogCancel} = useDialogPluginComponent();
 
 </script>
 

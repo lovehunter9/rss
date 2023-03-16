@@ -2,7 +2,7 @@
   <q-dialog
     class="delete-root text-center"
     ref="dialogRef"
-    @hide="onDialogHide">
+    >
     <q-card class="q-dialog-plugin">
       <div class="text-title">Edit Feed</div>
       <img class="icon-close" src="../../assets/menu/close.svg" @click="onDialogCancel">
@@ -163,7 +163,7 @@ if (props.feed) {
   hideEntriesRef.value = model.hide_globally
 }
 
-const {dialogRef, onDialogHide, onDialogOK, onDialogCancel} = useDialogPluginComponent();
+const {dialogRef, onDialogOK, onDialogCancel} = useDialogPluginComponent();
 
 updateCategories();
 

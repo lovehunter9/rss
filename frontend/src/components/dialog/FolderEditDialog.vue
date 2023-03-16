@@ -2,7 +2,7 @@
   <q-dialog
     class="delete-root text-center"
     ref="dialogRef"
-    @hide="onDialogHide">
+    >
 
     <q-card class="q-dialog-plugin">
 
@@ -69,7 +69,7 @@ const prop = defineProps({
 const organizeStore = useOrganizeStore()
 const $q = useQuasar();
 
-const {dialogRef, onDialogHide, onDialogOK, onDialogCancel} = useDialogPluginComponent();
+const {dialogRef, onDialogOK, onDialogCancel} = useDialogPluginComponent();
 
 function remove() {
   $q.dialog({

@@ -2,7 +2,7 @@
   <q-dialog
     class="delete-root text-center"
     ref="dialogRef"
-    @hide="onDialogHide">
+    >
     <q-card class="q-dialog-plugin">
       <div class="text-title">Add Folder</div>
 
@@ -32,7 +32,7 @@ import {create_category} from 'src/api/api';
 import {CategoryRequest} from 'src/types';
 
 const inputRef = ref()
-const {dialogRef, onDialogHide, onDialogOK} = useDialogPluginComponent();
+const {dialogRef, onDialogOK} = useDialogPluginComponent();
 const store = useRssStore()
 const $q = useQuasar()
 

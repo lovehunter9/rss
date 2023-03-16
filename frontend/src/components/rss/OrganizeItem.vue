@@ -57,7 +57,10 @@ const imgRef = ref()
 
 if (props.data) {
   if (props.data.getType() === ORGANIZE_TYPE.FEED) {
-    imgRef.value = store.feeds_icon[(props.data.data as Feed).id].data;
+    if (store.feeds_icon && store.feeds_icon[(props.data.data as Feed).id] !== undefined) {
+      imgRef.value = store.feeds_icon[(props.data.data as Feed).id].data;
+    }
+
     first.value = (props.data.data as Feed).title
     second.value = (props.data.data as Feed).feed_url
     third.value = (props.data.data as Feed).category.title

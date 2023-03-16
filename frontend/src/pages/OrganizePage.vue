@@ -88,7 +88,7 @@
 
 <script lang="ts" setup>
 import SearchView from 'components/rss/SearchView.vue';
-import {ref, watch} from 'vue';
+import {ref, watch, onMounted} from 'vue';
 import {useRssStore} from 'stores/rss';
 import OrganizeItem from 'components/rss/OrganizeItem.vue';
 import OrganizeTitle from 'components/rss/OrganizeTitle.vue';
@@ -103,7 +103,7 @@ const pagination = ref(8);
 const organizeStore = useOrganizeStore();
 let searchData = '';
 
-updateData();
+
 
 function changeType(type: ORGANIZE_TYPE) {
   console.log(type)
@@ -131,13 +131,21 @@ function searchChanged(data: string) {
 watch(
   () => [store.categories, store.feeds],
   () => {
-    updateData();
+    setTimeout(() => {
+      updateData()
+    }, 500);
   },
   {
     deep: true,
     immediate: true,
   }
 );
+
+
+onMounted(async ()=> {
+  await store.refresh_category_and_feeds()
+})
+
 </script>
 
 <style lang="scss" scoped>
