@@ -6,7 +6,7 @@
       class="label">{{
         'The most interesting articles published by the feeds you personally follow will be here'
       }}</span>
-    <q-btn class="add-btn" flat dense label="Add feeds" @click="addFeed"/>
+    <q-btn class="add-btn" flat dense label="Add feeds" @click="addFeed" v-show="addFee"/>
   </div>
 </template>
 
@@ -16,6 +16,14 @@ import AddFeedDialog from 'components/dialog/AddFeedDialog.vue';
 import {useQuasar} from 'quasar';
 
 const $q = useQuasar()
+
+defineProps({
+  addFee : {
+    type : Boolean,
+    default : true,
+    require : false
+  }
+})
 
 const addFeed = () => {
   $q.dialog({

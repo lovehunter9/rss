@@ -94,10 +94,15 @@ export const useRssStore = defineStore('rss', {
             category.feeds.push(feed);
           }
         }
+        try {
+          //wait organize item icon
+          await this.update_feed_icons(feeds);
+        }catch (e){
+          console.log(e)
+        }
         this.feeds = feeds;
         this.categories = categories;
         this.refresh_feeds_counter();
-        this.update_feed_icons();
       } catch (e) {
         console.log(e);
       }
@@ -114,8 +119,8 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async update_feed_icons() {
-      for (const feed of this.feeds) {
+    async update_feed_icons(feeds : Feed[]) {
+      for (const feed of feeds) {
         await this.get_feed_icon(feed.id);
       }
     },

@@ -33,6 +33,7 @@ import FeedEditDialog from 'components/dialog/FeedEditDialog.vue';
 import {BaseOption, OptionalCategory, ORGANIZE_TYPE} from 'stores/organizeConfig';
 import {Category, Feed} from 'src/types';
 import FolderEditDialog from 'components/dialog/FolderEditDialog.vue';
+import { newsBus, newsBusMessage } from 'src/utils/utils';
 
 const props = defineProps({
   data: {
@@ -57,7 +58,10 @@ const imgRef = ref()
 
 if (props.data) {
   if (props.data.getType() === ORGANIZE_TYPE.FEED) {
-    imgRef.value = store.feeds_icon[(props.data.data as Feed).id].data;
+    if (store.feeds_icon && store.feeds_icon[(props.data.data as Feed).id] !== undefined) {
+      imgRef.value = store.feeds_icon[(props.data.data as Feed).id].data;
+    }
+
     first.value = (props.data.data as Feed).title
     second.value = (props.data.data as Feed).feed_url
     third.value = (props.data.data as Feed).category.title
@@ -125,6 +129,9 @@ function edit() {
 
     $q.dialog(opts).onOk(() => {
       //Do Nothing
+
+      newsBus.emit(newsBusMessage.feedRefresh)
+
     }).onCancel(() => {
       console.log('Cancel');
     })

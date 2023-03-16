@@ -107,7 +107,8 @@ export const formatContentHtml = (htmlContent: string) => {
 
 export enum newsBusMessage {
   pre = 'PRE_MESSAGE',
-  next = 'NEXT_MESSAGE'
+  next = 'NEXT_MESSAGE',
+  feedRefresh = 'FEED_REFRESH'
 }
 
 export const newsBus = new EventBus();

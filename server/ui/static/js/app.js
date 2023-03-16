@@ -214,7 +214,7 @@ function handleRefreshAllFeeds() {
     request.execute();
 }
 
-export function updateEntriesStatus(entryIDs, status, callback) {
+function updateEntriesStatus(entryIDs, status, callback) {
     let url = document.body.dataset.entriesStatusUrl;
     let request = new RequestBuilder(url);
     request.withBody({entry_ids: entryIDs, status: status});

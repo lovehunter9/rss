@@ -49,7 +49,11 @@ const inputValue = ref(props.text)
 const emit = defineEmits(['input'])
 
 function onInput(value : string){
-  emit('input',props.emitKey,value)
+  if (props.emitKey.length > 0) {
+    emit('input',props.emitKey,value)
+    return
+  }
+  emit('input',value)
 }
 
 </script>

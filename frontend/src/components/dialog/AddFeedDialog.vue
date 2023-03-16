@@ -2,7 +2,7 @@
   <q-dialog
     class="delete-root text-center"
     ref="dialogRef"
-    @hide="onDialogHide">
+    >
     <q-card class="q-dialog-plugin">
       <div class="text-title">Add Feeds</div>
 
@@ -78,7 +78,7 @@ import {create_feed, get_feeds} from 'src/api/api';
 import {Category, FeedCreationRequest} from 'src/types';
 
 const inputRef = ref()
-const {dialogRef, onDialogHide, onDialogOK} = useDialogPluginComponent();
+const {dialogRef, onDialogOK} = useDialogPluginComponent();
 const store = useRssStore()
 const $q = useQuasar()
 
@@ -99,6 +99,7 @@ onMounted(() => {
 })
 
 function onInput(input: string) {
+  console.log(input);
   inputRef.value = input
 }
 
