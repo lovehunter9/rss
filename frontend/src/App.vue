@@ -5,6 +5,7 @@
 <script>
 import { defineComponent } from 'vue';
 import { useRssStore } from './stores/rss';
+import { MenuType } from './types';
 
 export default defineComponent({
   name: 'App',
@@ -18,6 +19,10 @@ export default defineComponent({
     console.log(base_url);
     rootStore.setUrl(base_url);
     rootStore.setSDKUrl(base_url);
+    rootStore.menu_choice = {
+      type: MenuType.Today,
+      value: 0
+    }
 
     console.log('login setup 2');
     return {}
