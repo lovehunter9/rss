@@ -639,4 +639,27 @@ var migrations = []func(tx *sql.Tx) error{
 		_, err = tx.Exec(sql)
 		return err
 	},
+	func(tx *sql.Tx) (err error) {
+		sql := `
+			CREATE TABLE boards (
+				id bigserial not null,
+				user_id int not null,
+				title text not null ,
+				description text  null,
+				created_at timestamp with time zone default now(),
+				primary key (id)
+			);
+
+			CREATE TABLE entry_board (
+				entry_id bigint not null,
+				board_id bigint not null,
+				primary key(board_id, entry_id),
+				foreign key (board_id) references boards(id) on delete cascade,
+				foreign key (entry_id) references entries(id) on delete cascade
+			);
+			ALTER TABLE entries ADD COLUMN readlater_tag bool default 'f';
+		`
+		_, err = tx.Exec(sql)
+		return err
+	},
 }

@@ -576,3 +576,22 @@ func (s *Storage) UpdateEntryFullContent(entryId int64, fullContent string) erro
 
 	return nil
 }
+
+func (s *Storage) ReadLater(userID int64, entryID int64) error {
+	query := `UPDATE entries SET readlater_tag = NOT readlater_tag WHERE user_id=$1 AND id=$2`
+	result, err := s.db.Exec(query, userID, entryID)
+	if err != nil {
+		return fmt.Errorf(`store: unable to toggle bookmark flag for entry #%d: %v`, entryID, err)
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf(`store: unable to toggle bookmark flag for entry #%d: %v`, entryID, err)
+	}
+
+	if count == 0 {
+		return errors.New(`store: nothing has been updated`)
+	}
+
+	return nil
+}
