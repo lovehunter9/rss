@@ -54,7 +54,8 @@ export const utcToStamp = (utc_datetime: string) => {
 
 export const getPastTime = (stamp1: Date, stamp2: Date) => {
   const time = stamp1.getTime() - stamp2.getTime()
-  const minute = time / 1000
+  const second = time / 1000
+  const minute = second / 60;
   if (minute < 1) {
     return 'just now'
   }

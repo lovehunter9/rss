@@ -6,7 +6,7 @@
         <img class="icon-start" :src="nextImage()" title="next" @click="nextAction">
       </div>
       <div class="row justify-end items-center">
-        <img class="icon-end" :src="readRef" :title="readTextRef" @click="readChange"/>
+        <img class="icon-end" :src="readRef" :title="readTextRef" @click="readChange" />
         <img class="icon-end" :src="markRef" :title="markTextRef" @click="bookmark">
         <img class="icon-end" src="../../assets/menu/share.svg">
       </div>
@@ -20,8 +20,11 @@
         </div>
         <img class="entry-icon" :src="store.feeds_icon[item.feed_id].data">
       </div>
-      <q-separator style="margin-top:16px"/>
-      <!-- <h1 v-if="!entry.startsWith('<h')"> {{ item.title }} </h1> -->
+      <q-separator style="margin-top:16px;margin-bottom: 16px;" />
+      <h1> {{ item.title }} </h1>
+      <span class="time">
+        {{ getTime() }}
+      </span>
       <div class="html-content" v-if="item">
         <div v-html="entry"></div>
       </div>
@@ -37,11 +40,11 @@ import {
   onMounted,
   PropType
 } from 'vue';
-import {useRssStore} from 'stores/rss';
-import {EntriesQueryRequest, Entry, EntryStatus, MenuType} from 'src/types';
-import {formatContentHtml, newsBus, newsBusMessage} from 'src/utils/utils'
-import {useRouter} from 'vue-router';
-
+import { useRssStore } from 'stores/rss';
+import { EntriesQueryRequest, Entry, EntryStatus, MenuType } from 'src/types';
+import { formatContentHtml, newsBus, newsBusMessage, utcToStamp } from 'src/utils/utils'
+import { useRouter } from 'vue-router';
+import { date } from 'quasar'
 
 const store = useRssStore();
 const router = useRouter()
@@ -61,7 +64,7 @@ const props = defineProps({
   }
 })
 
-watch(() => [store.menu_choice,store.entries], (newValue) => {
+watch(() => [store.menu_choice, store.entries], (newValue) => {
   if (newValue) {
     updateUI();
   }
@@ -93,32 +96,32 @@ function updateUI() {
     markStatus.value = props.item.starred;
   }
 
-  if (markStatus.value){
+  if (markStatus.value) {
     markRef.value = require('../../assets/menu/bookmark.svg')
-    markTextRef.value ='Cancel read later'
+    markTextRef.value = 'Cancel read later'
   } else {
     markRef.value = require('../../assets/menu/unbookmark.svg')
-    markTextRef.value ='Read later'
+    markTextRef.value = 'Read later'
   }
 
-  if (readStatus.value){
+  if (readStatus.value) {
     readRef.value = require('../../assets/menu/read.svg')
-    readTextRef.value ='Click to convert the current article as unread'
+    readTextRef.value = 'Click to convert the current article as unread'
   } else {
     readRef.value = require('../../assets/menu/unread.svg')
-    readTextRef.value ='Click to convert the current article as read'
+    readTextRef.value = 'Click to convert the current article as read'
   }
 }
 
-function bookmark(){
-  if (props.item){
+function bookmark() {
+  if (props.item) {
     store.mark_entry_starred(props.item.id)
   }
 }
 
-function readChange(){
-  if (props.item){
-    store.mark_entry_read(props.item.id,readStatus.value ? EntryStatus.Unread : EntryStatus.Read)
+function readChange() {
+  if (props.item) {
+    store.mark_entry_read(props.item.id, readStatus.value ? EntryStatus.Unread : EntryStatus.Read)
   }
 }
 
@@ -133,9 +136,9 @@ watch(
     }
     updateEntry(newVal);
   }
-  ,{
-    deep : true,
-    immediate : true
+  , {
+    deep: true,
+    immediate: true
   });
 
 onMounted(async () => {
@@ -180,9 +183,19 @@ const jumpToFeed = () => {
   };
   console.log(store.menu_choice)
   store.get_entries(
-    new EntriesQueryRequest({limit: 50, offset: 0, feed_id: props.item.id})
+    new EntriesQueryRequest({ limit: 50, offset: 0, feed_id: props.item.id })
   );
   router.push('/')
+}
+
+function getTime() {
+  if (props.item) {
+    const timeStemp = utcToStamp(props.item.published_at)
+    const dateString = date.formatDate(timeStemp, 'MMM DD, YYYY')
+    const timeString = date.formatDate(timeStemp, 'h:mm A')
+    return `${dateString} at ${timeString}`
+  }
+  return '';
 }
 
 </script>
@@ -214,10 +227,10 @@ const jumpToFeed = () => {
   .content-bg {
     width: 100%;
     margin-top: 10px;
-    // height: 100px;
-    // background-color: red;
     padding-left: 32px;
     padding-right: 32px;
+    height: calc(100% - 78px);
+    overflow-y: scroll;
 
     .author {
       a:link {
@@ -234,29 +247,32 @@ const jumpToFeed = () => {
     .entry-icon {
       width: 28px;
       height: 28px;
-      // border-radius: 50%;
+    }
+
+    .time {
+      font-family: 'Roboto';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 14px;
+      color: #857C77;
     }
 
     .html-content {
       margin-top: 20px;
       width: 100%;
-      // padding-left: 32px;
-      // padding-right: 32px;
+
+      // height: calc(100% - 146px);
 
       font-family: 'Roboto';
       font-style: normal;
       font-weight: 400;
       font-size: 14px;
       line-height: 20px;
-      /* or 143% */
-
 
       color: #1A130F;
       word-break: break-all;
       padding-bottom: 30px;
-      // padding-left: 0;
-      // padding-right: 0;
-      // background-color: red;
     }
   }
 
