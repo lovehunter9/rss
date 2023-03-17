@@ -7,7 +7,7 @@
       </div>
       <div class="row justify-end items-center">
         <img class="icon-end" :src="readRef" :title="readTextRef" @click="readChange"/>
-        <img class="icon-end" :src="markRef" :title="markTextRef" @click="readLater">
+        <img class="icon-end" :src="markRef" :title="markTextRef" @click="addToBoard">
         <img class="icon-end" src="../../assets/menu/share.svg">
       </div>
     </div>
@@ -44,6 +44,7 @@ import { EntriesQueryRequest, Entry, EntryStatus, MenuType } from 'src/types';
 import { formatContentHtml, newsBus, newsBusMessage, utcToStamp } from 'src/utils/utils'
 import { useRouter } from 'vue-router';
 import { date } from 'quasar'
+import {addEntryToBoard} from 'src/api/api';
 
 const store = useRssStore();
 const router = useRouter()
@@ -112,9 +113,10 @@ function updateUI() {
   }
 }
 
-function readLater() {
+function addToBoard() {
   if (props.item) {
-    store.mark_entry_readLater(props.item.id)
+    // store.mark_entry_readLater(props.item.id)
+    addEntryToBoard({board_id : 1,entry_id : props.item.id})
   }
 }
 
@@ -189,9 +191,9 @@ const jumpToFeed = () => {
 
 function getTime() {
   if (props.item) {
-    const timeStemp = utcToStamp(props.item.published_at)
-    const dateString = date.formatDate(timeStemp, 'MMM DD, YYYY')
-    const timeString = date.formatDate(timeStemp, 'h:mm A')
+    const timeStamp = utcToStamp(props.item.published_at)
+    const dateString = date.formatDate(timeStamp, 'MMM DD, YYYY')
+    const timeString = date.formatDate(timeStamp, 'h:mm A')
     return `${dateString} at ${timeString}`
   }
   return '';

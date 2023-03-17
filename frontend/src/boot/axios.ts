@@ -27,7 +27,7 @@ export default boot(({ app }) => {
   //       so you can easily perform requests against your app's API
   app.config.globalProperties.$axios.interceptors.response.use((response:AxiosResponse) => {
 
-    if( !response || response.status != 200 || !response.data ) {
+    if( !response || (response.status != 200 && response.status != 201) || !response.data ) {
 
         throw Error('Network error, please try again later')
     }

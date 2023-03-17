@@ -13,6 +13,9 @@ import {
   SDKQueryRequest,
   SDKSearchPathResponse,
   FeedModificationRequest,
+  BoardRequest,
+  Board,
+  BoardEntriesQueryRequest, EntryToBoardRequest,
 } from 'src/types';
 import { useRssStore } from 'src/stores/rss';
 
@@ -28,6 +31,7 @@ export async function create_category(req: CategoryRequest) {
     console.log(data);
     return data;
   } catch (e) {
+    console.log(e)
     return null;
   }
 }
@@ -62,6 +66,26 @@ export async function update_category(
   }
 }
 
+export async function addEntryToBoard(request : EntryToBoardRequest){
+  const rssStore = useRssStore();
+  try {
+    await axios.put(rssStore.url + '/api/entries/addEntryToBoard', request);
+    return true;
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function removeEntryToBoard(request : EntryToBoardRequest){
+  const rssStore = useRssStore();
+  try {
+    await axios.put(rssStore.url + '/api/entries/removeEntryFromBoard', request);
+    return true;
+  } catch (e) {
+    return null;
+  }
+}
+
 export async function remove_category(categoryID: string) {
   const rssStore = useRssStore();
   try {
@@ -76,6 +100,16 @@ export async function update_feed(feedID: string,request : FeedModificationReque
   const rssStore = useRssStore();
   try {
     await axios.put(rssStore.url + '/api/feeds/' + feedID, request);
+    return true;
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function update_board(boardId: string,request : BoardRequest) {
+  const rssStore = useRssStore();
+  try {
+    await axios.put(rssStore.url + '/api/boards/' + boardId, request);
     return true;
   } catch (e) {
     return null;
@@ -263,6 +297,41 @@ export async function get_readLater(): Promise<EntriesQueryResponse> {
 
   const data: EntriesQueryResponse = await axios.get(
     rssStore.url + '/api/readlater'
+  );
+
+  return data;
+}
+
+export async function create_board(q: BoardRequest) : Promise<any>{
+  const rssStore = useRssStore();
+
+  const data = await axios.post(
+    rssStore.url + '/api/boards',
+    q
+  );
+
+  return data;
+}
+
+export async function get_boards() : Promise<Board[]>{
+  const rssStore = useRssStore();
+
+  const data : Board[] = await axios.get(
+    rssStore.url + '/api/boards'
+  );
+
+  return data;
+}
+
+export async function get_board_entries(
+  boardId : number,
+  q: BoardEntriesQueryRequest
+): Promise<EntriesQueryResponse> {
+  const rssStore = useRssStore();
+
+  console.log(q.build())
+  const data: EntriesQueryResponse = await axios.get(
+    rssStore.url + '/api/boards/' + boardId + '/entries' + q.build()
   );
 
   return data;

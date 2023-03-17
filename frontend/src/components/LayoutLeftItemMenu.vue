@@ -1,12 +1,14 @@
 <template>
   <div class="left-menu-root">
-    <q-item clickable :dense="dense" :active="store.menu_choice.type == menuType" active-class="itemActiveStyle"
-      class="menuItem left-menu-title-normal q-mx-sm q-pl-xs q-pr-md q-py-xs" @click="itemOnClick()"
-      @mouseover="willChange()" @mouseout="changeBack()">
+    <q-item clickable :dense="dense"
+            :active="store.menu_choice.type === menuType && store.menu_choice.value === menuValue"
+            active-class="itemActiveStyle"
+            class="menuItem left-menu-title-normal q-mx-sm q-pl-xs q-pr-md q-py-xs" @click="itemOnClick()"
+            @mouseover="changeBackground()" @mouseout="returnBackground()">
       <q-item-section class="items-center" avatar>
-        <q-icon :name="formatIconName()" size="20px"></q-icon>
+        <q-icon :name="formatIconName()" size="20px"/>
       </q-item-section>
-      <q-item-section class="item-title-margin-left"> {{ menuTypeName(menuType) }}</q-item-section>
+      <q-item-section class="item-title-margin-left">{{ title ? title : menuTypeName(menuType) }}</q-item-section>
       <q-item-section v-if="showUnReadCount" side>
         <div class="unreadCount">
           {{ unreadCount }}
@@ -17,15 +19,20 @@
 </template>
 
 <script setup lang='ts'>
-import { useRssStore } from 'src/stores/rss';
-import { MenuType, menuTypeName } from '../types'
-import { defineProps,PropType, ref } from 'vue';
+import {useRssStore} from 'src/stores/rss';
+import {MenuType, menuTypeName} from '../types'
+import {defineProps, PropType, ref} from 'vue';
 
 const props = defineProps({
   menuType: {
     type: Object as PropType<MenuType>,
     require: true,
     default: MenuType.Empty
+  },
+  menuValue: {
+    type: Number,
+    require: false,
+    default: 0
   },
   showUnReadCount: {
     type: Boolean,
@@ -39,37 +46,53 @@ const props = defineProps({
   dense: {
     type: Boolean,
     default: false
+  },
+  title: {
+    type: String,
+    default: '',
+    require: false
+  },
+  imageName: {
+    type: String,
+    default: '',
+    require: false
   }
 });
 
 const emit = defineEmits(['itemOnClick']);
 
 const itemOnClick = () => {
-	emit('itemOnClick');
+  emit('itemOnClick');
 };
 
 const store = useRssStore();
 
 
-const willchangeType = ref(MenuType.Empty);
+const currentMenuType = ref(MenuType.Empty);
 
-
-const willChange = () => {
-  willchangeType.value = props.menuType
+const changeBackground = () => {
+  currentMenuType.value = props.menuType
 }
 
-const changeBack = () => {
-  if (willchangeType.value === props.menuType) {
-    willchangeType.value = MenuType.Empty
+const returnBackground = () => {
+  if (currentMenuType.value === props.menuType) {
+    currentMenuType.value = MenuType.Empty
   }
 }
 
 const formatIconName = () => {
   let nameTypeName = menuTypeName(props.menuType)
-  nameTypeName = nameTypeName.toLowerCase()
-  nameTypeName = nameTypeName.replace(/\s*/g, '');
-  if (props.menuType === store.menu_choice.type || (willchangeType.value === props.menuType)) {
-    nameTypeName = nameTypeName + '_hover'
+  if (props.imageName) {
+    nameTypeName = props.imageName;
+    if ((props.menuType === store.menu_choice.type && props.menuValue === store.menu_choice.value) || (currentMenuType.value === props.menuType)) {
+      nameTypeName = nameTypeName + '_hover'
+    }
+  } else {
+    nameTypeName = nameTypeName.toLowerCase()
+    nameTypeName = nameTypeName.replace(/\s*/g, '');
+    if (props.menuType === store.menu_choice.type || (currentMenuType.value === props.menuType)) {
+      nameTypeName = nameTypeName + '_hover'
+    }
   }
   return `img:/imgs/${nameTypeName}.svg`
 }
@@ -109,7 +132,7 @@ const formatIconName = () => {
     color: #847C77;
 
     background: rgba(26, 19, 15, 0.05);
-    padding:2px 8px;
+    padding: 2px 8px;
     border-radius: 8px;
   }
 

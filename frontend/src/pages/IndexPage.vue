@@ -4,9 +4,13 @@
     <q-splitter v-model="splitterModel" unit="px" disable style="height: 100%;background-color: white;" v-if="store.entries.length > 0">
     <template v-slot:before>
       <div class="item-list">
-        <div class="row justify-end items-center">
+        <div class="row justify-end items-center" v-if="store.menu_choice.type !== MenuType.Board">
           <img class="icon-read-all" :src="readRef" @click="readAll" :title="readTextRef">
           <img class="icon-refresh" src="../assets/menu/refresh.svg">
+        </div>
+        <div class="row justify-end items-center" v-else>
+          <img class="icon-read-all" src="../assets/menu/modify.svg" @click="editBoard">
+          <img class="icon-refresh" src="../assets/menu/delete.svg" @click="remove">
         </div>
         <div class="text-label">{{ labelRef }}</div>
         <div class="text-sub-label">{{ subLabelRef }}</div>
@@ -26,11 +30,11 @@
           {{ 'No item selected.' }}
         </div>
       </div>
-
     </template>
 
   </q-splitter>
-  <empty-view style="width:100%;height:100%" v-else/>
+
+    <empty-view style="width:100%;height:100%" v-else/>
 
   </div>
 </template>
@@ -44,6 +48,9 @@ import {newsBus, newsBusMessage} from 'src/utils/utils';
 import {useRoute, useRouter} from 'vue-router';
 import NewsView from 'components/rss/NewsView.vue';
 import EmptyView from 'components/rss/EmptyView.vue';
+import { useQuasar} from 'quasar';
+import AddBoardDialog from 'components/dialog/AddBoardDialog.vue';
+import FeedDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 
 const store = useRssStore();
 const labelRef = ref('')
@@ -55,6 +62,7 @@ const Route = useRoute()
 const readRef = ref(require('../assets/menu/unread.svg'));
 const readTextRef = ref('Click to convert all articles to read');
 const readStatus = ref(false);
+const $q = useQuasar();
 
 watch(() => [store.menu_choice,store.entries], (newValue) => {
   if (newValue) {
@@ -167,6 +175,42 @@ function readAll(){
       store.mark_entry_read(entry.id,EntryStatus.Read)
     })
   }
+}
+
+function editBoard() {
+  $q.dialog({
+    component: AddBoardDialog,
+    componentProps: {
+      boardId: store.menu_choice.value
+    }
+  }).onOk(() => {
+    //Do Nothing
+
+    newsBus.emit(newsBusMessage.feedRefresh)
+
+  }).onCancel(() => {
+    console.log('Cancel');
+  })
+    .onDismiss(() => {
+      console.log('Dismiss');
+    });
+}
+
+function remove() {
+  console.log('delete')
+  $q.dialog({
+    component: FeedDeleteDialog,
+    componentProps: {
+      isFeed: true
+    }
+  }).onOk(async () => {
+    console.log('Ok');
+  }).onCancel(() => {
+    console.log('Cancel');
+  })
+    .onDismiss(() => {
+      console.log('Dismiss');
+    });
 }
 
 const splitterModel = ref(400)
