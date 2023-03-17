@@ -4,14 +4,14 @@
       <div class="circle" v-if="!readStatusRef" />
       <div class="circle-temp" v-else />
       <div class="layout-right column justify-start">
-        <div class="row justify-start">
-          <q-img class="entry-icon" :src="store.feeds_icon[entry.feed_id].data"/>
+        <div class="row justify-start" style="width: 100%;">
+          <q-img class="entry-icon" :src="store.feeds_icon[entry!.feed_id].data"/>
           <div class="column feed-layout justify-start">
-            <span class="text-feed-name">{{ entry.feed.title }}</span>
+            <span class="text-feed-name">{{ entry!.feed.title }}</span>
             <span class="text-feed-create">{{ getTime() }}</span>
           </div>
         </div>
-        <span class="text-entry-title">{{ entry.title }}</span>
+        <span class="text-entry-title">{{ entry!.title }}</span>
         <!--        <span>{{ entry.time }}</span>-->
       </div>
     </div>
@@ -114,6 +114,8 @@ function getTime() {
 
     .feed-layout {
       margin-left: 10px;
+      // background-color: green;
+      max-width: calc(100% - 42px);
 
       .text-feed-name {
         font-family: 'Roboto';

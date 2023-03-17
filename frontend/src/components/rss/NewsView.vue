@@ -81,11 +81,11 @@ async function updateEntry(newVal: Entry) {
 
   let id = newVal.id;
 
-  let k = await store.fetch_entry_content(id);
-  console.log(k);
-  if (k != undefined) {
-    entry.value = formatContentHtml(k);
-  }
+  // let k = await store.fetch_entry_content(id);
+  // console.log(k);
+  // if (k != undefined) {
+  //   entry.value = formatContentHtml(k);
+  // }
 
   updateUI();
 }
