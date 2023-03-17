@@ -105,11 +105,11 @@ export async function category_mark_all_as_read(categoryID: string) {
   }
 }
 
-export async function entry_bookmark(entryId: number) {
+export async function entry_readlater(entryId: number){
   const rssStore = useRssStore();
   try {
     await axios.put(
-      rssStore.url + '/api/entries/' + entryId + '/bookmark',
+      rssStore.url + '/api/entries/' + entryId + '/readlater',
       {}
     );
     return true;
@@ -253,6 +253,16 @@ export async function update_entry_status(
   const data: EntriesQueryResponse = await axios.post(
     rssStore.url + '/api/entry/status',
     q
+  );
+
+  return data;
+}
+
+export async function get_readLater(): Promise<EntriesQueryResponse> {
+  const rssStore = useRssStore();
+
+  const data: EntriesQueryResponse = await axios.get(
+    rssStore.url + '/api/readlater'
   );
 
   return data;

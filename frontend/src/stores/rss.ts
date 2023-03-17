@@ -8,23 +8,28 @@ import {
   EntryStatus,
   Feed,
   FeedCounters,
-  FeedIconResponse, FeedModificationRequest,
+  FeedIconResponse,
+  FeedModificationRequest,
   MenuChoice,
   MenuType,
   SDKQueryRequest,
 } from 'src/types';
 
 import {
-  entry_bookmark,
   fetch_feed_counter,
   get_categories,
   get_entries,
   get_entry_content,
   get_feed_icon,
   get_feeds,
-  get_today, remove_category, remove_feed,
+  get_today,
+  remove_category,
+  remove_feed,
   update_entry_status,
-  sdkSearchFeedsByPath, update_feed,
+  sdkSearchFeedsByPath,
+  update_feed,
+  entry_readlater,
+  get_readLater,
 } from 'src/api/api';
 
 export type DataState = {
@@ -265,6 +270,21 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
+    async get_readLater(onlyAmount = false){
+      try {
+        this.entries = [];
+        this.entries_total = 0;
+        const data: EntriesQueryResponse = await get_readLater();
+        if (!onlyAmount) {
+          this.entries = data.entries;
+          this.entries_total = data.total;
+        }
+        return data.total
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
     async mark_entry_read(entry_id: number,status : EntryStatus) {
       try {
         await update_entry_status({
@@ -283,12 +303,12 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async mark_entry_starred(entry_id: number){
+    async mark_entry_readLater(entry_id: number){
       try {
-        await entry_bookmark(entry_id);
+        await entry_readlater(entry_id);
         for (const entry of this.entries) {
           if (entry.id === entry_id) {
-            entry.starred = !entry.starred
+            entry.readlater_tag = !entry.readlater_tag
           }
         }
         await this.refresh_feeds_counter();

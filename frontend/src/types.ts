@@ -133,6 +133,7 @@ export interface Enclosure {
 // 	Hash        string        `json:"hash"`
 // 	Title       string        `json:"title"`
 // 	URL         string        `json:"url"`
+//  ReadLater   string        `json:"readlater_tag"`
 // 	CommentsURL string        `json:"comments_url"`
 // 	Date        time.Time     `json:"published_at"`
 // 	CreatedAt   time.Time     `json:"created_at"`
@@ -157,6 +158,7 @@ export interface Entry {
   published_at: string;
   created_at: string;
   changed_at: string;
+  readlater_tag : boolean;
   content: string;
   author: string;
   share_code: string;
