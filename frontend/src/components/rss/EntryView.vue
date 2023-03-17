@@ -5,7 +5,7 @@
       <div class="circle-temp" v-else />
       <div class="layout-right column justify-start">
         <div class="row justify-start">
-          <img class="entry-icon" :src="store.feeds_icon[entry.feed_id].data">
+          <q-img class="entry-icon" :src="store.feeds_icon[entry.feed_id].data"/>
           <div class="column feed-layout justify-start">
             <span class="text-feed-name">{{ entry.feed.title }}</span>
             <span class="text-feed-create">{{ getTime() }}</span>
@@ -16,6 +16,7 @@
       </div>
     </div>
   </q-item>
+  <div class="line"/>
 </template>
 
 <script setup lang="ts">
@@ -91,7 +92,7 @@ function getTime() {
     width: 6px;
     height: 6px;
     background-color: #81C565;
-     border-radius: 50%;
+    border-radius: 50%;
     display: inline-block;
     margin-top: 13px;
   }
@@ -108,6 +109,7 @@ function getTime() {
     .entry-icon {
       width: 32px;
       height: 32px;
+      border-radius: 50%
     }
 
     .feed-layout {
@@ -161,5 +163,14 @@ function getTime() {
 .itemActiveStyle {
     background-color: rgba(26, 19, 15, 0.05);
   }
+
+.line{
+  float: right;
+  height: 1px;
+  width: calc(100% - 32px);
+  margin-left: 16px;
+  margin-right: 16px;
+  background: #E0E0E0;
+}
 
 </style>

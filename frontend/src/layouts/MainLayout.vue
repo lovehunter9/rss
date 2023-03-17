@@ -137,6 +137,10 @@ export default defineComponent({
     const settingMode = ref();
     const dialogShow = ref(false);
     const isFolderManager = ref(false);
+    console.log('Route.path === ');
+
+    console.log(Route.path);
+
 
     let active = ref('vault');
 
@@ -200,7 +204,26 @@ export default defineComponent({
 
     watch(() => Route.path,(value) => {
       isFolderManager.value = value.includes('/folderSetting');
+      if (isFolderManager.value) {
+        store.menu_choice = {
+          type : MenuType.Empty,
+          value : 0
+        }
+      }
     })
+
+    if (Route.path.includes('/folderSetting')) {
+      isFolderManager.value = true
+      store.menu_choice = {
+        type: MenuType.Empty,
+        value: 0
+      };
+    } else if (Route.path.includes('/discover')) {
+      store.menu_choice = {
+        type: MenuType.Discover,
+        value: 0
+      };
+    }
 
     watch(
       () => screenWidth.value,

@@ -19,7 +19,7 @@
     <img class="modify-icon" src="../../assets/menu/modify.svg" @click="edit">
     <img class="delete-icon" src="../../assets/menu/delete.svg" @click="remove">
   </div>
-  <q-separator inset/>
+  <div class="line"/>
 </template>
 
 <script setup lang="ts">
@@ -33,6 +33,7 @@ import FeedEditDialog from 'components/dialog/FeedEditDialog.vue';
 import {BaseOption, OptionalCategory, ORGANIZE_TYPE} from 'stores/organizeConfig';
 import {Category, Feed} from 'src/types';
 import FolderEditDialog from 'components/dialog/FolderEditDialog.vue';
+import { newsBus, newsBusMessage } from 'src/utils/utils';
 
 const props = defineProps({
   data: {
@@ -128,6 +129,9 @@ function edit() {
 
     $q.dialog(opts).onOk(() => {
       //Do Nothing
+
+      newsBus.emit(newsBusMessage.feedRefresh)
+
     }).onCancel(() => {
       console.log('Cancel');
     })
@@ -246,6 +250,15 @@ function getLatestEntryTime(): string {
     width: 20px;
     height: 20px;
   }
+}
+
+.line{
+  float: right;
+  height: 1px;
+  width: calc(100% - 32px);
+  margin-left: 16px;
+  margin-right: 16px;
+  background: #E0E0E0;
 }
 
 

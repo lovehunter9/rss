@@ -99,6 +99,7 @@ onMounted(() => {
 })
 
 function onInput(input: string) {
+  console.log(input);
   inputRef.value = input
 }
 

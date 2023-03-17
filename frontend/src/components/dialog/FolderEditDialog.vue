@@ -18,7 +18,7 @@
 
         <dialog-feeds-title :folder="folder"/>
 
-        <q-scroll-area class="scroll-area">
+        <q-scroll-area class="scroll-area" v-if="folder.getOptionalFeeds().length > 0">
 
           <div class="column justify-start items-start">
 
@@ -34,6 +34,8 @@
           </div>
 
         </q-scroll-area>
+
+        <empty-view :add-fee="false" class="scroll-area" v-else/>
 
       </div>
 
@@ -58,6 +60,7 @@ import OrganizeItem from 'components/rss/OrganizeItem.vue';
 import FeedDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import {useOrganizeStore} from 'stores/organize';
 import DialogFeedsTitle from 'components/rss/DialogFeedsTitle.vue';
+import EmptyView from "components/rss/EmptyView.vue";
 
 const prop = defineProps({
   folder: {

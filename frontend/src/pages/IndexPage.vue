@@ -1,5 +1,7 @@
 <template>
-  <q-splitter v-model="splitterModel" unit="px" disable style="height: 100%;background-color: white;">
+  <div class="index-root">
+
+    <q-splitter v-model="splitterModel" unit="px" disable style="height: 100%;background-color: white;" v-if="store.entries.length > 0">
     <template v-slot:before>
       <div class="item-list">
         <div class="row justify-end items-center">
@@ -28,6 +30,9 @@
     </template>
 
   </q-splitter>
+  <empty-view style="width:100%;height:100%" v-else/>
+
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -38,6 +43,7 @@ import EntryView from 'components/rss/EntryView.vue';
 import {newsBus, newsBusMessage} from 'src/utils/utils';
 import {useRoute, useRouter} from 'vue-router';
 import NewsView from 'components/rss/NewsView.vue';
+import EmptyView from 'components/rss/EmptyView.vue';
 
 const store = useRssStore();
 const labelRef = ref('')
@@ -194,8 +200,12 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-.item-list {
+
+.index-root {
+  height: 100%;
   background-color: #FFFFFF;
+  .item-list {
+
   border-right: 1px solid #ececec;
   height: 100vh;
   overflow: auto;
@@ -247,4 +257,6 @@ watch(
   }
 
 }
+}
+
 </style>
