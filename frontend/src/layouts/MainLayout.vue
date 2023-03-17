@@ -306,16 +306,7 @@ export default defineComponent({
         // })
         goto('/')
       } else if (type == MenuType.ReadLater) {
-        // store.get_entries(new EntriesQueryRequest({limit : 50,offset : 0}),(response) => {
-        //   const entries = response.entries.filter((entry) => {
-        //     return entry.starred;
-        //   })
-        //   if (entries){
-        //     return { entries : entries,total : entries.length}
-        //   }else {
-        //     return  response
-        //   }
-        // })
+        store.get_readLater();
         goto('/')
       }
     }

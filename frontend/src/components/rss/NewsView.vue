@@ -6,8 +6,8 @@
         <img class="icon-start" :src="nextImage()" title="next" @click="nextAction">
       </div>
       <div class="row justify-end items-center">
-        <img class="icon-end" :src="readRef" :title="readTextRef" @click="readChange" />
-        <img class="icon-end" :src="markRef" :title="markTextRef" @click="bookmark">
+        <img class="icon-end" :src="readRef" :title="readTextRef" @click="readChange"/>
+        <img class="icon-end" :src="markRef" :title="markTextRef" @click="readLater">
         <img class="icon-end" src="../../assets/menu/share.svg">
       </div>
     </div>
@@ -92,7 +92,7 @@ async function updateEntry(newVal: Entry) {
 function updateUI() {
   if (props.item) {
     readStatus.value = props.item.status === EntryStatus.Read;
-    markStatus.value = props.item.starred;
+    markStatus.value = props.item.readlater_tag;
   }
 
   if (markStatus.value) {
@@ -112,9 +112,9 @@ function updateUI() {
   }
 }
 
-function bookmark() {
+function readLater() {
   if (props.item) {
-    store.mark_entry_starred(props.item.id)
+    store.mark_entry_readLater(props.item.id)
   }
 }
 

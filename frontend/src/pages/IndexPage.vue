@@ -224,16 +224,7 @@ const loadMoreEnable = ref(true)
 
 
 const requestEntrys = async (loadmore = false) => {
-  console.log('store.menu_choice ====> ');
-  console.log(store.menu_choice);
-  if (!loadmore) {
-    // store.entries = []
-    // store.entries_total = 0;
-  }
-
-  if (store.menu_choice.type === MenuType.Today) {
-    // loadMoreEnable.value = false
-    // store.get_today()
+  if (store.menu_choice.type === MenuType.Today || store.menu_choice.type === MenuType.ReadLater) {
     return 0
   }
 
@@ -281,8 +272,6 @@ const onScroll = (info: any) => {
 
 const onLoadRef = async ( done: (() => void)) => {
   requestEntrys(true).then((number) => {
-    console.log('number ===> ');
-    console.log(number);
     loadMoreEnable.value = number !== undefined && number >= 50;
     done()
   })
@@ -340,13 +329,10 @@ const onLoadRef = async ( done: (() => void)) => {
     .list-view {
       margin-top: 8px;
       height: calc(100% - 110px);
-      // overflow-y: scroll;
-      // background-color: red;
     }
 
     .entry {
       width: 100%;
-      // height: 120px;
     }
 
   }
