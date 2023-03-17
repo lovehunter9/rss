@@ -70,6 +70,19 @@ h4,h5,h6 {
   line-height: 24px;
 }
 
+iframe {
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  // height: auto;
+}
+
+video {
+  margin-top: 10px;
+  margin-top: 10px;
+  width: 100%;
+}
+
 
 figure {
   overflow: auto;
@@ -96,9 +109,6 @@ body.body--dark {
   .drawer {
     background-color: #2A2D35;
   }
-  .menuItem {}
-
-  .itemActiveStyle {}
 
   .lauout-app {
     background-color: #EcEceC;
@@ -206,11 +216,6 @@ body.body--light {
       // background: #F3F8FE;
       color: #FF8642;
     }
-  }
-
-  .itemActiveStyle {
-    // background: #F3F8FE;
-    // color: #2787FF;
   }
 
   .lauout-app {

@@ -236,14 +236,16 @@ export const useRssStore = defineStore('rss', {
         const data: EntriesQueryResponse = await get_entries(q);
         if (filter){
           const response = filter({ entries : data.entries, total : data.total})
-          this.entries = response.entries;
+
+          this.entries = q.offset > 0 ? [...this.entries,...response.entries] : response.entries;
           this.entries_total = response.total;
         }else {
-          this.entries = data.entries;
+          this.entries = q.offset > 0 ? [...this.entries,...data.entries] : data.entries;;
           this.entries_total = data.total;
         }
         console.log(this.entries)
         console.log(this.entries_total)
+        return data.entries.length
       } catch (e) {
         console.log(e);
       }

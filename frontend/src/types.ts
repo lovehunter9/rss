@@ -437,7 +437,7 @@ export class EntriesQueryRequest {
   category_id?: number;
   direction?: string;
   order?: EnteryQueryOrder;
-  status?: EntryQueryDirection;
+  status?: EntryStatus;
   limit = 10;
   offset = 0;
 

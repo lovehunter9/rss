@@ -1,10 +1,10 @@
 <template>
   <div class="feed-root row items-center">
     <q-checkbox dense size="md" v-model="selection" color="orange" @update:model-value="onSelected"
-                v-show="data.getType() === ORGANIZE_TYPE.FEED"/>
+                v-show="data!.getType() === ORGANIZE_TYPE.FEED"/>
 
     <div class="row items-center"
-         :class="data.getType() === ORGANIZE_TYPE.FEED ? 'feed-text-layout' : 'folder-text-layout'">
+         :class="data!.getType() === ORGANIZE_TYPE.FEED ? 'feed-text-layout' : 'folder-text-layout'">
       <div class="row" style="flex: 15">
         <q-img class="feed-icon" :src="imgRef" v-show="imgRef"/>
         <div class="column justify-start items-start">
@@ -37,6 +37,7 @@ import { newsBus, newsBusMessage } from 'src/utils/utils';
 
 const props = defineProps({
   data: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     type: Object as PropType<BaseOption<any>>,
     require: true
   },

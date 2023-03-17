@@ -14,12 +14,11 @@
         </div>
         <q-scroll-area style="height:calc(100% - 110px);">
           <q-list class="margin-bottom-safe-area">
-
-          <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false" @item-on-click="changeItemMenu(MenuType.Discover)"/>
-          <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="`${todayCount}`" @item-on-click="changeItemMenu(MenuType.Today)"/>
-          <layout-left-item-menu :menu-type="MenuType.Unread" :unread-count="`${store.allUnRead}`" @item-on-click="changeItemMenu(MenuType.Unread)"/>
-          <layout-left-item-menu :menu-type="MenuType.ReadLater" :unread-count="count.total" @item-on-click="changeItemMenu(MenuType.ReadLater)"/>
-        </q-list>
+            <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false" @item-on-click="changeItemMenu(MenuType.Discover)"/>
+            <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="`${todayCount}`" @item-on-click="changeItemMenu(MenuType.Today)"/>
+            <layout-left-item-menu :menu-type="MenuType.Unread" :unread-count="`${store.allUnRead}`" @item-on-click="changeItemMenu(MenuType.Unread)"/>
+            <layout-left-item-menu :menu-type="MenuType.ReadLater" :unread-count="count.total" @item-on-click="changeItemMenu(MenuType.ReadLater)"/>
+          </q-list>
 
         <q-separator style="margin-top:6px;margin-bottom: 11px;" inset/>
 
@@ -112,7 +111,7 @@
 import {defineComponent, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useQuasar} from 'quasar';
 import {useRoute, useRouter} from 'vue-router';
-import {useIsMobile} from '../utils/utils';
+// import {useIsMobile} from '../utils/utils';
 import {useRssStore} from 'stores/rss';
 
 import {EntriesQueryRequest, Entry, EntryStatus, Feed, MenuType} from '../types';
@@ -148,8 +147,8 @@ export default defineComponent({
 
     const leftDrawerOpen = ref(false);
     let innerWidth = ref(450);
-    const timer = ref();
-    const screenWidth = ref(document.body.clientWidth);
+    // const timer = ref();
+    // const screenWidth = ref(document.body.clientWidth);
 
     const count = ref<any>({ total: 10 });
 
@@ -183,8 +182,6 @@ export default defineComponent({
     watch(
       () => Route.params.entry_id,
       (newValue, oldValue) => {
-        console.log('newValue:', newValue, oldValue);
-        console.log(Route.params);
         if (newValue == oldValue) {
           return;
         }
@@ -225,35 +222,35 @@ export default defineComponent({
       };
     }
 
-    watch(
-      () => screenWidth.value,
-      (newVal) => {
-        if (!timer.value) {
-          timer.value = true;
-          innerWidth.value = (newVal - 300) / 2;
-          setTimeout(function () {
-            timer.value = false;
-          }, 400);
-        }
-      }
-    );
+    // watch(
+    //   () => screenWidth.value,
+    //   (newVal) => {
+    //     if (!timer.value) {
+    //       timer.value = true;
+    //       innerWidth.value = (newVal - 300) / 2;
+    //       setTimeout(function () {
+    //         timer.value = false;
+    //       }, 400);
+    //     }
+    //   }
+    // );
 
     onMounted(async () => {
-      if (useIsMobile()) {
-        innerWidth.value =
-          document.documentElement.clientWidth || document.body.clientWidth;
-      } else {
-        innerWidth.value = (screenWidth.value - 300) / 2;
-        window.onresize = () => {
-          return (() => {
-            screenWidth.value = document.body.clientWidth;
-          })();
-        };
-      }
+      // if (useIsMobile()) {
+      //   innerWidth.value =
+      //     document.documentElement.clientWidth || document.body.clientWidth;
+      // } else {
+      //   innerWidth.value = (screenWidth.value - 300) / 2;
+      //   window.onresize = () => {
+      //     return (() => {
+      //       screenWidth.value = document.body.clientWidth;
+      //     })();
+      //   };
+      // }
 
       await store.refresh_category_and_feeds();
 
-      todayCount.value = await store.get_today(true) || 0
+      todayCount.value = await store.get_today() || 0
 
       // await console.log(getPageRSSHub({
       //   url: 'https://www.bilibili.com/video/av479863545/',
@@ -282,14 +279,14 @@ export default defineComponent({
       };
       console.log(store.menu_choice)
       if (type == MenuType.Feed) {
-        store.get_entries(
-          new EntriesQueryRequest({limit: 50, offset: 0, feed_id: value})
-        );
+        // store.get_entries(
+        //   new EntriesQueryRequest({limit: 50, offset: 0, feed_id: value})
+        // );
         goto('/')
       } else if (type == MenuType.Category) {
-        store.get_entries(
-          new EntriesQueryRequest({limit: 50, offset: 0, category_id: value})
-        );
+        // store.get_entries(
+        //   new EntriesQueryRequest({limit: 50, offset: 0, category_id: value})
+        // );
         goto('/')
       } else if (type == MenuType.Today) {
         store.get_today();
@@ -297,28 +294,28 @@ export default defineComponent({
       } else if (type == MenuType.Discover) {
         goto('/discover')
       } else if (type == MenuType.Unread) {
-        store.get_entries(new EntriesQueryRequest({limit : 50,offset : 0}),(response) => {
-           const entries = response.entries.filter((entry) => {
-             return entry.status === EntryStatus.Unread;
-           })
-          if (entries){
-            return { entries : entries,total : entries.length}
-          }else {
-            return  response
-          }
-        })
+        // store.get_entries(new EntriesQueryRequest({limit : 50,offset : 0}),(response) => {
+        //    const entries = response.entries.filter((entry) => {
+        //      return entry.status === EntryStatus.Unread;
+        //    })
+        //   if (entries){
+        //     return { entries : entries,total : entries.length}
+        //   }else {
+        //     return  response
+        //   }
+        // })
         goto('/')
       } else if (type == MenuType.ReadLater) {
-        store.get_entries(new EntriesQueryRequest({limit : 50,offset : 0}),(response) => {
-          const entries = response.entries.filter((entry) => {
-            return entry.starred;
-          })
-          if (entries){
-            return { entries : entries,total : entries.length}
-          }else {
-            return  response
-          }
-        })
+        // store.get_entries(new EntriesQueryRequest({limit : 50,offset : 0}),(response) => {
+        //   const entries = response.entries.filter((entry) => {
+        //     return entry.starred;
+        //   })
+        //   if (entries){
+        //     return { entries : entries,total : entries.length}
+        //   }else {
+        //     return  response
+        //   }
+        // })
         goto('/')
       }
     }
@@ -375,7 +372,7 @@ export default defineComponent({
       store,
       active,
       isFolderManager,
-      innerWidth,
+      // innerWidth,
       updateLeftDrawer,
       goFolderSetting,
       settingMode,
