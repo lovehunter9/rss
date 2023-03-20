@@ -178,10 +178,12 @@ export class BaseOrganize<T extends BaseOption<U>, U> {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async storeRemove(id: number): Promise<void> {
     //DO Something
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   updateList(title?: string, search?: string): void {
     //DO Something
   }

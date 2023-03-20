@@ -278,7 +278,8 @@ func (e *EntryQueryBuilder) GetEntries() (model.Entries, error) {
 			f.user_agent,
 			f.cookie,
 			fi.icon_id,
-			u.timezone
+			u.timezone,
+			g.board_ids
 		FROM
 			entries e
 		LEFT JOIN
@@ -289,6 +290,8 @@ func (e *EntryQueryBuilder) GetEntries() (model.Entries, error) {
 			feed_icons fi ON fi.feed_id=f.id
 		LEFT JOIN
 			users u ON u.id=e.user_id
+		LEFT JOIN
+			(SELECT s.entry_id, ARRAY_TO_STRING(ARRAY_AGG(s.board_id),',') as board_ids from entry_board s GROUP BY s.entry_id) g ON e.id=g.entry_id
 		WHERE %s %s
 	`
 
@@ -307,6 +310,7 @@ func (e *EntryQueryBuilder) GetEntries() (model.Entries, error) {
 		var entry model.Entry
 		var iconID sql.NullInt64
 		var tz string
+		var boardIDS sql.NullString
 
 		entry.Feed = &model.Feed{}
 		entry.Feed.Category = &model.Category{}
@@ -343,6 +347,7 @@ func (e *EntryQueryBuilder) GetEntries() (model.Entries, error) {
 			&entry.Feed.Cookie,
 			&iconID,
 			&tz,
+			&boardIDS,
 		)
 
 		if err != nil {
@@ -365,6 +370,11 @@ func (e *EntryQueryBuilder) GetEntries() (model.Entries, error) {
 		entry.Feed.UserID = entry.UserID
 		entry.Feed.Icon.FeedID = entry.FeedID
 		entry.Feed.Category.UserID = entry.UserID
+		entry.BoardIDS = ""
+		// entry.BoardIDS = 
+		if (boardIDS.Valid) {
+			entry.BoardIDS = boardIDS.String
+		}
 		entries = append(entries, &entry)
 	}
 
@@ -488,7 +498,8 @@ func (e *EntryQueryBuilder) GetBoardEntries() (model.Entries, error) {
 			f.user_agent,
 			f.cookie,
 			fi.icon_id,
-			u.timezone
+			u.timezone,
+			g.board_ids
 		FROM
 			entries e
 		JOIN
@@ -501,6 +512,8 @@ func (e *EntryQueryBuilder) GetBoardEntries() (model.Entries, error) {
 			feed_icons fi ON fi.feed_id=f.id
 		LEFT JOIN
 			users u ON u.id=e.user_id
+		LEFT JOIN
+			(SELECT s.entry_id, ARRAY_TO_STRING(ARRAY_AGG(s.board_id),',') as board_ids from entry_board s GROUP BY s.entry_id) g ON e.id=g.entry_id
 		WHERE %s %s
 	`
 
@@ -519,6 +532,7 @@ func (e *EntryQueryBuilder) GetBoardEntries() (model.Entries, error) {
 		var entry model.Entry
 		var iconID sql.NullInt64
 		var tz string
+		var boardIDS sql.NullString
 
 		entry.Feed = &model.Feed{}
 		entry.Feed.Category = &model.Category{}
@@ -555,6 +569,7 @@ func (e *EntryQueryBuilder) GetBoardEntries() (model.Entries, error) {
 			&entry.Feed.Cookie,
 			&iconID,
 			&tz,
+			&boardIDS,
 		)
 
 		if err != nil {
@@ -577,6 +592,11 @@ func (e *EntryQueryBuilder) GetBoardEntries() (model.Entries, error) {
 		entry.Feed.UserID = entry.UserID
 		entry.Feed.Icon.FeedID = entry.FeedID
 		entry.Feed.Category.UserID = entry.UserID
+		entry.BoardIDS = ""
+		if (boardIDS.Valid) {
+			entry.BoardIDS = boardIDS.String
+		}
+
 		entries = append(entries, &entry)
 	}
 

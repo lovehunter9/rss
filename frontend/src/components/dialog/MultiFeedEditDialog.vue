@@ -11,7 +11,7 @@
 
         <div class="column justify-start items-start">
 
-          <div class="edit-label">You've selected {{ props.feeds.length }} feeds</div>
+          <div class="edit-label">You've selected {{ props.feeds?.length }} feeds</div>
 
           <div class="row items-start">
             <div class="selected-button row justify-start items-center" v-for="item in feeds" :key="item.id">

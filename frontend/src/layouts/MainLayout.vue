@@ -14,76 +14,80 @@
         </div>
         <q-scroll-area style="height:calc(100% - 110px);">
           <q-list class="margin-bottom-safe-area">
-            <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false" @item-on-click="changeItemMenu(MenuType.Discover)"/>
-            <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="`${todayCount}`" @item-on-click="changeItemMenu(MenuType.Today)"/>
-            <layout-left-item-menu :menu-type="MenuType.Unread" :unread-count="`${store.allUnRead}`" @item-on-click="changeItemMenu(MenuType.Unread)"/>
-            <layout-left-item-menu :menu-type="MenuType.ReadLater" :unread-count="count.total" @item-on-click="changeItemMenu(MenuType.ReadLater)"/>
+            <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false"
+                                   @item-on-click="changeItemMenu(MenuType.Discover)"/>
+            <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="`${todayCount}`"
+                                   @item-on-click="changeItemMenu(MenuType.Today)"/>
+            <layout-left-item-menu :menu-type="MenuType.Unread" :unread-count="`${store.allUnRead}`"
+                                   @item-on-click="changeItemMenu(MenuType.Unread)"/>
+<!--            <layout-left-item-menu :menu-type="MenuType.ReadLater" :unread-count="count.total"-->
+<!--                                   @item-on-click="changeItemMenu(MenuType.ReadLater)"/>-->
           </q-list>
 
-        <q-separator style="margin-top:6px;margin-bottom: 11px;" inset/>
+          <q-separator style="margin-top:6px;margin-bottom: 11px;" inset/>
 
-        <div class="row justify-between items-center folderInfo"
-             @click="goFolderSetting">
-          <span class="folder">Folder</span>
-          <q-img style="width: 16px;height: 16px" :src="isFolderManager ? require('../assets/menu/activeSetting.svg') : require('../assets/menu/setting.svg')"/>
-        </div>
+          <div class="row justify-between items-center folderInfo"
+               @click="goFolderSetting">
+            <span class="folder">Folder</span>
+            <q-img style="width: 16px;height: 16px"
+                   :src="isFolderManager ? require('../assets/menu/activeSetting.svg') : require('../assets/menu/setting.svg')"/>
+          </div>
 
-        <q-item class="item" dense v-for="(category, index) in store.categories"
-                :key="'ct' + index" style="padding: 0;">
-          <q-expansion-item dense switchToggleSide :disable="category.feeds.length === 0">
-            <template v-slot:header>
-              <q-item class="menuItem"
-                      :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && category.feeds.find(e => e.id === store.menu_choice.value) !== undefined"
-                      active-class="itemActiveStyle" dense
-                      :class="category.feeds.length > 0 ? 'folder-extension-margin-left' : 'folder-extension-margin-none'"
-                      @click="changeItemMenu(MenuType.Category, category.id)">
-                <q-item-section class="folderTitle">
-                  {{ category.title }}
+          <q-item class="item" dense v-for="(category, index) in store.categories"
+                  :key="'ct' + index" style="padding: 0;">
+            <q-expansion-item dense switchToggleSide :disable="category.feeds.length === 0">
+              <template v-slot:header>
+                <q-item class="menuItem"
+                        :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && category.feeds.find(e => e.id === store.menu_choice.value) !== undefined"
+                        active-class="itemActiveStyle" dense
+                        :class="category.feeds.length > 0 ? 'folder-extension-margin-left' : 'folder-extension-margin-none'"
+                        @click="changeItemMenu(MenuType.Category, category.id)">
+                  <q-item-section class="folderTitle">
+                    {{ category.title }}
+                  </q-item-section>
+                  <q-item-section side>
+                    <div class="unreadCount">
+                      {{ feedReduce(category.feeds) }}
+                    </div>
+                  </q-item-section>
+                </q-item>
+              </template>
+              <q-item dense class="menuItem feed-select-item" clickable v-for="(feed, fi) in category.feeds"
+                      :key="'ft' + fi"
+                      @click="changeItemMenu(MenuType.Feed, feed.id)"
+                      :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && store.menu_choice.value === feed.id"
+                      active-class="itemActiveStyle">
+                <q-item-section avatar>
+                  <!-- <q-icon :name="formatIconName(MenuType.Discover)" size="14px"></q-icon> -->
+                  <img v-if="store.feeds_icon[feed.id] && store.feeds_icon[feed.id].data"
+                       :src="store.feeds_icon[feed.id].data" :width="14" :height="14"/>
+                </q-item-section>
+                <q-item-section class="folderTitle" style="margin-left:-30px;padding-top: 10px;padding-bottom: 10px;">
+                  {{ feed.title }}
                 </q-item-section>
                 <q-item-section side>
                   <div class="unreadCount">
-                {{ feedReduce(category.feeds)}}
-              </div>
+                    {{ feed.unread ?? 0 }}
+                  </div>
                 </q-item-section>
               </q-item>
-            </template>
-            <q-item dense class="menuItem feed-select-item" clickable v-for="(feed, fi) in category.feeds"
-                    :key="'ft' + fi"
-                    @click="changeItemMenu(MenuType.Feed, feed.id)"
-                    :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && store.menu_choice.value === feed.id"
-                    active-class="itemActiveStyle">
-              <q-item-section avatar>
-                <!-- <q-icon :name="formatIconName(MenuType.Discover)" size="14px"></q-icon> -->
-                <img v-if="store.feeds_icon[feed.id] && store.feeds_icon[feed.id].data"
-                     :src="store.feeds_icon[feed.id].data" :width="14" :height="14"/>
-              </q-item-section>
-              <q-item-section class="folderTitle" style="margin-left:-30px;padding-top: 10px;padding-bottom: 10px;">
-                {{ feed.title }}
-              </q-item-section>
-              <q-item-section side>
-                <div class="unreadCount">
-                  {{ feed.unread ?? 0 }}
-                </div>
-              </q-item-section>
-            </q-item>
-          </q-expansion-item>
-        </q-item>
+            </q-expansion-item>
+          </q-item>
 
-        <!-- <q-item clickable active-class="itemActiveStyle" class="menuItem q-mx-sm q-pl-xs q-pr-md q-py-xs"
-          @click="addFolder()">
-          <q-item-section class="items-center" avatar>
-             <q-icon :name="formatIconName(MenuType.AddFolder)" size="20px"></q-icon>
-          </q-item-section>
-          <q-item-section class="text-subtitle1">Add Folder</q-item-section>
-        </q-item> -->
+          <layout-left-item-menu :menu-type="MenuType.CreateNewFolder" :show-un-read-count="false" :dense="true"
+                                 @item-on-click="addFolder()"/>
+          <div class="row justify-between items-center folderInfo">
+            <span class="folder">Boards</span>
+          </div>
 
-        <layout-left-item-menu :menu-type="MenuType.CreateNewFolder" :show-un-read-count="false" :dense="true"
-                               @item-on-click="addFolder()"/>
-        <div class="row justify-between items-center folderInfo">
-          <span class="folder">Boards</span>
-        </div>
 
-        <layout-left-item-menu :menu-type="MenuType.Innovation" :show-un-read-count="false"/>
+
+          <layout-left-item-menu v-for="item in store.boards" :key="item.id + item.title" :menu-type="MenuType.Board"
+                                 :menu-value="item.id" :title="item.title" image-name="board" :show-un-read-count="false"
+                                 @item-on-click="changeItemMenu(MenuType.Board,item.id)"/>
+          <layout-left-item-menu :menu-type="MenuType.CreateNewBoard" :show-un-read-count="false" :dense="true"
+                                 @item-on-click="addBoard()"/>
+
         </q-scroll-area>
 
         <div class="row justify-between items-center"
@@ -114,11 +118,12 @@ import {useRoute, useRouter} from 'vue-router';
 // import {useIsMobile} from '../utils/utils';
 import {useRssStore} from 'stores/rss';
 
-import {EntriesQueryRequest, Entry, EntryStatus, Feed, MenuType} from '../types';
+import {Entry, EntryStatus, Feed, MenuType} from '../types';
 import SearchView from 'components/rss/SearchView.vue';
 import LayoutLeftItemMenu from 'components/LayoutLeftItemMenu.vue'
 import AddFolderDialog from 'components/dialog/AddFolderDialog.vue';
 import AddFeedDialog from 'components/dialog/AddFeedDialog.vue';
+import AddBoardDialog from 'components/dialog/AddBoardDialog.vue';
 
 export default defineComponent({
   name: 'MainLayout',
@@ -146,11 +151,11 @@ export default defineComponent({
     const store = useRssStore();
 
     const leftDrawerOpen = ref(false);
-    let innerWidth = ref(450);
+    // let innerWidth = ref(450);
     // const timer = ref();
     // const screenWidth = ref(document.body.clientWidth);
 
-    const count = ref<any>({ total: 10 });
+    const count = ref<any>({total: 10});
 
     const todayCount = ref<number>(0)
 
@@ -190,7 +195,7 @@ export default defineComponent({
         let entry = store.get_local_entry(entry_id);
         if (entry) {
           if (entry.status != EntryStatus.Read) {
-            store.mark_entry_read(entry_id,EntryStatus.Read);
+            store.mark_entry_read(entry_id, EntryStatus.Read);
           }
           item.value = entry;
         } else {
@@ -199,12 +204,12 @@ export default defineComponent({
       }
     );
 
-    watch(() => Route.path,(value) => {
+    watch(() => Route.path, (value) => {
       isFolderManager.value = value.includes('/folderSetting');
       if (isFolderManager.value) {
         store.menu_choice = {
-          type : MenuType.Empty,
-          value : 0
+          type: MenuType.Empty,
+          value: 0
         }
       }
     })
@@ -272,7 +277,7 @@ export default defineComponent({
       });
     }
 
-    function changeItemMenu(type: MenuType, value?: number) {
+    function changeItemMenu(type: MenuType, value = 0) {
       store.menu_choice = {
         type,
         value
@@ -294,19 +299,11 @@ export default defineComponent({
       } else if (type == MenuType.Discover) {
         goto('/discover')
       } else if (type == MenuType.Unread) {
-        // store.get_entries(new EntriesQueryRequest({limit : 50,offset : 0}),(response) => {
-        //    const entries = response.entries.filter((entry) => {
-        //      return entry.status === EntryStatus.Unread;
-        //    })
-        //   if (entries){
-        //     return { entries : entries,total : entries.length}
-        //   }else {
-        //     return  response
-        //   }
-        // })
         goto('/')
       } else if (type == MenuType.ReadLater) {
         store.get_readLater();
+        goto('/')
+      } else if (type == MenuType.Board) {
         goto('/')
       }
     }
@@ -316,7 +313,24 @@ export default defineComponent({
         component: AddFolderDialog,
         componentProps: {}
       })
-        .onOk(async (data : string) => {
+        .onOk(async (data: string) => {
+          console.log(data)
+        })
+        .onCancel(() => {
+          console.log('Cancel');
+        })
+        .onDismiss(() => {
+          console.log('Called on OK or Cancel');
+          //     });
+        });
+    };
+
+    const addBoard = () => {
+      $q.dialog({
+        component: AddBoardDialog,
+        componentProps: {}
+      })
+        .onOk(async (data: string) => {
           console.log(data)
         })
         .onCancel(() => {
@@ -345,7 +359,7 @@ export default defineComponent({
         });
     };
 
-    const feedReduce = (array : Array<Feed>) : number => {
+    const feedReduce = (array: Array<Feed>): number => {
       let result = 0
       array.forEach(e => {
         result += e.unread || 0
@@ -373,6 +387,7 @@ export default defineComponent({
       tags,
       searchTxt,
       addFolder,
+      addBoard,
       addFeed,
       feedReduce,
       todayCount
@@ -402,7 +417,7 @@ export default defineComponent({
     width: calc(100% - 72px)
   }
 
-  .btn-add{
+  .btn-add {
     margin-top: 16px;
     margin-right: 16px;
     width: 32px;
@@ -585,6 +600,7 @@ export default defineComponent({
 :global(.q-field--dense) {
   height: 32px;
 }
+
 :global(.q-field__control) {
   height: 32px !important;
   min-height: 32px !important;

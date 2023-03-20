@@ -8,7 +8,8 @@ export enum MenuType {
   Today = 6,
   ReadLater = 7,
   CreateNewFolder = 8,
-  Innovation = 9
+  CreateNewBoard = 9,
+  Board = 10
 }
 
 export const menuTypeName = (menuType: MenuType) => {
@@ -28,9 +29,9 @@ export const menuTypeName = (menuType: MenuType) => {
       break;
     case MenuType.CreateNewFolder:
       menuTypeName = 'Create New Folder';
-      break
-    case MenuType.Innovation:
-      menuTypeName = 'Innovation';
+      break;
+    case MenuType.CreateNewBoard:
+      menuTypeName = 'Create New Board';
       break
     default:
       break;
@@ -55,6 +56,44 @@ export interface Icon {
   hash: string;
   mime_type: string;
   content: string;
+}
+
+
+// Category represents a feed category.
+// type Board struct {
+//   ID          int64  `json:"id"`
+//   UserID      int64  `json:"user_id"`
+//   Title       string `json:"title"`
+//   Description string `json:"description"`
+// }
+
+export interface Board{
+  id : number;
+  user_id : number;
+  title : string;
+  description : string;
+}
+
+
+// CategoryRequest represents the request to create or update a category.
+// type BoardRequest struct {
+//   Title       string `json:"title"`
+//   Description string `json:"description"`
+// }
+
+export interface BoardRequest{
+  title : string;
+  description : string;
+}
+
+// type EntryToBoardRequest struct {
+//   EntryID int64 `json:"entry_id"`
+//   BoardID int64 `json:"board_id"`
+// }
+
+export interface EntryToBoardRequest{
+  entry_id : number;
+  board_id : number;
 }
 
 // FeedIcon is a junction table between feeds and icons.
@@ -166,6 +205,7 @@ export interface Entry {
   reading_time: number;
   enclosures: Enclosure[];
   feed: Feed;
+  board_ids: string;
 }
 
 export interface EntryContent {
@@ -276,15 +316,15 @@ export interface FeedCounters {
 // 	FetchViaProxy               bool   `json:"fetch_via_proxy"`
 // 	AllowSelfSignedCertificates bool   `json:"allow_self_signed_certificates"`
 // }
-interface SubscriptionDiscoveryRequest {
-  url: string;
-  user_agent: string;
-  cookie: string;
-  username: string;
-  password: string;
-  fetch_via_proxy: boolean;
-  allow_self_signed_certificates: boolean;
-}
+// interface SubscriptionDiscoveryRequest {
+//   url: string;
+//   user_agent: string;
+//   cookie: string;
+//   username: string;
+//   password: string;
+//   fetch_via_proxy: boolean;
+//   allow_self_signed_certificates: boolean;
+// }
 
 // FeedCreationRequest represents the request to create a feed.
 // type FeedCreationRequest struct {
@@ -509,7 +549,55 @@ export class EntriesQueryRequest {
   }
 }
 
+export class BoardEntriesQueryRequest {
+  direction?: string;
+  order?: EnteryQueryOrder;
+  limit = 10;
+  offset = 0;
 
+  constructor(props?: Partial<BoardEntriesQueryRequest>) {
+    props && Object.assign(this, props);
+  }
+
+  public build(): string {
+    let url = '';
+    if (this.direction) {
+      if (url) {
+        url += '&';
+      } else {
+        url += '?';
+      }
+      url += `direction=${this.direction}`;
+    }
+    if (this.order) {
+      if (url) {
+        url += '&';
+      } else {
+        url += '?';
+      }
+      url += `order=${this.order}`;
+    }
+    if (this.limit) {
+      if (url) {
+        url += '&';
+      } else {
+        url += '?';
+      }
+      url += `limit=${this.limit}`;
+    }
+    console.log(url)
+    if (this.offset) {
+      if (url) {
+        url += '&';
+      } else {
+        url += '?';
+      }
+      url += `offset=${this.offset}`;
+    }
+    console.log(url)
+    return url;
+  }
+}
 
 export class SDKQueryRequest {
 

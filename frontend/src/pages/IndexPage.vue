@@ -2,40 +2,37 @@
   <div class="index-root">
 
     <q-splitter v-model="splitterModel" unit="px" disable style="height: 100%;background-color: white;"
-      v-if="store.entries.length > 0">
+                v-if="store.entries.length > 0">
       <template v-slot:before>
         <div class="item-list">
-          <div class="row justify-end items-center">
+          <div class="row justify-end items-center" v-if="store.menu_choice.type !== MenuType.Board">
             <img class="icon-read-all" :src="readRef" @click="readAll" :title="readTextRef">
             <img class="icon-refresh" src="../assets/menu/refresh.svg">
           </div>
+          <div class="row justify-end items-center" v-else>
+            <img class="icon-read-all" src="../assets/menu/modify.svg" @click="editBoard">
+            <img class="icon-refresh" src="../assets/menu/delete.svg" @click="remove">
+          </div>
           <div class="text-label">{{ labelRef }}</div>
           <div class="text-sub-label">{{ subLabelRef }}</div>
-          <q-scroll-area class="list-view"  @scroll="onScroll">
-          <q-list >
-              <!-- <q-infinite-scroll @load="onLoadRef" :offset="250"> -->
+          <q-scroll-area class="list-view" @scroll="onScroll">
+            <q-list>
 
-                <div v-for="(entry, index) in store.entries" :key="`it` + index" class="entry">
-                  <entry-view :entry='entry' :selected="index === selectIndex" @onClickCallback="onClickCallback(index)" />
-                </div>
-  <!--
-              <template v-slot:loading>
-                <div class="row justify-center q-my-md">
-                  <q-spinner-dots color="primary" size="40px" />
-                </div>
-              </template>
-            </q-infinite-scroll> -->
+              <div v-for="(entry, index) in store.entries" :key="`it` + index" class="entry">
+                <entry-view :entry='entry' :selected="index === selectIndex"
+                            @onClickCallback="onClickCallback(index)"/>
+              </div>
             </q-list>
-            <footer-loading-component v-show="loadMoreEnable"></footer-loading-component>
+            <footer-loading-component v-show="loadMoreEnable"/>
           </q-scroll-area>
-          </div>
+        </div>
       </template>
 
       <template v-slot:after>
         <div class="column items-center justify-center" style="height: 100vh;">
-          <news-view v-if="item" :item="item" />
+          <news-view v-if="item" :item="item"/>
           <div class="text-7A7A7A column items-center justify-center" v-else>
-            <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148" />
+            <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148"/>
             {{ 'No item selected.' }}
           </div>
         </div>
@@ -43,20 +40,23 @@
       </template>
 
     </q-splitter>
-    <empty-view style="width:100%;height:100%" v-else />
+    <empty-view style="width:100%;height:100%" v-else/>
 
   </div>
 </template>
 
 <script lang="ts" setup>
-import { useRssStore } from 'stores/rss';
-import { EntriesQueryRequest, Entry, EntryStatus, MenuType } from 'src/types';
-import { onMounted, ref, watch } from 'vue';
+import {useRssStore} from 'stores/rss';
+import {BoardEntriesQueryRequest, EntriesQueryRequest, Entry, EntryStatus, MenuType} from 'src/types';
+import {onMounted, ref, watch} from 'vue';
 import EntryView from 'components/rss/EntryView.vue';
-import { newsBus, newsBusMessage } from 'src/utils/utils';
-import { useRoute, useRouter } from 'vue-router';
+import {newsBus, newsBusMessage} from 'src/utils/utils';
+import {useRoute, useRouter} from 'vue-router';
 import NewsView from 'components/rss/NewsView.vue';
 import EmptyView from 'components/rss/EmptyView.vue';
+import {useQuasar} from 'quasar';
+import AddBoardDialog from 'components/dialog/AddBoardDialog.vue';
+import FeedDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import FooterLoadingComponent from 'components/rss/FooterLoadingComponent.vue'
 
 const store = useRssStore();
@@ -69,6 +69,7 @@ const Route = useRoute()
 const readRef = ref(require('../assets/menu/unread.svg'));
 const readTextRef = ref('Click to convert all articles to read');
 const readStatus = ref(false);
+const $q = useQuasar();
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 watch(() => [store.menu_choice], (newValue) => {
@@ -80,9 +81,9 @@ watch(() => [store.entries], (newValue) => {
   if (newValue) {
     updateUI();
   }
-},{
-  immediate : true,
-  deep : true
+}, {
+  immediate: true,
+  deep: true
 })
 
 
@@ -192,6 +193,42 @@ function readAll() {
   }
 }
 
+function editBoard() {
+  $q.dialog({
+    component: AddBoardDialog,
+    componentProps: {
+      boardId: store.menu_choice.value
+    }
+  }).onOk(() => {
+    //Do Nothing
+
+    newsBus.emit(newsBusMessage.feedRefresh)
+
+  }).onCancel(() => {
+    console.log('Cancel');
+  })
+    .onDismiss(() => {
+      console.log('Dismiss');
+    });
+}
+
+function remove() {
+  console.log('delete')
+  $q.dialog({
+    component: FeedDeleteDialog,
+    componentProps: {
+      isFeed: true
+    }
+  }).onOk(async () => {
+    console.log('Ok');
+  }).onCancel(() => {
+    console.log('Cancel');
+  })
+    .onDismiss(() => {
+      console.log('Dismiss');
+    });
+}
+
 const splitterModel = ref(400)
 const item = ref<Entry | undefined>()
 
@@ -224,7 +261,13 @@ const loadMoreEnable = ref(true)
 
 
 const requestEntrys = async (loadmore = false) => {
-  if (store.menu_choice.type === MenuType.Today || store.menu_choice.type === MenuType.ReadLater) {
+  if (store.menu_choice.type === MenuType.Today || store.menu_choice.type === MenuType.ReadLater || store.menu_choice.type === MenuType.Board) {
+    if (store.menu_choice.type === MenuType.Today) {
+      return
+    }
+    if (store.menu_choice.type === MenuType.Board) {
+      store.get_board_entries(store.menu_choice.value || 0,new BoardEntriesQueryRequest({limit: 50, offset: 0}))
+    }
     return 0
   }
 
@@ -246,7 +289,7 @@ const requestEntrys = async (loadmore = false) => {
         return entry.starred;
       })
       if (entries) {
-        return { entries: entries, total: entries.length }
+        return {entries: entries, total: entries.length}
       }
     }
     return response
@@ -270,7 +313,7 @@ const onScroll = (info: any) => {
   }
 }
 
-const onLoadRef = async ( done: (() => void)) => {
+const onLoadRef = async (done: (() => void)) => {
   requestEntrys(true).then((number) => {
     loadMoreEnable.value = number !== undefined && number >= 50;
     done()

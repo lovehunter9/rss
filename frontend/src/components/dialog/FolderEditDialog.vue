@@ -14,7 +14,7 @@
 
         <div class="edit-title">Folder Name</div>
 
-        <edit-view class="edit-view" :text="folder.data.title" :is-read-only="true"/>
+        <edit-view class="edit-view" :text="folder?.data.title" :is-read-only="true"/>
 
         <dialog-feeds-title :folder="folder"/>
 
@@ -52,15 +52,15 @@
 
 <script setup lang="ts">
 
-import {useDialogPluginComponent, useQuasar} from 'quasar';
+import {useDialogPluginComponent} from 'quasar';
 import { onUnmounted, PropType} from 'vue';
 import {OptionalCategory} from 'stores/organizeConfig';
 import EditView from 'components/rss/EditView.vue';
 import OrganizeItem from 'components/rss/OrganizeItem.vue';
-import FeedDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
-import {useOrganizeStore} from 'stores/organize';
+// import FeedDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
+// import {useOrganizeStore} from 'stores/organize';
 import DialogFeedsTitle from 'components/rss/DialogFeedsTitle.vue';
-import EmptyView from "components/rss/EmptyView.vue";
+import EmptyView from 'components/rss/EmptyView.vue';
 
 const prop = defineProps({
   folder: {
@@ -69,28 +69,28 @@ const prop = defineProps({
   }
 })
 
-const organizeStore = useOrganizeStore()
-const $q = useQuasar();
+// const organizeStore = useOrganizeStore()
+// const $q = useQuasar();
 
 const {dialogRef, onDialogOK, onDialogCancel} = useDialogPluginComponent();
 
-function remove() {
-  $q.dialog({
-    component: FeedDeleteDialog,
-    componentProps: {}
-  }).onOk(async () => {
-    if (prop.folder) {
-      await prop.folder.getSelectedFeed().forEach((value) => {
-        organizeStore.delete(value.id)
-      })
-    }
-  }).onCancel(() => {
-    console.log('Cancel');
-  })
-    .onDismiss(() => {
-      console.log('Dismiss');
-    });
-}
+// function remove() {
+//   $q.dialog({
+//     component: FeedDeleteDialog,
+//     componentProps: {}
+//   }).onOk(async () => {
+//     if (prop.folder) {
+//       await prop.folder.getSelectedFeed().forEach((value) => {
+//         organizeStore.delete(value.id)
+//       })
+//     }
+//   }).onCancel(() => {
+//     console.log('Cancel');
+//   })
+//     .onDismiss(() => {
+//       console.log('Dismiss');
+//     });
+// }
 
 onUnmounted(() => {
   if (prop.folder){

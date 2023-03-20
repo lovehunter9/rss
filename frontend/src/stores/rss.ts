@@ -1,5 +1,7 @@
 import {defineStore} from 'pinia';
 import {
+  Board, BoardEntriesQueryRequest,
+  BoardRequest,
   Category,
   EntriesQueryRequest,
   EntriesQueryResponse,
@@ -30,6 +32,10 @@ import {
   update_feed,
   entry_readlater,
   get_readLater,
+  update_board,
+  get_boards,
+  get_board_entries,
+  create_board,
 } from 'src/api/api';
 
 export type DataState = {
@@ -44,6 +50,7 @@ export type DataState = {
   entries_total: number;
   // entry_choice: Entry | undefined;
   contents: Record<number, string>;
+  boards : Board[];
 
   leftDrawerOpen: boolean;
   dialogShow: boolean;
@@ -61,6 +68,7 @@ export const useRssStore = defineStore('rss', {
       feeds_icon: {},
       categories: [],
       feeds: [],
+      boards : [],
       entries: [],
       entries_total: 0,
       contents: {},
@@ -85,6 +93,7 @@ export const useRssStore = defineStore('rss', {
       try {
         const categories: Category[] = await get_categories();
         const feeds: Feed[] = await get_feeds();
+        this.boards = await get_boards();
 
         for (const category of categories) {
           category.feeds = [];
@@ -150,6 +159,27 @@ export const useRssStore = defineStore('rss', {
         const data = await update_feed(feedID.toString(),request);
         console.log(data)
         await this.refresh_category_and_feeds()
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
+    async updateBoard(boardId: number, request : BoardRequest) {
+      try {
+        const data = await update_board(boardId.toString(),request);
+        console.log(data)
+        // await this.refresh_category_and_feeds()
+        this.boards = await get_boards();
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
+    async createBoard(request : BoardRequest) {
+      try {
+        const data = await create_board(request)
+        this.boards = await get_boards();
+        return data
       } catch (e) {
         console.log(e);
       }
@@ -287,6 +317,16 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
+    async get_board_entries(boardId : number,request : BoardEntriesQueryRequest){
+      try {
+        const response: EntriesQueryResponse = await get_board_entries(boardId,request);
+        this.entries = response.entries;
+        this.entries_total = response.total;
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
     async mark_entry_read(entry_id: number,status : EntryStatus) {
       try {
         await update_entry_status({
@@ -347,6 +387,12 @@ export const useRssStore = defineStore('rss', {
         return result
       } catch (error) {
       }
+    },
+
+    updateEntryBoards(entry_id: number, board_ids: string) {
+       this.entries.filter(e => e.id === entry_id).map( e=> {
+        e.board_ids = board_ids
+       })
     }
   },
 });

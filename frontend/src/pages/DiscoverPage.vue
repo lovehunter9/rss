@@ -44,9 +44,9 @@ import './discover/css/discover.scss'
 import DiscoverDetail from './discover/DiscoverDetail.vue';
 import DiscoverSearchView from './discover/DiscoverSearchView.vue'
 
-function onSearch(vault : string){
-  console.log(vault)
-}
+// function onSearch(vault : string){
+//   console.log(vault)
+// }
 
 const showDetail = ref(false)
 

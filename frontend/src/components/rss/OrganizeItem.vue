@@ -162,23 +162,23 @@ function remove() {
     });
 }
 
-function getLatestEntryTime(): string {
-  if (props.data) {
-    // let list : Entry[] = props.feed.entries
-    // console.log(props.feed)
-    // for (let i = 0; i < list.length; i++) {
-    //   for (let j = 0; j < list.length - i - 1; j++) {
-    //     if (utcToStamp(list[j].created_at).getTime() < utcToStamp(list[j + 1].created_at).getTime()) {
-    //       [list[j], list[j + 1]] = [list[j + 1], list[j]];
-    //     }
-    //   }
-    // }
-    // return getPastTime(new Date, utcToStamp(list[0].created_at));
+// function getLatestEntryTime(): string {
+//   if (props.data) {
+//     // let list : Entry[] = props.feed.entries
+//     // console.log(props.feed)
+//     // for (let i = 0; i < list.length; i++) {
+//     //   for (let j = 0; j < list.length - i - 1; j++) {
+//     //     if (utcToStamp(list[j].created_at).getTime() < utcToStamp(list[j + 1].created_at).getTime()) {
+//     //       [list[j], list[j + 1]] = [list[j + 1], list[j]];
+//     //     }
+//     //   }
+//     // }
+//     // return getPastTime(new Date, utcToStamp(list[0].created_at));
 
-    return 'sss'
-  }
-  return 'error'
-}
+//     return 'sss'
+//   }
+//   return 'error'
+// }
 
 </script>
 
