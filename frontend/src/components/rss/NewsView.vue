@@ -8,35 +8,7 @@
       <div class="row justify-end items-center">
         <img class="icon-end" :src="readRef" :title="readTextRef" @click="readChange" />
         <q-img class="icon-end" :src="markRef" :title="markTextRef">
-          <q-menu :offset="[10, 8]">
-            <q-list style="min-width:236px">
-              <q-item v-for="item in boardSelectStatusRef " dense :key="item.id" @click="addToBoard(item.id)" clickable
-                v-close-popup>
-                <q-item-section avatar>
-                  <img
-                    :src="isContainBoard(item.id) ? require('../../assets/menu/bookmark.svg') : require('../../assets/menu/unbookmark.svg')"
-                    :width="16" :height="16" />
-                </q-item-section>
-                <q-item-section style=" font-family: 'Roboto';font-style: normal;font-weight: 400;font-size: 12px;
-                      line-height: 12px;color: #1A130F;margin-left: -30px;">
-                  {{ item.title }}
-                </q-item-section>
-                <q-item-section side v-if="isContainBoard(item.id)">
-                  <q-checkbox v-model="item.selected" size="25px" color="orange" disable />
-                </q-item-section>
-              </q-item>
-              <q-item dense v-close-popup clickable @click="createBoard()">
-                <q-item-section avatar>
-                  <img src="../../assets/menu/add.svg" :width="16" :height="16" />
-                </q-item-section>
-
-                <q-item-section style="font-family: 'Roboto';font-style: normal;font-weight: 400;font-size: 12px;
-                      line-height: 12px;color: #FF8642;margin-left: -30px;">
-                  Create New Boards
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
+          <change-entry-board-menu-component :item="item"></change-entry-board-menu-component>
         </q-img>
         <img class="icon-end" src="../../assets/menu/share.svg">
       </div>
@@ -70,14 +42,11 @@ import {
   PropType
 } from 'vue';
 import { useRssStore } from 'stores/rss';
-import { EntriesQueryRequest, Entry, EntryStatus, MenuType } from 'src/types';
+import { Entry, EntryStatus, MenuType } from 'src/types';
 import { formatContentHtml, newsBus, newsBusMessage, utcToStamp } from 'src/utils/utils'
 import { useRouter } from 'vue-router';
-import { date, useQuasar } from 'quasar'
-// import { similarity2 } from 'src/utils/stringCompare'
-import { addEntryToBoard, removeEntryToBoard } from 'src/api/api';
-import AddBoardDialog from 'components/dialog/AddBoardDialog.vue';
-
+import { date } from 'quasar'
+import ChangeEntryBoardMenuComponent from 'components/rss/ChangeEntryBoardMenuComponent.vue'
 
 const store = useRssStore();
 const router = useRouter()
@@ -87,8 +56,6 @@ const readTextRef = ref('Click to convert the current article as unread');
 const markTextRef = ref('Read later');
 const readStatus = ref(true);
 const markStatus = ref(false);
-
-const $q = useQuasar()
 
 let entry = ref<string>('');
 
@@ -152,51 +119,6 @@ function updateUI() {
   }
 }
 
-async function addToBoard(board_id: number) {
-  if (props.item) {
-    try {
-      if (isContainBoard(board_id)) {
-        await removeEntryToBoard({ board_id: board_id, entry_id: props.item.id })
-        // props.item.board_ids = props.item.board_ids.split(',') //.filter(e => Number(e) !== board.id).join(',')
-        store.updateEntryBoards(
-          props.item.id,
-          props.item.board_ids.split(',').filter(e => Number(e) !== board_id).join(',')
-        )
-      } else {
-        await addEntryToBoard({ board_id: board_id, entry_id: props.item.id })
-        store.updateEntryBoards(
-          props.item.id,
-          props.item.board_ids.length > 0 ? (props.item.board_ids + ',' + board_id) : `${board_id}`
-        )
-      }
-      // eslint-disable-next-line vue/no-mutating-props
-      (props.item as any) = store.entries.find(e => e.id === props.item.id)
-
-      boardSelectStatusRef.value = initBoardsStatus()
-    } catch (error) {
-      console.log(error);
-    }
-  }
-}
-
-async function createBoard() {
-  $q.dialog({
-    component: AddBoardDialog,
-    componentProps: {}
-  })
-    .onOk(async (id: number) => {
-      if (id > 0) {
-        addToBoard(id)
-      }
-    })
-    .onCancel(() => {
-      console.log('Cancel');
-    })
-    .onDismiss(() => {
-      console.log('Called on OK or Cancel');
-      //     });
-    });
-}
 
 function readChange() {
   if (props.item) {
@@ -204,9 +126,6 @@ function readChange() {
   }
 }
 
-function isContainBoard(id: number) {
-  return props.item.board_ids.split(',').find(e => Number(e) === id) != undefined
-}
 
 // const showSelfTitle = ref(false)
 watch(
@@ -258,16 +177,10 @@ const nextImage = () => {
 }
 
 const jumpToFeed = () => {
-  // store.
-
   store.menu_choice = {
     type: MenuType.Feed,
-    value: props.item.id
+    value: props.item.feed_id
   };
-  console.log(store.menu_choice)
-  store.get_entries(
-    new EntriesQueryRequest({ limit: 50, offset: 0, feed_id: props.item.id })
-  );
   router.push('/')
 }
 
@@ -281,16 +194,6 @@ function getTime() {
   return '';
 }
 
-const initBoardsStatus = () => {
-  return store.boards.map(e => {
-    return {
-      ...e,
-      selected: isContainBoard(e.id)
-    }
-  })
-}
-
-const boardSelectStatusRef = ref(initBoardsStatus())
 
 </script>
 
@@ -370,5 +273,9 @@ const boardSelectStatusRef = ref(initBoardsStatus())
     }
   }
 
+
+
 }
+
+
 </style>

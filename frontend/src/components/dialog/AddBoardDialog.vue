@@ -33,7 +33,6 @@ import {Loading, useDialogPluginComponent} from 'quasar';
 import EditView from 'components/rss/EditView.vue';
 import {onMounted, ref} from 'vue';
 import {useRssStore} from 'stores/rss';
-import {create_board, get_feeds} from 'src/api/api';
 
 const {dialogRef, onDialogOK} = useDialogPluginComponent();
 const store = useRssStore()
