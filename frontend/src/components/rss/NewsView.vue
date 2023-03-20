@@ -44,6 +44,7 @@ import { EntriesQueryRequest, Entry, EntryStatus, MenuType } from 'src/types';
 import { formatContentHtml, newsBus, newsBusMessage, utcToStamp } from 'src/utils/utils'
 import { useRouter } from 'vue-router';
 import { date } from 'quasar'
+import { similarity2 } from 'src/utils/stringCompare'
 
 const store = useRssStore();
 const router = useRouter()
@@ -78,12 +79,16 @@ async function updateEntry(newVal: Entry) {
   entry.value = formatContentHtml(newVal.content);
   store.update_entry_content(newVal.id, newVal.content);
 
-  let id = newVal.id;
+  // let id = newVal.id;
 
   // let k = await store.fetch_entry_content(id);
   // console.log(k);
   // if (k != undefined) {
-  //   entry.value = formatContentHtml(k);
+  //   const result = similarity2(newVal.content,k)
+  //   console.log('匹配度:' + result);
+  //   if (result > 0.5) {
+  //     entry.value = formatContentHtml(k);
+  //   }
   // }
 
   updateUI();
