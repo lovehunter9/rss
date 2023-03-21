@@ -57,8 +57,6 @@ import { onUnmounted, PropType} from 'vue';
 import {OptionalCategory} from 'stores/organizeConfig';
 import EditView from 'components/rss/EditView.vue';
 import OrganizeItem from 'components/rss/OrganizeItem.vue';
-// import FeedDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
-// import {useOrganizeStore} from 'stores/organize';
 import DialogFeedsTitle from 'components/rss/DialogFeedsTitle.vue';
 import EmptyView from 'components/rss/EmptyView.vue';
 
@@ -69,28 +67,7 @@ const prop = defineProps({
   }
 })
 
-// const organizeStore = useOrganizeStore()
-// const $q = useQuasar();
-
 const {dialogRef, onDialogOK, onDialogCancel} = useDialogPluginComponent();
-
-// function remove() {
-//   $q.dialog({
-//     component: FeedDeleteDialog,
-//     componentProps: {}
-//   }).onOk(async () => {
-//     if (prop.folder) {
-//       await prop.folder.getSelectedFeed().forEach((value) => {
-//         organizeStore.delete(value.id)
-//       })
-//     }
-//   }).onCancel(() => {
-//     console.log('Cancel');
-//   })
-//     .onDismiss(() => {
-//       console.log('Dismiss');
-//     });
-// }
 
 onUnmounted(() => {
   if (prop.folder){

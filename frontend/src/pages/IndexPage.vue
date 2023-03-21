@@ -47,7 +47,7 @@
 
 <script lang="ts" setup>
 import {useRssStore} from 'stores/rss';
-import {BoardEntriesQueryRequest, EntriesQueryRequest, Entry, EntryStatus, MenuType} from 'src/types';
+import {BoardEntriesQueryRequest, DeleteType, EntriesQueryRequest, Entry, EntryStatus, MenuType} from 'src/types';
 import {onMounted, ref, watch} from 'vue';
 import EntryView from 'components/rss/EntryView.vue';
 import {newsBus, newsBusMessage} from 'src/utils/utils';
@@ -56,8 +56,9 @@ import NewsView from 'components/rss/NewsView.vue';
 import EmptyView from 'components/rss/EmptyView.vue';
 import {useQuasar} from 'quasar';
 import AddBoardDialog from 'components/dialog/AddBoardDialog.vue';
-import FeedDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
+import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import FooterLoadingComponent from 'components/rss/FooterLoadingComponent.vue'
+import {removeEntryToBoard} from 'src/api/api';
 
 const store = useRssStore();
 const labelRef = ref('')
@@ -72,15 +73,14 @@ const readStatus = ref(false);
 const $q = useQuasar();
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-watch(() => [store.menu_choice], (newValue) => {
+watch(() => store.menu_choice, (newValue) => {
   requestEntrys()
 })
 
 
-watch(() => [store.entries], (newValue) => {
-  if (newValue) {
-    updateUI();
-  }
+watch(() => store.entries, (newValue) => {
+  console.log(newValue)
+  updateUI();
 }, {
   immediate: true,
   deep: true
@@ -215,12 +215,17 @@ function editBoard() {
 function remove() {
   console.log('delete')
   $q.dialog({
-    component: FeedDeleteDialog,
+    component: OrganizeDeleteDialog,
     componentProps: {
-      isFeed: true
+      type: DeleteType.Board
     }
   }).onOk(async () => {
-    console.log('Ok');
+    await store.entries.forEach((entry) => {
+      if (store.menu_choice.value){
+        removeEntryToBoard({ board_id: store.menu_choice.value, entry_id: entry.id })
+      }
+    })
+    await store.get_board_entries(store.menu_choice.value || 0,new BoardEntriesQueryRequest({limit: 50, offset: 0}))
   }).onCancel(() => {
     console.log('Cancel');
   })

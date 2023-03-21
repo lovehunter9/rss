@@ -19,9 +19,10 @@
 
 import {PropType, ref, watch} from 'vue';
 import {useOrganizeStore} from 'stores/organize';
-import FeedDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
+import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import {useQuasar} from 'quasar';
 import {OptionalCategory} from 'stores/organizeConfig';
+import {DeleteType} from 'src/types';
 
 const $q = useQuasar()
 const selection = ref<boolean | null>(false)
@@ -38,9 +39,9 @@ const prop = defineProps({
 function remove() {
   console.log('Delete')
   $q.dialog({
-    component: FeedDeleteDialog,
+    component: OrganizeDeleteDialog,
     componentProps: {
-      isFeed : true
+      type : DeleteType.FEED
     }
   }).onOk(async () => {
     if (prop.folder){

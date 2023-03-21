@@ -28,10 +28,10 @@ import {PropType, ref, watch} from 'vue';
 import {useRssStore} from 'stores/rss';
 import {useOrganizeStore} from 'stores/organize';
 import {QDialogOptions, useQuasar} from 'quasar';
-import FeedDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
+import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import FeedEditDialog from 'components/dialog/FeedEditDialog.vue';
 import {BaseOption, OptionalCategory, ORGANIZE_TYPE} from 'stores/organizeConfig';
-import {Category, Feed} from 'src/types';
+import {Category, DeleteType, Feed} from 'src/types';
 import FolderEditDialog from 'components/dialog/FolderEditDialog.vue';
 import { newsBus, newsBusMessage } from 'src/utils/utils';
 
@@ -145,11 +145,19 @@ function edit() {
 
 function remove() {
   console.log('delete')
-  $q.dialog({
-    component: FeedDeleteDialog,
-    componentProps: {
-      isFeed: props.parent ? true : organizeStore.organizeData.type === ORGANIZE_TYPE.FEED
+  let type;
+  if (props.parent){
+    type = DeleteType.FEED
+  }else {
+    if (organizeStore.organizeData.type === ORGANIZE_TYPE.FEED){
+      type = DeleteType.FEED
+    }else {
+      type = DeleteType.Folder
     }
+  }
+  $q.dialog({
+    component: OrganizeDeleteDialog,
+    componentProps: {type}
   }).onOk(async () => {
     if (props.data) {
       await organizeStore.delete(props.data.getId())

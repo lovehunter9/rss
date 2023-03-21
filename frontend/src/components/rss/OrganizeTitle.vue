@@ -36,9 +36,10 @@
 import {ref, watch} from 'vue';
 import {useOrganizeStore} from 'stores/organize';
 import MultiFeedEditDialog from 'components/dialog/MultiFeedEditDialog.vue';
-import FeedDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
+import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import {useQuasar} from 'quasar';
 import {ORGANIZE_TYPE} from 'stores/organizeConfig';
+import {DeleteType} from 'src/types';
 
 const $q = useQuasar()
 
@@ -66,9 +67,9 @@ function edit() {
 function remove() {
   console.log('delete')
   $q.dialog({
-    component: FeedDeleteDialog,
+    component: OrganizeDeleteDialog,
     componentProps: {
-      isFeed : organizeStore.organizeData.type === ORGANIZE_TYPE.FEED
+      type : DeleteType.FEED
     }
   }).onOk(async () => {
     await organizeStore.getSelectedList().forEach((value) => {
