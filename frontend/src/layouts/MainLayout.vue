@@ -582,14 +582,17 @@ export default defineComponent({
 }
 
 :global(.q-field--auto-height .q-field__control) {
-  min-height: 32px;
-  // padding-top: 0;
+  min-height: 32px !important;
+  height: 32px !important;
+}
+
+:global(.q-field--dense .q-field__control) {
+  min-height: 32px !important;
+  height: 32px !important;
 }
 
 :global(.q-field__native) {
-  height: 32px;
   min-height: 32px !important;
-  // font-size: 12px;
   padding: 0;
 }
 
@@ -599,11 +602,6 @@ export default defineComponent({
 
 :global(.q-field--dense) {
   height: 32px;
-}
-
-:global(.q-field__control) {
-  height: 32px !important;
-  min-height: 32px !important;
 }
 
 </style>

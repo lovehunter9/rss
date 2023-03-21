@@ -1,27 +1,19 @@
 <template>
-  <q-dialog
-    class="delete-root text-center"
-    ref="dialogRef"
-  >
+  <q-dialog class="delete-root text-center" ref="dialogRef">
     <q-card class="q-dialog-plugin">
       <div class="text-title">{{ dialogTitleRef }}</div>
 
       <div style="width: 100%;" class="column justify-start items-start">
         <div class="edit-title">Title</div>
-        <edit-view class="edit-view" placeholder="Board Title" :text="titleRef" @input="onTitleChanged"/>
+        <edit-view class="edit-view" placeholder="Board Title" :text="titleRef" @input="onTitleChanged" />
 
         <div class="edit-title">Description</div>
-        <edit-view class="edit-view"
-                   placeholder="Describe this board, example: monitor AI industry trends, Discover, etc."
-                   :text="descRef" @input="onDescChanged"/>
+        <q-input v-model="descRef" outlined standout type="textarea" class="message-input"
+          placeholder="Describe this board, example: monitor AI industry trends, Discover, etc." />
       </div>
 
       <div class="row justify-end items-end" style="width: 100%">
-        <q-btn
-          dense
-          class="btn-confirm"
-          label="Confirm"
-          @click="onConfirm"/>
+        <q-btn dense class="btn-confirm" label="Confirm" @click="onConfirm" />
       </div>
     </q-card>
   </q-dialog>
@@ -29,13 +21,15 @@
 
 <script setup lang="ts">
 
-import {Loading, useDialogPluginComponent} from 'quasar';
+import { Loading, useDialogPluginComponent } from 'quasar';
 import EditView from 'components/rss/EditView.vue';
-import {onMounted, ref} from 'vue';
-import {useRssStore} from 'stores/rss';
+import { onMounted, ref } from 'vue';
+import { useRssStore } from 'stores/rss';
 
-const {dialogRef, onDialogOK} = useDialogPluginComponent();
+const { dialogRef, onDialogOK } = useDialogPluginComponent();
 const store = useRssStore()
+
+const text = ref('')
 
 const props = defineProps({
   boardId: {
@@ -53,12 +47,12 @@ if (props.boardId) {
 }
 
 onMounted(() => {
-  if (props.boardId){
+  if (props.boardId) {
     const find = store.boards.find((board) => {
       return board.id == props.boardId
     })
     console.log(find)
-    if (find){
+    if (find) {
       onTitleChanged(find.title)
       onDescChanged(find.description)
     }
@@ -74,18 +68,18 @@ function onDescChanged(input: string) {
 }
 
 
-async function onConfirm(){
-  if (props.boardId && props.boardId > 0){
-    await store.updateBoard(props.boardId,{
-      title : titleRef.value,
-      description : descRef.value
+async function onConfirm() {
+  if (props.boardId && props.boardId > 0) {
+    await store.updateBoard(props.boardId, {
+      title: titleRef.value,
+      description: descRef.value
     });
     onDialogOK(props.boardId);
-  }else {
+  } else {
     try {
       const board = await store.createBoard({
-        title : titleRef.value,
-        description : descRef.value
+        title: titleRef.value,
+        description: descRef.value
       });
       onDialogOK(board?.id || -1);
     } catch (e) {
@@ -214,6 +208,18 @@ async function onConfirm(){
   font-size: 12px;
   line-height: 12px;
   color: #1a130f;
+}
+
+.message-input {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 12px;
+  color: #BDBDBD;
+  max-width: 100%;
+  width: 100%;
+  margin-top: 4px;
 }
 </style>
 
