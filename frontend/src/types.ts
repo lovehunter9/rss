@@ -9,7 +9,8 @@ export enum MenuType {
   ReadLater = 7,
   CreateNewFolder = 8,
   CreateNewBoard = 9,
-  Board = 10
+  Board = 10,
+  Trend = 11
 }
 
 export const menuTypeName = (menuType: MenuType) => {
@@ -32,6 +33,9 @@ export const menuTypeName = (menuType: MenuType) => {
       break;
     case MenuType.CreateNewBoard:
       menuTypeName = 'Create New Board';
+      break
+    case MenuType.Trend:
+      menuTypeName = 'Trend';
       break
     default:
       break;
