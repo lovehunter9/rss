@@ -173,7 +173,7 @@ func (f *FeedQueryBuilder) GetFeeds() (model.Feeds, error) {
 			c.hide_globally as category_hidden,
 			fi.icon_id,
 			u.timezone,
-			f.update_time
+			f.update_time at time zone u.timezone
 		FROM
 			feeds f
 		LEFT JOIN
