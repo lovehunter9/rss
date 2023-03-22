@@ -21,6 +21,10 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'trend',
         component: () => import('pages/TrendPage.vue')
+      },
+      {
+        path: 'search',
+        component: () => import('pages/SearchPage.vue')
       }
     ],
   },

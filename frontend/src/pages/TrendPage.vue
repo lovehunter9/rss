@@ -2,7 +2,7 @@
   <div class="trend-root">
     <div class="page-title"> Provide the best information based on trends </div>
     <TabsCompnent :tabs="tabs"></TabsCompnent>
-    <q-scroll-area style="height:calc(100% - 68px)">
+    <q-scroll-area style="height:calc(100% - 75px);margin-top: 8px;">
       <q-list>
       <div  v-for="item in 10" :key="item">
         <EntryTotalComponent></EntryTotalComponent>

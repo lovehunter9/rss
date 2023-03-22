@@ -5,45 +5,49 @@
       'mainlayout-ios': $q.platform.is.ios
     }">
       <q-drawer v-model="leftDrawerOpen" @update:model-value="updateLeftDrawer" show-if-above bordered height="100%"
-                class="drawer">
-        <div class="row" style="width: 100%">
-          <search-view class="search-view" @onSearch="onSearch"/>
+        class="drawer">
+        <div class="row" style="width: 100%;margin-bottom: 8px;">
+          <!-- <search-view class="search-view" @click="changeItemMenu(MenuType.Discover)"/> -->
+          <div class="search-view row items-center" @click="changeItemMenu(MenuType.Search)">
+            <q-icon name="search" size="16px" style="color:#857C77;margin-left: 8px;"></q-icon>
+            <div style="margin-left:10px;"> Search </div>
+          </div>
+
           <div class="btn-add row justify-center items-center" @click="addFeed">
-            <q-img style="width: 12px;height: 12px" src="../assets/menu/add.svg"/>
+            <q-img style="width: 12px;height: 12px" src="../assets/menu/add.svg" />
           </div>
         </div>
         <q-scroll-area style="height:calc(100% - 110px);">
           <q-list class="margin-bottom-safe-area">
-            <!-- <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false"
-                                   @item-on-click="changeItemMenu(MenuType.Discover)"/> -->
+            <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false"
+              @item-on-click="changeItemMenu(MenuType.Discover)" />
             <layout-left-item-menu :menu-type="MenuType.Trend" :show-un-read-count="false"
-                                   @item-on-click="changeItemMenu(MenuType.Trend)"/>
+              @item-on-click="changeItemMenu(MenuType.Trend)" />
             <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="`${todayCount}`"
-                                   @item-on-click="changeItemMenu(MenuType.Today)"/>
+              @item-on-click="changeItemMenu(MenuType.Today)" />
             <layout-left-item-menu :menu-type="MenuType.Unread" :unread-count="`${store.allUnRead}`"
-                                   @item-on-click="changeItemMenu(MenuType.Unread)"/>
-<!--            <layout-left-item-menu :menu-type="MenuType.ReadLater" :unread-count="count.total"-->
-<!--                                   @item-on-click="changeItemMenu(MenuType.ReadLater)"/>-->
+              @item-on-click="changeItemMenu(MenuType.Unread)" />
+            <!--            <layout-left-item-menu :menu-type="MenuType.ReadLater" :unread-count="count.total"-->
+            <!--                                   @item-on-click="changeItemMenu(MenuType.ReadLater)"/>-->
           </q-list>
 
-          <q-separator style="margin-top:6px;margin-bottom: 11px;" inset/>
+          <q-separator style="margin-top:6px;margin-bottom: 11px;" inset />
 
-          <div class="row justify-between items-center folderInfo"
-               @click="goFolderSetting">
+          <div class="row justify-between items-center folderInfo" @click="goFolderSetting">
             <span class="folder">Folder</span>
             <q-img style="width: 16px;height: 16px"
-                   :src="isFolderManager ? require('../assets/menu/activeSetting.svg') : require('../assets/menu/setting.svg')"/>
+              :src="isFolderManager ? require('../assets/menu/activeSetting.svg') : require('../assets/menu/setting.svg')" />
           </div>
 
-          <q-item class="item" dense v-for="(category, index) in store.categories"
-                  :key="'ct' + index" style="padding: 0;">
+          <q-item class="item" dense v-for="(category, index) in store.categories" :key="'ct' + index"
+            style="padding: 0;">
             <q-expansion-item dense switchToggleSide :disable="category.feeds.length === 0">
               <template v-slot:header>
                 <q-item class="menuItem"
-                        :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && category.feeds.find(e => e.id === store.menu_choice.value) !== undefined"
-                        active-class="itemActiveStyle" dense
-                        :class="category.feeds.length > 0 ? 'folder-extension-margin-left' : 'folder-extension-margin-none'"
-                        @click="changeItemMenu(MenuType.Category, category.id)">
+                  :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && category.feeds.find(e => e.id === store.menu_choice.value) !== undefined"
+                  active-class="itemActiveStyle" dense
+                  :class="category.feeds.length > 0 ? 'folder-extension-margin-left' : 'folder-extension-margin-none'"
+                  @click="changeItemMenu(MenuType.Category, category.id)">
                   <q-item-section class="folderTitle">
                     {{ category.title }}
                   </q-item-section>
@@ -55,14 +59,13 @@
                 </q-item>
               </template>
               <q-item dense class="menuItem feed-select-item" clickable v-for="(feed, fi) in category.feeds"
-                      :key="'ft' + fi"
-                      @click="changeItemMenu(MenuType.Feed, feed.id)"
-                      :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && store.menu_choice.value === feed.id"
-                      active-class="itemActiveStyle">
+                :key="'ft' + fi" @click="changeItemMenu(MenuType.Feed, feed.id)"
+                :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && store.menu_choice.value === feed.id"
+                active-class="itemActiveStyle">
                 <q-item-section avatar>
                   <!-- <q-icon :name="formatIconName(MenuType.Discover)" size="14px"></q-icon> -->
                   <img v-if="store.feeds_icon[feed.id] && store.feeds_icon[feed.id].data"
-                       :src="store.feeds_icon[feed.id].data" :width="14" :height="14"/>
+                    :src="store.feeds_icon[feed.id].data" :width="14" :height="14" />
                 </q-item-section>
                 <q-item-section class="folderTitle" style="margin-left:-30px;padding-top: 10px;padding-bottom: 10px;">
                   {{ feed.title }}
@@ -77,7 +80,7 @@
           </q-item>
 
           <layout-left-item-menu :menu-type="MenuType.CreateNewFolder" :show-un-read-count="false" :dense="true"
-                                 @item-on-click="addFolder()"/>
+            @item-on-click="addFolder()" />
           <div class="row justify-between items-center folderInfo">
             <span class="folder">Boards</span>
           </div>
@@ -85,15 +88,15 @@
 
 
           <layout-left-item-menu v-for="item in store.boards" :key="item.id + item.title" :menu-type="MenuType.Board"
-                                 :menu-value="item.id" :title="item.title" image-name="board" :show-un-read-count="false"
-                                 @item-on-click="changeItemMenu(MenuType.Board,item.id)"/>
+            :menu-value="item.id" :title="item.title" image-name="board" :show-un-read-count="false"
+            @item-on-click="changeItemMenu(MenuType.Board, item.id)" />
           <layout-left-item-menu :menu-type="MenuType.CreateNewBoard" :show-un-read-count="false" :dense="true"
-                                 @item-on-click="addBoard()"/>
+            @item-on-click="addBoard()" />
 
         </q-scroll-area>
 
         <div class="row justify-between items-center"
-             style="height: 48px;width : 100%;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px;position: absolute;bottom: 0">
+          style="height: 48px;width : 100%;margin-left: 8px;margin-right: 8px;padding-left: 8px;padding-right: 8px;position: absolute;bottom: 0">
           <div class="row justify-start items-center">
             <img style="margin-right: 8px;width: 12px;height: 12px" src="../assets/menu/setting.svg">
 
@@ -106,7 +109,7 @@
       </q-drawer>
 
       <q-page-container class="container">
-        <router-view/>
+        <router-view />
       </q-page-container>
 
     </div>
@@ -114,14 +117,14 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted, onUnmounted, ref, watch} from 'vue';
-import {useQuasar} from 'quasar';
-import {useRoute, useRouter} from 'vue-router';
+import { defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useQuasar } from 'quasar';
+import { useRoute, useRouter } from 'vue-router';
 // import {useIsMobile} from '../utils/utils';
-import {useRssStore} from 'stores/rss';
+import { useRssStore } from 'stores/rss';
 
-import {Entry, EntryStatus, Feed, MenuType} from '../types';
-import SearchView from 'components/rss/SearchView.vue';
+import { Entry, EntryStatus, Feed, MenuType } from '../types';
+// import SearchView from 'components/rss/SearchView.vue';
 import LayoutLeftItemMenu from 'components/LayoutLeftItemMenu.vue'
 import AddFolderDialog from 'components/dialog/AddFolderDialog.vue';
 import AddFeedDialog from 'components/dialog/AddFeedDialog.vue';
@@ -131,7 +134,7 @@ export default defineComponent({
   name: 'MainLayout',
 
   components: {
-    SearchView,
+    // SearchView,
     LayoutLeftItemMenu
   },
 
@@ -157,7 +160,7 @@ export default defineComponent({
     // const timer = ref();
     // const screenWidth = ref(document.body.clientWidth);
 
-    const count = ref<any>({total: 10});
+    const count = ref<any>({ total: 10 });
 
     const todayCount = ref<number>(0)
 
@@ -309,6 +312,8 @@ export default defineComponent({
         goto('/')
       } else if (type == MenuType.Trend) {
         goto('/trend')
+      } else if (type == MenuType.Search) {
+        goto('/search')
       }
     }
 
@@ -417,8 +422,21 @@ export default defineComponent({
   position: absolute;
 
   .search-view {
-    margin: 16px 8px 8px 16px;
-    width: calc(100% - 72px)
+    margin: 16px 8px 0px 16px;
+    width: calc(100% - 72px);
+    // background-color: red;
+    border: 1px solid #E0E0E0;
+    border-radius: 6px;
+
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 12px;
+    /* identical to box height, or 100% */
+
+
+    color: #BDBDBD;
   }
 
   .btn-add {
@@ -442,7 +460,7 @@ export default defineComponent({
   transform: translate3d(0px, 0px, -10px) rotateX(5deg);
   transform-origin: 0px center;
   transition: transform 0.4s cubic-bezier(0.6, 0, 0.2, 1) 0s,
-  filter 0.4s ease 0s;
+    filter 0.4s ease 0s;
 }
 
 // @media (min-width: 1200px) {
@@ -607,5 +625,4 @@ export default defineComponent({
 :global(.q-field--dense) {
   height: 32px;
 }
-
 </style>

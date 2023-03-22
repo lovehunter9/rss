@@ -1,7 +1,7 @@
 <template>
   <div class="tabs-root">
     <q-tabs v-model="tab" align="left" dense class="tabs-bg" indicator-color="color-FF8642" narrowIndicator inline-label
-      activeColor="color-FF8642">
+      activeColor="color-FF8642" @update:model-value="updateTab">
       <q-tab class="normal-tab-class" v-for='rowItem in tabs' :key=rowItem.name :name='rowItem.name'
         :disable='rowItem.disable'>
         <q-icon :name="tab === rowItem.name ? rowItem.selectedIcon : rowItem.normalIcon" size="16px"></q-icon>
@@ -37,6 +37,12 @@ const props = defineProps({
 })
 
 const tab = ref(props.tabs[props.defaultPosition].name)
+
+const emits = defineEmits(['updateTab'])
+
+const updateTab = (tab: string) => {
+  emits('updateTab',tab)
+}
 
 </script>
 

@@ -2,16 +2,24 @@
   <q-dialog
     class="delete-root text-center"
     ref="dialogRef"
-    >
+  >
     <q-card class="q-dialog-plugin">
-      <div class="text-title">Delete {{ isFeed ? 'Feed' : 'Folder' }}
-      </div>
+
+      <div class="text-title" v-show="type === DeleteType.FEED">Delete Feed</div>
+      <div class="text-title" v-show="type === DeleteType.Folder">Delete Folder</div>
+      <div class="text-title" v-show="type === DeleteType.Board">Delete Board</div>
+
       <img class="icon-close" src="../../assets/menu/close.svg" @click="onDialogCancel">
-      <div class="text-label">
-        {{ isFeed ? 'Do you want to remove the selected RSS feeds？' : 'Do you want to delete this folder?' }}
+
+      <div class="text-label" v-show="type === DeleteType.FEED">Do you want to remove the selected RSS feeds？</div>
+      <div class="text-label" v-show="type === DeleteType.Folder">Do you want to delete this folder?</div>
+      <div class="text-label" v-show="type === DeleteType.Board">Do you want to delete this Board?</div>
+
+      <div class="text-content" v-show="type === DeleteType.Folder">This will cause removal of all feeds under this
+        folder.
       </div>
-      <div class="text-content" v-show="!isFeed">This will cause
-        removal of all feeds under this folder.
+      <div class="text-content" v-show="type === DeleteType.Board">This will cause removal of all feeds under this
+        Board.
       </div>
 
       <div class="row justify-end items-end" style="width: 100%">
@@ -28,11 +36,13 @@
 <script setup lang="ts">
 
 import {useDialogPluginComponent} from 'quasar';
+import {DeleteType} from 'src/types';
+import {PropType} from 'vue';
 
 defineProps({
-  isFeed: {
-    type: Boolean,
-    require: true
+  type: {
+    type: Object as PropType<DeleteType>,
+    require: DeleteType.FEED
   }
 })
 

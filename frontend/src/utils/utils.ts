@@ -60,7 +60,7 @@ export const getPastTime = (stamp1: Date, stamp2: Date) => {
     return 'just now'
   }
   if (minute < 60) {
-    return `${minute} minutes ago`
+    return `${minute.toFixed(0)} minutes ago`
   }
 
   const hour = minute / 60;

@@ -55,6 +55,7 @@ type Feed struct {
 	HideGlobally                bool      `json:"hide_globally"`
 	UnreadCount                 int       `json:"-"`
 	ReadCount                   int       `json:"-"`
+	UpdateTime                  time.Time `json:"update_time"`
 }
 
 type FeedCounters struct {

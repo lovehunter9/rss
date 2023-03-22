@@ -1,10 +1,10 @@
 <template>
   <div class="feed-root row items-center">
     <q-checkbox dense size="md" v-model="selection" color="orange" @update:model-value="onSelected"
-                v-show="data!.getType() === ORGANIZE_TYPE.FEED"/>
+                v-show="data.getType() === ORGANIZE_TYPE.FEED"/>
 
     <div class="row items-center"
-         :class="data!.getType() === ORGANIZE_TYPE.FEED ? 'feed-text-layout' : 'folder-text-layout'">
+         :class="data.getType() === ORGANIZE_TYPE.FEED ? 'feed-text-layout' : 'folder-text-layout'">
       <div class="row" style="flex: 15">
         <q-img class="feed-icon" :src="imgRef" v-show="imgRef"/>
         <div class="column justify-start items-start">
@@ -28,12 +28,16 @@ import {PropType, ref, watch} from 'vue';
 import {useRssStore} from 'stores/rss';
 import {useOrganizeStore} from 'stores/organize';
 import {QDialogOptions, useQuasar} from 'quasar';
-import FeedDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
+import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import FeedEditDialog from 'components/dialog/FeedEditDialog.vue';
 import {BaseOption, OptionalCategory, ORGANIZE_TYPE} from 'stores/organizeConfig';
-import {Category, Feed} from 'src/types';
+import {
+  Category,
+  DeleteType,
+  Feed
+} from 'src/types';
 import FolderEditDialog from 'components/dialog/FolderEditDialog.vue';
-import { newsBus, newsBusMessage } from 'src/utils/utils';
+import {getPastTime, newsBus, newsBusMessage} from 'src/utils/utils';
 
 const props = defineProps({
   data: {
@@ -58,6 +62,21 @@ const fourth = ref()
 const imgRef = ref()
 
 if (props.data) {
+
+  const filter = store.feeds.filter((feed) => {
+    if (props.data) {
+      if (props.data.getType() === ORGANIZE_TYPE.FEED) {
+        return feed.id == props.data.getId()
+      } else {
+        return feed.category.id == props.data.getId()
+      }
+    }
+    return false
+  })
+  if (filter) {
+    console.log(filter)
+    fourth.value = getLatestTime(filter)
+  }
   if (props.data.getType() === ORGANIZE_TYPE.FEED) {
     if (store.feeds_icon && store.feeds_icon[(props.data.data as Feed).id] !== undefined) {
       imgRef.value = store.feeds_icon[(props.data.data as Feed).id].data;
@@ -66,11 +85,9 @@ if (props.data) {
     first.value = (props.data.data as Feed).title
     second.value = (props.data.data as Feed).feed_url
     third.value = (props.data.data as Feed).category.title
-    fourth.value = (props.data.data as Feed).id
   } else {
     first.value = (props.data.data as Category).title
     third.value = (props.data.data as Category).feeds.length
-    fourth.value = (props.data.data as Category).id
   }
 }
 
@@ -101,7 +118,7 @@ function onSelected(value: boolean) {
     return
   }
   if (props.parent) {
-    props.parent.setFeedSelected(props.data.getId(),value)
+    props.parent.setFeedSelected(props.data.getId(), value)
   } else {
     organizeStore.setSelected(props.data.getId(), value)
   }
@@ -145,11 +162,19 @@ function edit() {
 
 function remove() {
   console.log('delete')
-  $q.dialog({
-    component: FeedDeleteDialog,
-    componentProps: {
-      isFeed: props.parent ? true : organizeStore.organizeData.type === ORGANIZE_TYPE.FEED
+  let type;
+  if (props.parent) {
+    type = DeleteType.FEED
+  } else {
+    if (organizeStore.organizeData.type === ORGANIZE_TYPE.FEED) {
+      type = DeleteType.FEED
+    } else {
+      type = DeleteType.Folder
     }
+  }
+  $q.dialog({
+    component: OrganizeDeleteDialog,
+    componentProps: {type}
   }).onOk(async () => {
     if (props.data) {
       await organizeStore.delete(props.data.getId())
@@ -162,23 +187,19 @@ function remove() {
     });
 }
 
-// function getLatestEntryTime(): string {
-//   if (props.data) {
-//     // let list : Entry[] = props.feed.entries
-//     // console.log(props.feed)
-//     // for (let i = 0; i < list.length; i++) {
-//     //   for (let j = 0; j < list.length - i - 1; j++) {
-//     //     if (utcToStamp(list[j].created_at).getTime() < utcToStamp(list[j + 1].created_at).getTime()) {
-//     //       [list[j], list[j + 1]] = [list[j + 1], list[j]];
-//     //     }
-//     //   }
-//     // }
-//     // return getPastTime(new Date, utcToStamp(list[0].created_at));
-
-//     return 'sss'
-//   }
-//   return 'error'
-// }
+function getLatestTime(list: Feed[]): string {
+  if (list.length > 0) {
+    for (let i = 0; i < list.length; i++) {
+      for (let j = 0; j < list.length - i - 1; j++) {
+        if (Date.parse(list[j].last_modified_header) < Date.parse(list[j + 1].last_modified_header)) {
+          [list[j], list[j + 1]] = [list[j + 1], list[j]];
+        }
+      }
+    }
+    return getPastTime(new Date, new Date(Date.parse(list[0].last_modified_header)));
+  }
+  return 'none'
+}
 
 </script>
 
@@ -253,7 +274,7 @@ function remove() {
   }
 }
 
-.line{
+.line {
   float: right;
   height: 1px;
   width: calc(100% - 32px);

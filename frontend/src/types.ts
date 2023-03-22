@@ -13,6 +13,12 @@ export enum MenuType {
   Trend = 11
 }
 
+export enum DeleteType{
+  FEED = 0,
+  Folder = 1,
+  Board= 2
+}
+
 export const menuTypeName = (menuType: MenuType) => {
   let menuTypeName = '';
   switch (menuType) {

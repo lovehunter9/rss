@@ -145,6 +145,18 @@ func (h *handler) markFeedAsRead(w http.ResponseWriter, r *http.Request) {
 	json.NoContent(w, r)
 }
 
+func (h *handler) markTodayAsRead(w http.ResponseWriter, r *http.Request) {
+	userID := request.UserID(r)
+	t := time.Now()
+	todayTime := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
+	if err := h.store.MarkTodayAsRead(userID, todayTime); err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
+
+	json.NoContent(w, r)
+}
+
 func (h *handler) getCategoryFeeds(w http.ResponseWriter, r *http.Request) {
 	userID := request.UserID(r)
 	categoryID := request.RouteInt64Param(r, "categoryID")
