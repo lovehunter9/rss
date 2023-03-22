@@ -58,7 +58,6 @@ import {useQuasar} from 'quasar';
 import AddBoardDialog from 'components/dialog/AddBoardDialog.vue';
 import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import FooterLoadingComponent from 'components/rss/FooterLoadingComponent.vue'
-import {removeEntryToBoard} from 'src/api/api';
 
 const store = useRssStore();
 const labelRef = ref('')
@@ -74,12 +73,11 @@ const $q = useQuasar();
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 watch(() => store.menu_choice, (newValue) => {
-  requestEntrys()
+  requestEntries()
 })
 
 
 watch(() => store.entries, (newValue) => {
-  console.log(newValue)
   updateUI();
 }, {
   immediate: true,
@@ -90,7 +88,7 @@ watch(() => store.entries, (newValue) => {
 watch(() => readStatus.value, () => {
   if (readStatus.value) {
     readRef.value = require('../assets/menu/read.svg')
-    readTextRef.value = 'Click to convert all articles to unread'
+    // readTextRef.value = 'Click to convert all articles to unread'
   } else {
     readRef.value = require('../assets/menu/unread.svg')
     readTextRef.value = 'Click to convert all articles to read'
@@ -99,7 +97,7 @@ watch(() => readStatus.value, () => {
 
 onMounted(() => {
 
-  requestEntrys()
+  requestEntries()
 
   newsBus.on(newsBusMessage.pre, () => {
     if (selectIndex.value <= 0) {
@@ -181,16 +179,12 @@ function updateUI() {
   }
 }
 
-function readAll() {
-  if (readStatus.value) {
-    store.entries.forEach(entry => {
-      store.mark_entry_read(entry.id, EntryStatus.Unread)
-    })
-  } else {
-    store.entries.forEach(entry => {
-      store.mark_entry_read(entry.id, EntryStatus.Read)
-    })
+async function readAll() {
+  if (readStatus.value){
+    $q.notify('The current list is already read')
+    return
   }
+  await store.markAllAsRead()
 }
 
 function editBoard() {
@@ -220,12 +214,9 @@ function remove() {
       type: DeleteType.Board
     }
   }).onOk(async () => {
-    await store.entries.forEach((entry) => {
-      if (store.menu_choice.value){
-        removeEntryToBoard({ board_id: store.menu_choice.value, entry_id: entry.id })
-      }
-    })
-    await store.get_board_entries(store.menu_choice.value || 0,new BoardEntriesQueryRequest({limit: 50, offset: 0}))
+    if (store.menu_choice.value && store.menu_choice.value > 0){
+      await store.remove_local_board(store.menu_choice.value)
+    }
   }).onCancel(() => {
     console.log('Cancel');
   })
@@ -265,19 +256,19 @@ watch(
 const loadMoreEnable = ref(true)
 
 
-const requestEntrys = async (loadmore = false) => {
+const requestEntries = async (hasMore = false) => {
   if (store.menu_choice.type === MenuType.Today || store.menu_choice.type === MenuType.ReadLater || store.menu_choice.type === MenuType.Board) {
     if (store.menu_choice.type === MenuType.Today) {
       return
     }
     if (store.menu_choice.type === MenuType.Board) {
-      store.get_board_entries(store.menu_choice.value || 0,new BoardEntriesQueryRequest({limit: 50, offset: 0}))
+      await store.get_board_entries(store.menu_choice.value || 0,new BoardEntriesQueryRequest({limit: 50, offset: 0}))
     }
     return 0
   }
 
   const entriesQurey = new EntriesQueryRequest({
-    offset: loadmore ? store.entries.length : 0,
+    offset: hasMore ? store.entries.length : 0,
     limit: 50
   })
   if (store.menu_choice.type === MenuType.Feed) {
@@ -288,38 +279,35 @@ const requestEntrys = async (loadmore = false) => {
     entriesQurey.status = EntryStatus.Unread;
   }
 
-  const updateAccount = await store.get_entries(entriesQurey, (response) => {
-    if (store.menu_choice.type == MenuType.ReadLater) {
-      const entries = response.entries.filter((entry) => {
-        return entry.starred;
-      })
-      if (entries) {
-        return {entries: entries, total: entries.length}
-      }
-    }
-    return response
-  })
+  const updateAccount = await store.get_entries(entriesQurey)
+
+  if (store.entries.length > 0) {
+    const find = store.entries.find(entry => {
+      return entry.status === EntryStatus.Unread
+    })
+    readStatus.value = !find;
+  }
   return updateAccount
 }
 
-let loadingMoreing = false
+let loading = false
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const onScroll = (info: any) => {
-  if (loadingMoreing) {
+  if (loading || (store.entries.length > 0 && store.entries_total > 0 && store.entries.length === store.entries_total)) {
     return
   }
   if (info.verticalPosition + info.verticalContainerSize >= info.verticalSize - 30) {
-    loadingMoreing = true
+    loading = true
     onLoadRef(() => {
       console.log('loading done');
-      loadingMoreing = false
+      loading = false
     });
   }
 }
 
 const onLoadRef = async (done: (() => void)) => {
-  requestEntrys(true).then((number) => {
+  requestEntries(true).then((number) => {
     loadMoreEnable.value = number !== undefined && number >= 50;
     done()
   })

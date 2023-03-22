@@ -18,6 +18,14 @@ const routes: RouteRecordRaw[] = [
         path: 'folderSetting',
         component: () => import('pages/OrganizePage.vue'),
       },
+      {
+        path: 'trend',
+        component: () => import('pages/TrendPage.vue')
+      },
+      {
+        path: 'search',
+        component: () => import('pages/SearchPage.vue')
+      }
     ],
   },
 

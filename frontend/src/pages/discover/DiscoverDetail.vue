@@ -18,43 +18,7 @@
     </div>
 
     <q-list class="search-result-list">
-      <q-item v-for="item, index in searchResults" :key="index" class="search-result-item column">
-        <div class="item-header">
-          <div class="row justify-between items-center" style="width:100%;height:48px">
-            <div class="item-total-info row items-center justify-start">
-              <img :src="getRequireImage(item.logo)" :width="48" :height="48" />
-              <div class="item-total">
-                <div class="item-name">
-                  {{ item.title }}
-                </div>
-                <div class="item-url">
-                  {{ item.url }}
-                </div>
-              </div>
-            </div>
-            <div v-if="!item.isSubsribe" class="row justify-center items-center subscribe-btn" @click="addToFeed(item.subsribeUrl)">
-              <img src="../../assets/menu/subsribe.svg" :width="16" :height="16"/>
-              <div class="subscribe-title">
-                Subscribe
-              </div>
-            </div>
-            <div class="subscribe-title" v-if="item.isSubsribe">
-                Subscribed
-            </div>
-          </div>
-        </div>
-        <div class="item-content row justify-between">
-          <div v-for="content, indexj in item.details" :key="indexj" style="width: calc(100%/3 - 16px);margin-left: 8px;margin-right: 8px;">
-            <div class="item-content-content">
-              {{ content.content }}
-            </div>
-
-            <div class="item-conente-time">
-              {{ content.time }}
-            </div>
-           </div>
-        </div>
-      </q-item>
+      <SearchFeedComponent v-for="item,index in searchResults" :key="index" :feed="item"></SearchFeedComponent>
       <div class="row justify-center full-width no-more-result">
         No More Result &nbsp;
         <a href="javascript:;" @click="jumpToSearch()" style="color:#1B87F4"> Try other Topices </a>
@@ -68,10 +32,10 @@
 import { SDKSearchPathResponse } from 'src/types';
 import { ref } from 'vue';
 import TitleCommonent from '../../components/TitleCommonent.vue'
-import { getRequireImage } from 'src/utils/utils'
 import { useQuasar } from 'quasar';
 import AddFeedDialog from 'components/dialog/AddFeedDialog.vue';
 import { useRssStore } from 'src/stores/rss';
+import SearchFeedComponent from '../common/SearchFeedComponent.vue'
 
 const rssStore = useRssStore()
 
@@ -225,96 +189,6 @@ defineExpose({ floatTitleView, reloadFeed});
     margin-top: 16px;
     width: 100%;
     padding-bottom: 40px;
-  }
-
-  .search-result-item {
-    border: 1px solid #E0E0E0;
-    border-radius: 6px;
-    // width: 100%;
-    padding: 0;
-    margin-bottom: 16px;
-    // background-color: red;
-
-    .item-header {
-      width: calc(100% - 32px);
-      margin: 16px;
-      height: 48px;
-      // background-color: red;
-
-
-      .item-total-info {
-
-        .item-total {
-          margin-left: 15px;
-        }
-
-        .item-name {
-          font-family: 'Roboto';
-          font-style: normal;
-          font-weight: 500;
-          font-size: 14px;
-          line-height: 16px;
-          color: #1A130F;
-        }
-
-        .item-url {
-          margin-top: 4px;
-          font-family: 'Roboto';
-          font-style: normal;
-          font-weight: 400;
-          font-size: 14px;
-          line-height: 16px;
-          color: #847C77;
-        }
-      }
-
-
-      .subscribe-btn {
-        // width:110px;
-        padding: 8px 18px;
-        // height: 32px;
-        border: 1px solid #E0E0E0;
-        border-radius: 6px;
-      }
-
-      .subscribe-title {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 400;
-        font-size: 12px;
-        line-height: 14px;
-        color: #FF8642;
-        margin-left: 8px;
-      }
-    }
-
-    .item-content {
-      width: 100%;
-      padding-left: 8px;
-      padding-right: 8px;
-      // height: 200px;
-      // background-color: red;
-      margin-bottom: 24px;
-
-      .item-content-content {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 400;
-        font-size: 14px;
-        line-height: 20px;
-        color: #847C77;
-      }
-
-      .item-conente-time {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 400;
-        font-size: 12px;
-        line-height: 16px;
-        color: #847C77;
-        margin-top: 8px;
-      }
-    }
   }
 }
 

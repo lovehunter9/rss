@@ -1,0 +1,178 @@
+<template>
+  <q-item class="search-result-item column">
+    <div class="item-header">
+      <div class="row justify-between items-center" style="width:100%;height:48px">
+        <div class="item-total-info row items-center justify-start">
+          <img :src="getRequireImage(feed.logo || '')" :width="48" :height="48" />
+          <div class="item-total">
+            <div class="item-name">
+              {{ feed.title }}
+            </div>
+            <div class="item-url">
+              {{ feed.url }}
+            </div>
+          </div>
+        </div>
+        <div v-if="!feed.isSubsribe" class="row justify-center items-center subscribe-btn"
+          @click="addToFeed(feed.subsribeUrl)">
+          <img src="../../assets/menu/subsribe.svg" :width="16" :height="16" />
+          <div class="subscribe-title">
+            Subscribe
+          </div>
+        </div>
+        <div class="subscribe-title" v-if="feed.isSubsribe">
+          Subscribed
+        </div>
+      </div>
+    </div>
+    <div class="item-content row justify-between">
+      <div v-for="content, indexj in feed.details" :key="indexj"
+        style="width: calc(100%/3 - 16px);">
+        <div class="item-content-content">
+          {{ content.content }}
+        </div>
+
+        <div class="item-conente-time">
+          {{ content.time }}
+        </div>
+      </div>
+    </div>
+    <q-separator color='#EDEEF6' />
+  </q-item>
+</template>
+
+<script setup lang='ts'>
+import { PropType } from 'vue';
+import { getRequireImage } from 'src/utils/utils'
+import { useQuasar } from 'quasar';
+import AddFeedDialog from 'components/dialog/AddFeedDialog.vue';
+
+interface SearchFeedInterface {
+  title: string,
+  logo: string,
+  url: string,
+  subsribeUrl: string,
+  isSubsribe: boolean,
+  details: {
+    content: string,
+    time: string
+  }[]
+}
+
+const props = defineProps({
+  feed: {
+    type: Object as PropType<SearchFeedInterface>,
+    required: true
+  }
+})
+
+const $q = useQuasar()
+const addToFeed = (url: string) => {
+  $q.dialog({
+    component: AddFeedDialog,
+    componentProps: {
+      text: url
+    }
+  })
+    .onOk(() => {
+      console.log('OK');
+      // emit('backAction')
+      // eslint-disable-next-line vue/no-mutating-props
+      props.feed.isSubsribe = true
+    })
+    .onCancel(() => {
+      console.log('Cancel');
+    })
+    .onDismiss(() => {
+      console.log('Called on OK or Cancel');
+      //     });
+    })
+}
+
+
+</script>
+
+<style scoped lang='scss'>
+.search-result-item {
+  // border: 1px solid #E0E0E0;
+  border-radius: 6px;
+  padding: 0;
+  margin-bottom: 16px;
+
+  .item-header {
+    width: calc(100%);
+    margin: 16px 0px;
+    height: 48px;
+
+    .item-total-info {
+
+      .item-total {
+        margin-left: 15px;
+      }
+
+      .item-name {
+        font-family: 'Roboto';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 16px;
+        color: #1A130F;
+      }
+
+      .item-url {
+        margin-top: 4px;
+        font-family: 'Roboto';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 16px;
+        color: #847C77;
+      }
+    }
+
+
+    .subscribe-btn {
+      // width:110px;
+      padding: 8px 18px;
+      // height: 32px;
+      border: 1px solid #E0E0E0;
+      border-radius: 6px;
+    }
+
+    .subscribe-title {
+      font-family: 'Roboto';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 14px;
+      color: #FF8642;
+      margin-left: 8px;
+    }
+  }
+
+  .item-content {
+    width: 100%;
+
+    margin-bottom: 24px;
+
+    .item-content-content {
+      font-family: 'Roboto';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 20px;
+      color: #847C77;
+    }
+
+    .item-conente-time {
+      font-family: 'Roboto';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 16px;
+      color: #847C77;
+      margin-top: 8px;
+    }
+  }
+}
+</style>

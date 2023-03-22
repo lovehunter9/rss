@@ -9,7 +9,8 @@ export enum MenuType {
   ReadLater = 7,
   CreateNewFolder = 8,
   CreateNewBoard = 9,
-  Board = 10
+  Board = 10,
+  Trend = 11
 }
 
 export enum DeleteType{
@@ -38,6 +39,9 @@ export const menuTypeName = (menuType: MenuType) => {
       break;
     case MenuType.CreateNewBoard:
       menuTypeName = 'Create New Board';
+      break
+    case MenuType.Trend:
+      menuTypeName = 'Trend';
       break
     default:
       break;
@@ -267,6 +271,7 @@ export interface EntriesStatusUpdateRequest {
 // 	HideGlobally                bool      `json:"hide_globally"`
 // 	UnreadCount                 int       `json:"-"`
 // 	ReadCount                   int       `json:"-"`
+//  UpdateTime                  time.Time `json:"update_time"`
 // }
 export interface Feed {
   id: number;
@@ -299,6 +304,7 @@ export interface Feed {
   icon: FeedIcon;
   hide_globally: boolean;
   unread?: number;
+  update_time : string;
   // unread_count: number;
   // read_count: number;
 }

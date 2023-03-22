@@ -44,8 +44,6 @@ const props = defineProps({
 const emit = defineEmits(['onClickCallback'])
 const readStatusRef = ref(false)
 
-console.log(props.entry)
-
 if (props.entry) {
   readStatusRef.value = props.entry.status == EntryStatus.Read
 }
