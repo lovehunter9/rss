@@ -19,8 +19,8 @@
         </div>
         <q-scroll-area style="height:calc(100% - 110px);">
           <q-list class="margin-bottom-safe-area">
-            <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false"
-              @item-on-click="changeItemMenu(MenuType.Discover)" />
+            <!-- <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false"
+              @item-on-click="changeItemMenu(MenuType.Discover)" /> -->
             <layout-left-item-menu :menu-type="MenuType.Trend" :show-un-read-count="false"
               @item-on-click="changeItemMenu(MenuType.Trend)" />
             <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="`${todayCount}`"

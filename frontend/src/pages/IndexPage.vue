@@ -294,7 +294,7 @@ let loading = false
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const onScroll = (info: any) => {
-  if (loading) {
+  if (loading || (store.entries.length > 0 && store.entries_total > 0 && store.entries.length === store.entries_total)) {
     return
   }
   if (info.verticalPosition + info.verticalContainerSize >= info.verticalSize - 30) {
