@@ -220,6 +220,7 @@ func (s *Storage) FeedByID(userID, feedID int64) (*model.Feed, error) {
 
 // CreateFeed creates a new feed.
 func (s *Storage) CreateFeed(feed *model.Feed) error {
+
 	sql := `
 		INSERT INTO feeds (
 			feed_url,
@@ -279,27 +280,38 @@ func (s *Storage) CreateFeed(feed *model.Feed) error {
 		return fmt.Errorf(`store: unable to create feed %q: %v`, feed.FeedURL, err)
 	}
 
-	for i := 0; i < len(feed.Entries); i++ {
-		feed.Entries[i].FeedID = feed.ID
-		feed.Entries[i].UserID = feed.UserID
+	if len(feed.Entries) > 0 {
+		last := feed.Entries[0].Date
 
-		tx, err := s.db.Begin()
-		if err != nil {
-			return fmt.Errorf(`store: unable to start transaction: %v`, err)
-		}
+		for i := 0; i < len(feed.Entries); i++ {
+			feed.Entries[i].FeedID = feed.ID
+			feed.Entries[i].UserID = feed.UserID
 
-		if !s.entryExists(tx, feed.Entries[i]) {
-			if err := s.createEntry(tx, feed.Entries[i]); err != nil {
-				tx.Rollback()
-				return err
+			tx, err := s.db.Begin()
+			if err != nil {
+				return fmt.Errorf(`store: unable to start transaction: %v`, err)
+			}
+
+			if !s.entryExists(tx, feed.Entries[i]) {
+				if last.Before(feed.Entries[i].Date) {
+					last = feed.Entries[i].Date
+				}
+				if err := s.createEntry(tx, feed.Entries[i]); err != nil {
+					tx.Rollback()
+					return err
+				}
+			}
+
+			if err := tx.Commit(); err != nil {
+				return fmt.Errorf(`store: unable to commit transaction: %v`, err)
 			}
 		}
 
-		if err := tx.Commit(); err != nil {
-			return fmt.Errorf(`store: unable to commit transaction: %v`, err)
+		_, err := s.db.Exec(`UPDATE feeds SET update_time=$1 where id=$2`, last, feed.ID)
+		if err != nil {
+			return fmt.Errorf(`store: unable to set update_time: %v`, err)
 		}
 	}
-
 	return nil
 }
 

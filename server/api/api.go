@@ -66,6 +66,7 @@ func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
 	sr.HandleFunc("/feeds/{feedID}/entries/{entryID}", handler.getFeedEntry).Methods(http.MethodGet)
 
 	sr.HandleFunc("/today", handler.getTodayEntries).Methods(http.MethodGet) //今日entry
+	sr.HandleFunc("/today/mark-all-as-read", handler.markTodayAsRead).Methods(http.MethodPut)
 	//unreadentry 包括未读数量 调getEntries
 
 	sr.HandleFunc("/unread/mark-all-as-read", handler.markAllAsRead).Methods(http.MethodPut) //unreadentry 设置当前页已读  所有已读

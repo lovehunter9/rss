@@ -9,7 +9,7 @@ import "strings"
 func TruncateHTML(input string, max int) string {
 	text := StripTags(input)
 	text = strings.ReplaceAll(text, "\n", " ")
-	text = strings.ReplaceAll(text, "\t", " ")
+	text = strings.ReplaceAll(text, " ", " ")
 	text = strings.ReplaceAll(text, "  ", " ")
 	text = strings.TrimSpace(text)
 

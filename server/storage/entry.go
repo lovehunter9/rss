@@ -261,33 +261,47 @@ func (s *Storage) cleanupEntries(feedID int64, entryHashes []string) error {
 func (s *Storage) RefreshFeedEntries(userID, feedID int64, entries model.Entries, updateExistingEntries bool) (err error) {
 	var entryHashes []string
 
-	for _, entry := range entries {
-		entry.UserID = userID
-		entry.FeedID = feedID
+	feed, err := s.FeedByID(userID, feedID)
+	if err != nil {
+		return fmt.Errorf(`store: refreshFeedEntries unable to  get feed: %v`, err)
+	}
+	if len(entries) > 0 {
+		last := feed.UpdateTime
+		for _, entry := range entries {
+			entry.UserID = userID
+			entry.FeedID = feedID
 
-		tx, err := s.db.Begin()
-		if err != nil {
-			return fmt.Errorf(`store: unable to start transaction: %v`, err)
-		}
-
-		if s.entryExists(tx, entry) {
-			if updateExistingEntries {
-				err = s.updateEntry(tx, entry)
+			tx, err := s.db.Begin()
+			if err != nil {
+				return fmt.Errorf(`store: unable to start transaction: %v`, err)
 			}
-		} else {
-			err = s.createEntry(tx, entry)
-		}
 
+			if last.Before(entry.Date) {
+				last = entry.Date
+			}
+			if s.entryExists(tx, entry) {
+				if updateExistingEntries {
+					err = s.updateEntry(tx, entry)
+				}
+			} else {
+				err = s.createEntry(tx, entry)
+			}
+
+			if err != nil {
+				tx.Rollback()
+				return err
+			}
+
+			if err := tx.Commit(); err != nil {
+				return fmt.Errorf(`store: unable to commit transaction: %v`, err)
+			}
+
+			entryHashes = append(entryHashes, entry.Hash)
+		}
+		_, err := s.db.Exec(`UPDATE feeds SET update_time=$1 where id=$2`, last, feedID)
 		if err != nil {
-			tx.Rollback()
-			return err
+			return fmt.Errorf(`store: unable to set update_time: %v`, err)
 		}
-
-		if err := tx.Commit(); err != nil {
-			return fmt.Errorf(`store: unable to commit transaction: %v`, err)
-		}
-
-		entryHashes = append(entryHashes, entry.Hash)
 	}
 
 	go func() {
@@ -484,6 +498,31 @@ func (s *Storage) MarkCategoryAsRead(userID, categoryID int64, before time.Time)
 			feed_id IN (SELECT id FROM feeds WHERE user_id=$2 AND category_id=$5)
 	`
 	result, err := s.db.Exec(query, model.EntryStatusRead, userID, model.EntryStatusUnread, before, categoryID)
+	if err != nil {
+		return fmt.Errorf(`store: unable to mark category entries as read: %v`, err)
+	}
+
+	count, _ := result.RowsAffected()
+	logger.Debug("[Storage:MarkCategoryAsRead] %d items marked as read", count)
+
+	return nil
+}
+
+func (s *Storage) MarkTodayAsRead(userID int64, after time.Time) error {
+	query := `
+		UPDATE
+			entries
+		SET
+			status=$1,
+			changed_at=now()
+		WHERE
+			user_id=$2
+		AND
+			status=$3
+		AND
+			published_at > $4
+	`
+	result, err := s.db.Exec(query, model.EntryStatusRead, userID, model.EntryStatusUnread, after)
 	if err != nil {
 		return fmt.Errorf(`store: unable to mark category entries as read: %v`, err)
 	}
