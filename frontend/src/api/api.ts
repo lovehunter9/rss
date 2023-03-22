@@ -86,6 +86,16 @@ export async function removeEntryToBoard(request : EntryToBoardRequest){
   }
 }
 
+export async function removeBoard(boardId : string){
+  const rssStore = useRssStore();
+  try {
+    await axios.delete(rssStore.url + '/api/boards/' + boardId);
+    return true;
+  } catch (e) {
+    return null;
+  }
+}
+
 export async function remove_category(categoryID: string) {
   const rssStore = useRssStore();
   try {
@@ -131,6 +141,45 @@ export async function category_mark_all_as_read(categoryID: string) {
   try {
     await axios.put(
       rssStore.url + '/api/categories/' + categoryID + '/mark-all-as-read',
+      {}
+    );
+    return true;
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function feed_mark_all_as_read(feedId: string) {
+  const rssStore = useRssStore();
+  try {
+    await axios.put(
+      rssStore.url + '/api/feeds/' + feedId + '/mark-all-as-read',
+      {}
+    );
+    return true;
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function today_mark_all_as_read() {
+  const rssStore = useRssStore();
+  try {
+    await axios.put(
+      rssStore.url + '/api/today/mark-all-as-read',
+      {}
+    );
+    return true;
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function unread_mark_all_as_read() {
+  const rssStore = useRssStore();
+  try {
+    await axios.put(
+      rssStore.url + '/api/unread/mark-all-as-read',
       {}
     );
     return true;

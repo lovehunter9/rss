@@ -31,13 +31,9 @@ import {QDialogOptions, useQuasar} from 'quasar';
 import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import FeedEditDialog from 'components/dialog/FeedEditDialog.vue';
 import {BaseOption, OptionalCategory, ORGANIZE_TYPE} from 'stores/organizeConfig';
-import {
-  Category,
-  DeleteType,
-  Feed
-} from 'src/types';
+import {Category, DeleteType, Feed} from 'src/types';
 import FolderEditDialog from 'components/dialog/FolderEditDialog.vue';
-import {getPastTime, newsBus, newsBusMessage} from 'src/utils/utils';
+import {getPastTime, newsBus, newsBusMessage, utcToStamp} from 'src/utils/utils';
 
 const props = defineProps({
   data: {
@@ -191,12 +187,15 @@ function getLatestTime(list: Feed[]): string {
   if (list.length > 0) {
     for (let i = 0; i < list.length; i++) {
       for (let j = 0; j < list.length - i - 1; j++) {
-        if (Date.parse(list[j].last_modified_header) < Date.parse(list[j + 1].last_modified_header)) {
+        if (utcToStamp(list[j].update_time).getTime() < utcToStamp(list[j + 1].update_time).getTime()) {
           [list[j], list[j + 1]] = [list[j + 1], list[j]];
         }
       }
     }
-    return getPastTime(new Date, new Date(Date.parse(list[0].last_modified_header)));
+    if (list[0].id === 21){
+      console.log(utcToStamp(list[0].update_time))
+    }
+    return getPastTime(new Date, utcToStamp(list[0].update_time));
   }
   return 'none'
 }

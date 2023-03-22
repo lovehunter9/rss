@@ -267,6 +267,7 @@ export interface EntriesStatusUpdateRequest {
 // 	HideGlobally                bool      `json:"hide_globally"`
 // 	UnreadCount                 int       `json:"-"`
 // 	ReadCount                   int       `json:"-"`
+//  UpdateTime                  time.Time `json:"update_time"`
 // }
 export interface Feed {
   id: number;
@@ -299,6 +300,7 @@ export interface Feed {
   icon: FeedIcon;
   hide_globally: boolean;
   unread?: number;
+  update_time : string;
   // unread_count: number;
   // read_count: number;
 }

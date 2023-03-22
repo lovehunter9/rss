@@ -1,6 +1,7 @@
 import {defineStore} from 'pinia';
 import {
-  Board, BoardEntriesQueryRequest,
+  Board,
+  BoardEntriesQueryRequest,
   BoardRequest,
   Category,
   EntriesQueryRequest,
@@ -18,24 +19,27 @@ import {
 } from 'src/types';
 
 import {
+  create_board,
+  entry_readlater,
+  feed_mark_all_as_read,
   fetch_feed_counter,
+  get_board_entries,
+  get_boards,
   get_categories,
   get_entries,
   get_entry_content,
   get_feed_icon,
   get_feeds,
+  get_readLater,
   get_today,
   remove_category,
   remove_feed,
-  update_entry_status,
+  removeBoard,
   sdkSearchFeedsByPath,
-  update_feed,
-  entry_readlater,
-  get_readLater,
+  today_mark_all_as_read, unread_mark_all_as_read,
   update_board,
-  get_boards,
-  get_board_entries,
-  create_board,
+  update_entry_status,
+  update_feed,
 } from 'src/api/api';
 
 export type DataState = {
@@ -50,7 +54,7 @@ export type DataState = {
   entries_total: number;
   // entry_choice: Entry | undefined;
   contents: Record<number, string>;
-  boards : Board[];
+  boards: Board[];
 
   leftDrawerOpen: boolean;
   dialogShow: boolean;
@@ -68,7 +72,7 @@ export const useRssStore = defineStore('rss', {
       feeds_icon: {},
       categories: [],
       feeds: [],
-      boards : [],
+      boards: [],
       entries: [],
       entries_total: 0,
       contents: {},
@@ -111,7 +115,7 @@ export const useRssStore = defineStore('rss', {
         try {
           //wait organize item icon
           await this.update_feed_icons(feeds);
-        }catch (e){
+        } catch (e) {
           console.log(e)
         }
         this.feeds = feeds;
@@ -133,7 +137,7 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async update_feed_icons(feeds : Feed[]) {
+    async update_feed_icons(feeds: Feed[]) {
       for (const feed of feeds) {
         await this.get_feed_icon(feed.id);
       }
@@ -154,9 +158,9 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async updateFeed(feedID: number,request : FeedModificationRequest){
+    async updateFeed(feedID: number, request: FeedModificationRequest) {
       try {
-        const data = await update_feed(feedID.toString(),request);
+        const data = await update_feed(feedID.toString(), request);
         console.log(data)
         await this.refresh_category_and_feeds()
       } catch (e) {
@@ -164,9 +168,9 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async updateBoard(boardId: number, request : BoardRequest) {
+    async updateBoard(boardId: number, request: BoardRequest) {
       try {
-        const data = await update_board(boardId.toString(),request);
+        const data = await update_board(boardId.toString(), request);
         console.log(data)
         // await this.refresh_category_and_feeds()
         this.boards = await get_boards();
@@ -175,7 +179,7 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async createBoard(request : BoardRequest) {
+    async createBoard(request: BoardRequest) {
       try {
         const data = await create_board(request)
         this.boards = await get_boards();
@@ -216,7 +220,7 @@ export const useRssStore = defineStore('rss', {
       return this.entries.find((entry) => entry.id == id);
     },
 
-    can_pre_route(entry:Entry) : boolean {
+    can_pre_route(entry: Entry): boolean {
       const index = this.entries.findIndex(e => e.id == entry.id)
       if (index <= 0) {
         return false
@@ -224,9 +228,9 @@ export const useRssStore = defineStore('rss', {
       return true
     },
 
-    can_next_route(entry:Entry) : boolean {
+    can_next_route(entry: Entry): boolean {
       const index = this.entries.findIndex(e => e.id == entry.id)
-      if (index < 0 || index+1 >= this.entries.length) {
+      if (index < 0 || index + 1 >= this.entries.length) {
         return false
       }
       return true
@@ -245,7 +249,7 @@ export const useRssStore = defineStore('rss', {
       return this.feeds.find((feed) => feed.feed_url == feed_url);
     },
 
-    async remove_local_feed(id : number){
+    async remove_local_feed(id: number) {
       try {
         await remove_feed(id.toString());
         await this.refresh_category_and_feeds()
@@ -254,7 +258,7 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async remove_local_category(id : number){
+    async remove_local_category(id: number) {
       try {
         await remove_category(id.toString());
         await this.refresh_category_and_feeds()
@@ -263,19 +267,29 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async get_entries(q: EntriesQueryRequest,filter ?: (entriesQueryResponse : EntriesQueryResponse) => EntriesQueryResponse ) {
+    async remove_local_board(id: number) {
+      try {
+        await removeBoard(id.toString());
+        await this.refresh_category_and_feeds()
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
+    async get_entries(q: EntriesQueryRequest, filter ?: (entriesQueryResponse: EntriesQueryResponse) => EntriesQueryResponse) {
       const rssStore = useRssStore();
 
       try {
         console.log('get_entries ' + rssStore.url + '/api/entries' + q.build());
         const data: EntriesQueryResponse = await get_entries(q);
-        if (filter){
-          const response = filter({ entries : data.entries, total : data.total})
+        if (filter) {
+          const response = filter({entries: data.entries, total: data.total})
 
-          this.entries = q.offset > 0 ? [...this.entries,...response.entries] : response.entries;
+          this.entries = q.offset > 0 ? [...this.entries, ...response.entries] : response.entries;
           this.entries_total = response.total;
-        }else {
-          this.entries = q.offset > 0 ? [...this.entries,...data.entries] : data.entries;;
+        } else {
+          this.entries = q.offset > 0 ? [...this.entries, ...data.entries] : data.entries;
+          ;
           this.entries_total = data.total;
         }
         console.log(this.entries)
@@ -302,7 +316,7 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async get_readLater(onlyAmount = false){
+    async get_readLater(onlyAmount = false) {
       try {
         this.entries = [];
         this.entries_total = 0;
@@ -317,9 +331,9 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async get_board_entries(boardId : number,request : BoardEntriesQueryRequest){
+    async get_board_entries(boardId: number, request: BoardEntriesQueryRequest) {
       try {
-        const response: EntriesQueryResponse = await get_board_entries(boardId,request);
+        const response: EntriesQueryResponse = await get_board_entries(boardId, request);
         this.entries = response.entries;
         this.entries_total = response.total;
       } catch (e) {
@@ -327,7 +341,7 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async mark_entry_read(entry_id: number,status : EntryStatus) {
+    async mark_entry_read(entry_id: number, status: EntryStatus) {
       try {
         await update_entry_status({
           entry_ids: [entry_id],
@@ -345,7 +359,7 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async mark_entry_readLater(entry_id: number){
+    async mark_entry_readLater(entry_id: number) {
       try {
         await entry_readlater(entry_id);
         for (const entry of this.entries) {
@@ -354,6 +368,31 @@ export const useRssStore = defineStore('rss', {
           }
         }
         await this.refresh_feeds_counter();
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
+    async markAllAsRead() {
+      try {
+        switch (this.menu_choice.type) {
+          case MenuType.Feed:
+            if (this.menu_choice.value) {
+              await feed_mark_all_as_read(this.menu_choice.value.toString())
+            }
+            break
+          case MenuType.Today:
+            await today_mark_all_as_read()
+            break
+          case MenuType.Unread:
+            await unread_mark_all_as_read()
+        }
+        for (const entry of this.entries) {
+          if (entry.status === EntryStatus.Unread) {
+            entry.status = EntryStatus.Read
+          }
+        }
+        await this.refresh_category_and_feeds();
       } catch (e) {
         console.log(e);
       }
@@ -370,7 +409,7 @@ export const useRssStore = defineStore('rss', {
       this.menu_choice = choice;
     },
 
-    setUrl(new_url:string) {
+    setUrl(new_url: string) {
       this.url = new_url;
     },
 
@@ -390,9 +429,9 @@ export const useRssStore = defineStore('rss', {
     },
 
     updateEntryBoards(entry_id: number, board_ids: string) {
-       this.entries.filter(e => e.id === entry_id).map( e=> {
+      this.entries.filter(e => e.id === entry_id).map(e => {
         e.board_ids = board_ids
-       })
+      })
     }
   },
 });
