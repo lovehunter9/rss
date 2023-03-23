@@ -109,7 +109,8 @@ export const formatContentHtml = (htmlContent: string) => {
 export enum newsBusMessage {
   pre = 'PRE_MESSAGE',
   next = 'NEXT_MESSAGE',
-  feedRefresh = 'FEED_REFRESH'
+  feedRefresh = 'FEED_REFRESH',
+  rightMenuType = 'RIGHT_MENU_TYPE'
 }
 
 export const newsBus = new EventBus();
