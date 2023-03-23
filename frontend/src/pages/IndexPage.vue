@@ -11,7 +11,7 @@
           </div>
           <div class="row justify-end items-center" v-else>
             <img class="icon-read-all" src="../assets/menu/modify.svg" @click="editBoard">
-            <img class="icon-refresh" src="../assets/menu/delete.svg" @click="remove">
+            <img class="icon-refresh" src="../assets/menu/delete.svg" @click="removeBoard">
           </div>
           <div class="text-label">{{ labelRef }}</div>
           <div class="text-sub-label">{{ subLabelRef }}</div>
@@ -206,7 +206,7 @@ function editBoard() {
     });
 }
 
-function remove() {
+function removeBoard() {
   console.log('delete')
   $q.dialog({
     component: OrganizeDeleteDialog,

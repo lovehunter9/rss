@@ -89,7 +89,7 @@
 
           <layout-left-item-menu v-for="item in store.boards" :key="item.id + item.title" :menu-type="MenuType.Board"
             :menu-value="item.id" :title="item.title" image-name="board" :show-un-read-count="false"
-            @item-on-click="changeItemMenu(MenuType.Board, item.id)" />
+            @item-on-click="changeItemMenu(MenuType.Board, item.id)" @click.right="showContextMenu($event,item.id)"/>
           <layout-left-item-menu :menu-type="MenuType.CreateNewBoard" :show-un-read-count="false" :dense="true"
             @item-on-click="addBoard()" />
 
@@ -117,18 +117,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
-import { useQuasar } from 'quasar';
-import { useRoute, useRouter } from 'vue-router';
+import {defineComponent, onMounted, onUnmounted, ref, watch} from 'vue';
+import {useQuasar} from 'quasar';
+import {useRoute, useRouter} from 'vue-router';
 // import {useIsMobile} from '../utils/utils';
-import { useRssStore } from 'stores/rss';
+import {useRssStore} from 'stores/rss';
 
-import { Entry, EntryStatus, Feed, MenuType } from '../types';
+import {DeleteType, Entry, EntryStatus, Feed, MenuType} from '../types';
 // import SearchView from 'components/rss/SearchView.vue';
 import LayoutLeftItemMenu from 'components/LayoutLeftItemMenu.vue'
 import AddFolderDialog from 'components/dialog/AddFolderDialog.vue';
 import AddFeedDialog from 'components/dialog/AddFeedDialog.vue';
 import AddBoardDialog from 'components/dialog/AddBoardDialog.vue';
+import contextMenu, {RIGHT_MENU_TYPE} from 'components/RightMenuInstance';
+import {newsBus, newsBusMessage} from 'src/utils/utils';
+import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 
 export default defineComponent({
   name: 'MainLayout',
@@ -150,6 +153,10 @@ export default defineComponent({
 
     console.log(Route.path);
 
+    const showContextMenu = (e : any,menuId : number) => {
+      e.preventDefault();
+      contextMenu(e,menuId);
+    };
 
     let active = ref('vault');
 
@@ -173,6 +180,49 @@ export default defineComponent({
       }
     );
 
+    newsBus.on(newsBusMessage.rightMenuType,(menuId : number,type : RIGHT_MENU_TYPE) => {
+      switch (type){
+        case RIGHT_MENU_TYPE.EDIT:
+          editBoard(menuId)
+          break
+        case RIGHT_MENU_TYPE.DELETE:
+          removeBoard(menuId)
+          break
+      }
+    })
+
+    function editBoard(boardId : number) {
+      $q.dialog({
+        component: AddBoardDialog,
+        componentProps: {
+          boardId: boardId
+        }
+      }).onOk(() => {
+        newsBus.emit(newsBusMessage.feedRefresh)
+      }).onCancel(() => {
+        console.log('Cancel');
+      })
+        .onDismiss(() => {
+          console.log('Dismiss');
+        });
+    }
+
+    function removeBoard(boardId : number) {
+      console.log('delete')
+      $q.dialog({
+        component: OrganizeDeleteDialog,
+        componentProps: {
+          type: DeleteType.Board
+        }
+      }).onOk(async () => {
+        await store.remove_local_board(boardId)
+      }).onCancel(() => {
+        console.log('Cancel');
+      })
+        .onDismiss(() => {
+          console.log('Dismiss');
+        });
+    }
 
     // watch(
     //   () => store.dialogShow,
@@ -382,6 +432,7 @@ export default defineComponent({
       item,
       leftDrawerOpen,
       goto,
+      showContextMenu,
       onSearch,
       store,
       active,
