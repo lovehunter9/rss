@@ -3,7 +3,7 @@
     <q-item clickable :dense="dense"
             :active="store.menu_choice.type === menuType && store.menu_choice.value === menuValue"
             active-class="itemActiveStyle"
-            class="menuItem left-menu-title-normal q-mx-sm q-pl-xs q-pr-md q-py-xs" @click="itemOnClick()"
+            class="menuItem left-menu-title-normal q-mx-sm q-pl-xs q-pr-md q-py-xs" :class="!smallFontSize? 'left-menu-title-normal-font-size' : 'left-menu-title-dense-font-size'" @click="itemOnClick()"
             @mouseover="changeBackground()" @mouseout="returnBackground()">
       <q-item-section class="items-center" avatar>
         <q-icon :name="formatIconName()" size="20px"/>
@@ -56,6 +56,10 @@ const props = defineProps({
     type: String,
     default: '',
     require: false
+  },
+  smallFontSize: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -114,9 +118,17 @@ const formatIconName = () => {
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 400;
-    font-size: 14px;
     line-height: 14px;
   }
+
+  .left-menu-title-normal-font-size {
+    font-size: 14px;
+  }
+
+  .left-menu-title-dense-font-size {
+    font-size: 12px;
+  }
+
 
   .item-title-margin-left {
     margin-left: -15px;

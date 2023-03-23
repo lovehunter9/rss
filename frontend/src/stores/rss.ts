@@ -118,6 +118,7 @@ export const useRssStore = defineStore('rss', {
         } catch (e) {
           console.log(e)
         }
+
         this.feeds = feeds;
         this.categories = categories;
         this.refresh_feeds_counter();

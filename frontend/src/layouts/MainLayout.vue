@@ -13,8 +13,28 @@
             <div style="margin-left:10px;"> Search </div>
           </div>
 
-          <div class="btn-add row justify-center items-center" @click="addFeed">
-            <q-img style="width: 12px;height: 12px" src="../assets/menu/add.svg" />
+          <div class="btn-add row justify-center items-center">
+            <q-img style="width: 12px;height: 12px" src="../assets/menu/add.svg">
+            </q-img>
+            <q-menu style="width:140px;" anchor="bottom end" :offset="[-86, 8]">
+              <q-list style="font-size:12px;line-height: 12px;color: #1A130F;font-family: 'Roboto';font-style: normal;">
+                <q-item dense clickable v-close-popup @click="addFeed">
+                  <q-item-section>
+                    New Feeds
+                  </q-item-section>
+                </q-item>
+                <q-item dense clickable v-close-popup @click="addFolder">
+                  <q-item-section>
+                    New Folder
+                  </q-item-section>
+                </q-item>
+                <q-item dense clickable v-close-popup @click="addBoard">
+                  <q-item-section>
+                    New Boards
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
           </div>
         </div>
         <q-scroll-area style="height:calc(100% - 110px);">
@@ -41,7 +61,7 @@
 
           <q-item class="item" dense v-for="(category, index) in store.categories" :key="'ct' + index"
             style="padding: 0;">
-            <q-expansion-item dense switchToggleSide :disable="category.feeds.length === 0">
+            <q-expansion-item dense switchToggleSide :disable="category.feeds.length === 0" :defaultOpened="index === 0 && category.feeds.length > 0">
               <template v-slot:header>
                 <q-item class="menuItem"
                   :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && category.feeds.find(e => e.id === store.menu_choice.value) !== undefined"
@@ -80,7 +100,7 @@
           </q-item>
 
           <layout-left-item-menu :menu-type="MenuType.CreateNewFolder" :show-un-read-count="false" :dense="true"
-            @item-on-click="addFolder()" />
+            @item-on-click="addFolder()" :smallFontSize="true"/>
           <div class="row justify-between items-center folderInfo">
             <span class="folder">Boards</span>
           </div>
@@ -89,8 +109,8 @@
 
           <layout-left-item-menu v-for="item in store.boards" :key="item.id + item.title" :menu-type="MenuType.Board"
             :menu-value="item.id" :title="item.title" image-name="board" :show-un-read-count="false"
-            @item-on-click="changeItemMenu(MenuType.Board, item.id)" />
-          <layout-left-item-menu :menu-type="MenuType.CreateNewBoard" :show-un-read-count="false" :dense="true"
+            @item-on-click="changeItemMenu(MenuType.Board, item.id)" :smallFontSize="true"/>
+          <layout-left-item-menu :menu-type="MenuType.CreateNewBoard" :show-un-read-count="false" :dense="true" :smallFontSize="true"
             @item-on-click="addBoard()" />
 
         </q-scroll-area>
