@@ -10,7 +10,7 @@
       </q-item-section>
       <q-item-section class="item-title-margin-left">{{ title ? title : menuTypeName(menuType) }}</q-item-section>
       <q-item-section v-if="showUnReadCount" side>
-        <div class="unreadCount">
+        <div class="unreadCount text-minor-color">
           {{ unreadCount }}
         </div>
       </q-item-section>
@@ -22,6 +22,7 @@
 import {useRssStore} from 'src/stores/rss';
 import {MenuType, menuTypeName} from '../types'
 import {defineProps, PropType, ref} from 'vue';
+import { Dark } from 'quasar'
 
 const props = defineProps({
   menuType: {
@@ -98,6 +99,11 @@ const formatIconName = () => {
       nameTypeName = nameTypeName + '_hover'
     }
   }
+
+  if(!nameTypeName.endsWith('_hover') && Dark.isActive) {
+    nameTypeName = nameTypeName + '_dark'
+  }
+
   return `img:/imgs/${nameTypeName}.svg`
 }
 
@@ -107,7 +113,7 @@ const formatIconName = () => {
 
 .left-menu-root {
   .itemActiveStyle {
-    color: #FF8642;
+    color: $main-style;
   }
 
   .menuItem {
@@ -141,7 +147,6 @@ const formatIconName = () => {
     font-size: 12px;
     line-height: 12px;
     text-align: center;
-    color: #847C77;
 
     background: rgba(26, 19, 15, 0.05);
     padding: 2px 8px;

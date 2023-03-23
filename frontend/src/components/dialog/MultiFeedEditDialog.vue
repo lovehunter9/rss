@@ -4,34 +4,34 @@
     ref="dialogRef"
     >
     <q-card class="q-dialog-plugin">
-      <div class="text-title">Reorganize Selected Feeds</div>
+      <div class="text-title text-major-color">Reorganize Selected Feeds</div>
       <img class="icon-close" src="../../assets/menu/close.svg" @click="onDialogCancel">
 
       <q-scroll-area style="height: 478px">
 
         <div class="column justify-start items-start">
 
-          <div class="edit-label">You've selected {{ props.feeds?.length }} feeds</div>
+          <div class="edit-label text-minor-color">You've selected {{ props.feeds?.length }} feeds</div>
 
           <div class="row items-start">
             <div class="selected-button row justify-start items-center" v-for="item in feeds" :key="item.id">
               <img class="button-icon" :src="store.feeds_icon[item.id].data"/>
-              <div class="button-text">{{ item.title }}</div>
+              <div class="button-text text-major-color">{{ item.title }}</div>
             </div>
           </div>
 
-          <div class="edit-label" v-show="parentStatusRef != null">Added in</div>
-          <q-checkbox dense size="md" class="check-box" v-model="parentStatusRef" :label="parentCategoriesRef ? parentCategoriesRef.title : ''"
+          <div class="edit-label text-minor-color" v-show="parentStatusRef != null">Added in</div>
+          <q-checkbox dense size="md" class="check-box text-minor-color" v-model="parentStatusRef" :label="parentCategoriesRef ? parentCategoriesRef.title : ''"
                       color="orange" disable v-show="parentStatusRef != null"/>
 
-          <div class="edit-label">Folders</div>
+          <div class="edit-label text-minor-color">Folders</div>
           <q-checkbox v-for="item in categoriesRef" v-model="item.selected" :key="item.id" dense size="md"
-                      class="check-box" color="orange" :label="item.data.title"
+                      class="check-box text-minor-color" color="orange" :label="item.data.title"
                       @update:model-value="setSelected(item)"/>
 
           <div class="folder-layout row justify-start items-center" @click="addFolder">
             <q-icon name="img:/imgs/createnewfolder.svg" size="16px"/>
-            <div class="text-folder">Create New Folder</div>
+            <div class="text-folder text-major-color">Create New Folder</div>
           </div>
 
         </div>
@@ -179,7 +179,6 @@ async function onConfirm() {
     font-size: 16px;
     line-height: 20px;
     text-align: center;
-    color: #1A130F;
   }
 
   .icon-close {
@@ -212,7 +211,6 @@ async function onConfirm() {
       font-weight: 400;
       font-size: 12px;
       line-height: 14px;
-      color: #1A130F;
     }
   }
 
@@ -225,7 +223,6 @@ async function onConfirm() {
       font-weight: 400;
       font-size: 14px;
       line-height: 16px;
-      color: #1A130F;
       margin-left: 10px;
     }
   }
@@ -237,7 +234,6 @@ async function onConfirm() {
     font-weight: 400;
     font-size: 12px;
     line-height: 16px;
-    color: #857C77;
   }
 
   .check-box {
@@ -247,27 +243,6 @@ async function onConfirm() {
     font-weight: 400;
     font-size: 14px;
     line-height: 16px;
-    color: #847C77;
-  }
-
-  .btn-confirm {
-    text-transform: capitalize;
-    width: 92px;
-    height: 32px;
-    background: #FF8642;
-    border-radius: 6px;
-    margin-top: 50px;
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 14px;
-    text-align: center;
-    color: #FFFFFF;
-
-    &::before {
-      box-shadow: none;
-    }
   }
 
 }

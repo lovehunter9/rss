@@ -91,24 +91,3 @@ const emit = defineEmits(['showDetail'])
   }
 }
 </style>
-<style lang="scss" scoped>
-// .select_height {
-//   // height: 40px;
-//   // min-height: 40px;
-//   height: 32px;
-//   // width: 100%;
-//   // border: 1px solid #E0E0E0;
-//   // border-radius: 6px;
-// }
-
-
-.popup_content_select {
-  .optimized_itmes {
-    font-family: 'Source Han Sans CN';
-    font-style: normal;
-    font-weight: 700;
-    font-size: 14px;
-    color: #44588F;
-  }
-}
-</style>

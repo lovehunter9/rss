@@ -1,25 +1,25 @@
 <template>
-  <div class="discover-detail-root">
+  <div class="discover-detail-root ">
     <title-commonent backTitle="#blockchain" @back-action="backAction()"/>
-    <title-commonent backTitle="#blockchain" v-show="titleViewFixedRef" class="model2" @back-action="backAction()"/>
-    <div class="section-title" style="margin-top:2px" v-if="reletedTopics.length > 0">
+    <title-commonent backTitle="#blockchain" v-show="titleViewFixedRef" class="model2 bg-color-white" @back-action="backAction()"/>
+    <div class="section-title text-minor-color " style="margin-top:2px" v-if="reletedTopics.length > 0">
       Releted Topics
     </div>
     <div class="row justify-start" v-if="reletedTopics.length > 0">
       <q-intersection v-for="item, index in reletedTopics" :key="index">
-        <div class="relate-topic-item">
+        <div class="relate-topic-item text-minor-color ">
           {{ item.title }}
         </div>
       </q-intersection>
     </div>
 
-    <div class="section-title" style="margin-top:24px">
+    <div class="section-title text-minor-color " style="margin-top:24px">
       Search Result
     </div>
 
     <q-list class="search-result-list">
       <SearchFeedComponent v-for="item,index in searchResults" :key="index" :feed="item"></SearchFeedComponent>
-      <div class="row justify-center full-width no-more-result">
+      <div class="row justify-center full-width no-more-result text-major-color">
         No More Result &nbsp;
         <a href="javascript:;" @click="jumpToSearch()" style="color:#1B87F4"> Try other Topices </a>
       </div>
@@ -159,13 +159,11 @@ defineExpose({ floatTitleView, reloadFeed});
     font-weight: 400;
     font-size: 14px;
     line-height: 14px;
-    color: #857C77;
   }
 
   .model2 {
     top: 0;
 		position: fixed;
-    background-color: white;
     width: calc(100% - 240px);
 		z-index: 999;
 	}
@@ -182,7 +180,6 @@ defineExpose({ floatTitleView, reloadFeed});
     font-weight: 400;
     font-size: 12px;
     line-height: 12px;
-    color: #847C77;
   }
 
   .search-result-list {
@@ -198,7 +195,6 @@ defineExpose({ floatTitleView, reloadFeed});
   font-weight: 400;
   font-size: 12px;
   line-height: 16px;
-  color: #1A130F;
 }
 
 

@@ -3,7 +3,7 @@
     <div class="entry-header row items-center justify-between">
       <div class="enter-header-start row items-center">
         <q-img class="entry-icon row item-center" />
-        <div class="enter-time">
+        <div class="enter-time text-minor-color ">
           marginalrevolution.com · 1 mins ago
         </div>
       </div>
@@ -12,11 +12,11 @@
         <img class="icon-end" src="../../assets/menu/share.svg">
       </div>
     </div>
-    <div class="entry-title">
+    <div class="entry-title text-major-color">
       What is the single best way of improving your GPT prompts?
     </div>
 
-    <div class="entry-content">
+    <div class="entry-content text-minor-color">
       Memphis Grizzlies guard Ja Morant has been suspended by the NBA for eight games without pay for "conduct detrimental
       to the league," officials announced Wednesday.
     </div>
@@ -50,7 +50,6 @@ const markTextRef = ref('Add to board')
         font-weight: 400;
         font-size: 12px;
         line-height: 16px;
-        color: #847C77;
         margin-left: 12px;
       }
     }
@@ -69,10 +68,6 @@ const markTextRef = ref('Add to board')
     font-weight: 500;
     font-size: 16px;
     line-height: 20px;
-    /* identical to box height, or 125% */
-
-
-    color: #1A130F;
     margin-top: 12px;
   }
 
@@ -83,11 +78,6 @@ const markTextRef = ref('Add to board')
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
-    /* or 143% */
-
-
-    color: #847C77;
-
     margin-top: 11px;
   }
 

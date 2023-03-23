@@ -1,7 +1,7 @@
 <template>
-  <div class="index-root">
+  <div class="index-root bg-color-white">
 
-    <q-splitter v-model="splitterModel" unit="px" disable style="height: 100%;background-color: white;"
+    <q-splitter v-model="splitterModel" unit="px" disable style="height: 100%;"
                 v-if="store.entries.length > 0">
       <template v-slot:before>
         <div class="item-list">
@@ -13,8 +13,8 @@
             <img class="icon-read-all" src="../assets/menu/modify.svg" @click="editBoard">
             <img class="icon-refresh" src="../assets/menu/delete.svg" @click="removeBoard">
           </div>
-          <div class="text-label">{{ labelRef }}</div>
-          <div class="text-sub-label">{{ subLabelRef }}</div>
+          <div class="text-label text-major-color">{{ labelRef }}</div>
+          <div class="text-sub-label text-minor-color">{{ subLabelRef }}</div>
           <q-scroll-area class="list-view" @scroll="onScroll">
             <q-list>
 
@@ -318,7 +318,6 @@ const onLoadRef = async (done: (() => void)) => {
 <style lang="scss" scoped>
 .index-root {
   height: 100%;
-  background-color: #FFFFFF;
 
   .item-list {
 
@@ -348,7 +347,6 @@ const onLoadRef = async (done: (() => void)) => {
       margin-left: 16px;
       font-size: 16px;
       line-height: 16px;
-      color: #1A130F;
     }
 
     .text-sub-label {
@@ -359,7 +357,6 @@ const onLoadRef = async (done: (() => void)) => {
       font-weight: 400;
       font-size: 14px;
       line-height: 14px;
-      color: #857C77;
     }
 
     .list-view {

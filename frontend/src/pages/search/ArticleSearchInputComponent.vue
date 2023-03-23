@@ -4,7 +4,7 @@
       menu-self="top left" menu-anchor="bottom start" :menu-offset="[0, 5]" unelevated>
       <template v-slot:label>
         <div class="row items-center no-wrap justify-between" style="width: 72px;">
-          <div class="select-title-item"> All articles </div>
+          <div class="select-title-item text-major-color"> All articles </div>
         </div>
       </template>
       <q-list class="rounded-borders">
@@ -42,12 +42,8 @@ const isOnSearch = ref(false)
   border-radius: 6px;
 
   .select-view {
-    // height: 32px;
     width: 126px;
-    // margin-left: 16px;
-    // border: 1px solid #e0e0e0;
     border-radius: 0px;
-    // background-color: red;
 
     .select-title-item {
       font-family: 'Roboto';
@@ -55,7 +51,6 @@ const isOnSearch = ref(false)
       font-weight: 400;
       font-size: 12px;
       line-height: 12px;
-      color: #1a130f;
     }
   }
 

@@ -6,13 +6,13 @@
 
     <q-card class="q-dialog-plugin">
 
-      <div class="text-title">Edit Folder</div>
+      <div class="text-title text-major-color">Edit Folder</div>
 
       <img class="icon-close" src="../../assets/menu/close.svg" @click="onDialogCancel">
 
       <div class="column justify-start items-start">
 
-        <div class="edit-title">Folder Name</div>
+        <div class="edit-title text-minor-color">Folder Name</div>
 
         <edit-view class="edit-view" :text="folder?.data.title" :is-read-only="true"/>
 
@@ -109,7 +109,6 @@ function onConfirm() {
     font-size: 16px;
     line-height: 20px;
     text-align: center;
-    color: #1A130F;
   }
 
   .icon-close {
@@ -120,31 +119,6 @@ function onConfirm() {
     width: 16px
   }
 
-  .selected-button {
-    margin: 4px;
-    padding: 8px 16px;
-    height: 32px;
-    width: fit-content;
-    background-color: transparent;
-    border: 1px solid #E0E0E0;
-    border-radius: 6px;
-    text-transform: capitalize;
-
-    .button-icon {
-      width: 16px;
-      height: 16px;
-    }
-
-    .button-text {
-      margin-left: 8px;
-      font-family: 'Roboto';
-      font-style: normal;
-      font-weight: 400;
-      font-size: 12px;
-      line-height: 14px;
-      color: #1A130F;
-    }
-  }
 
   .edit-label {
     margin-top: 24px;
@@ -155,18 +129,8 @@ function onConfirm() {
     margin-right: 24px;
     font-size: 12px;
     line-height: 16px;
-    color: #857C77;
   }
 
-  .check-box {
-    margin-top: 12px;
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 16px;
-    color: #847C77;
-  }
 
   .edit-title {
     @extend .edit-label;
@@ -178,27 +142,6 @@ function onConfirm() {
     margin-left: 24px;
     margin-right: 24px;
     margin-top: 4px;
-  }
-
-  .btn-confirm {
-    text-transform: capitalize;
-    width: 92px;
-    height: 32px;
-    background: #FF8642;
-    border-radius: 6px;
-    margin-top: 50px;
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 500;
-    margin-right: 24px;
-    font-size: 14px;
-    line-height: 14px;
-    text-align: center;
-    color: #FFFFFF;
-
-    &::before {
-      box-shadow: none;
-    }
   }
 
 }

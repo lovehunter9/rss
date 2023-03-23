@@ -1,5 +1,6 @@
 import { EventBus } from 'quasar';
 import {ref, onMounted, onBeforeUnmount} from 'vue';
+import { Dark } from 'quasar'
 
 export function useWinSize() {
   const size = ref({
@@ -124,4 +125,16 @@ export function getRequireImage(path: string): string {
     return path;
   }
   return require(`../assets/${path}`);
+}
+
+/// path传 assets的相对路径'/开头' 可不传 默认为assets根路径下图片  hover效果图片原名称 + '_hover' dark图片以_dark结尾
+export const formatLocalImage = (name: string, path = '/',imageType = 'svg', isHover = false, useDark = true) => {
+  let formatName = name;
+  if (isHover) {
+    formatName = formatName + '_hover';
+  } else if (Dark.isActive && useDark) {
+    formatName = formatName + '_dark';
+  }
+
+  return require(`../assets${path}/${formatName}.${imageType}`);
 }

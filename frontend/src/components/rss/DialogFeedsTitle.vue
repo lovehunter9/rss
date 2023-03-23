@@ -6,10 +6,10 @@
       <span class="text-type" style="flex: 1">Feeds</span>
     </div>
     <div class="selection-layout row justify-between items-center" v-else>
-      <span class="text">Selected {{folder.getSelectedFeed().length}} of {{ folder.getOptionalFeeds().length }}</span>
+      <span class="text text-minor-color">Selected {{folder.getSelectedFeed().length}} of {{ folder.getOptionalFeeds().length }}</span>
       <q-btn flat dense class="selected-button row justify-start items-center" style="margin-left: 8px" @click="remove">
         <img class="button-icon" src="../../assets/menu/delete2.svg"/>
-        <div class="button-text">Delete</div>
+        <div class="button-text text-major-color">Delete</div>
       </q-btn>
     </div>
   </div>
@@ -100,7 +100,6 @@ if (prop.folder){
       font-weight: 400;
       font-size: 12px;
       line-height: 12px;
-      color: #847C77;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
@@ -118,7 +117,6 @@ if (prop.folder){
       font-weight: 400;
       font-size: 12px;
       line-height: 12px;
-      color: #847C77;
       white-space: nowrap;
       text-overflow: ellipsis;
       text-overflow: ellipsis;
@@ -144,24 +142,9 @@ if (prop.folder){
         font-weight: 400;
         font-size: 12px;
         line-height: 14px;
-        color: #1A130F;
       }
     }
 
-  }
-
-  .text-end {
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 12px;
-    color: #847C77;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    text-align: end;
-    width: 65px;
   }
 }
 

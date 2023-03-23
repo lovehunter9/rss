@@ -9,7 +9,7 @@
         <div class="row" style="width: 100%;margin-bottom: 8px;">
           <!-- <search-view class="search-view" @click="changeItemMenu(MenuType.Discover)"/> -->
           <div class="search-view row items-center" @click="changeItemMenu(MenuType.Search)">
-            <q-icon name="search" size="16px" style="color:#857C77;margin-left: 8px;"></q-icon>
+            <q-icon name="search" size="16px" style="margin-left: 8px;" class="text-minor-color"></q-icon>
             <div style="margin-left:10px;"> Search </div>
           </div>
 
@@ -17,7 +17,7 @@
             <q-img style="width: 12px;height: 12px" src="../assets/menu/add.svg">
             </q-img>
             <q-menu style="width:140px;" anchor="bottom end" :offset="[-86, 8]">
-              <q-list style="font-size:12px;line-height: 12px;color: #1A130F;font-family: 'Roboto';font-style: normal;">
+              <q-list style="font-size:12px;line-height: 12px;font-family: 'Roboto';font-style: normal;" class="text-major-color">
                 <q-item dense clickable v-close-popup @click="addFeed">
                   <q-item-section>
                     New Feeds
@@ -54,9 +54,9 @@
           <q-separator style="margin-top:6px;margin-bottom: 11px;" inset />
 
           <div class="row justify-between items-center folderInfo" @click="goFolderSetting">
-            <span class="folder">Folder</span>
+            <span class="folder text-minor-color">Folder</span>
             <q-img style="width: 16px;height: 16px"
-              :src="isFolderManager ? require('../assets/menu/activeSetting.svg') : require('../assets/menu/setting.svg')" />
+              :src="isFolderManager ? formatLocalImage('setting','/menu',undefined,true) : formatLocalImage('setting','/menu',undefined,false,true)" />
           </div>
 
           <q-item class="item" dense v-for="(category, index) in store.categories" :key="'ct' + index"
@@ -65,14 +65,14 @@
               <template v-slot:header>
                 <q-item class="menuItem"
                   :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && category.feeds.find(e => e.id === store.menu_choice.value) !== undefined"
-                  active-class="itemActiveStyle" dense
+                  active-class="item-active-color" dense
                   :class="category.feeds.length > 0 ? 'folder-extension-margin-left' : 'folder-extension-margin-none'"
                   @click="changeItemMenu(MenuType.Category, category.id)">
                   <q-item-section class="folderTitle">
                     {{ category.title }}
                   </q-item-section>
                   <q-item-section side>
-                    <div class="unreadCount">
+                    <div class="unreadCount text-minor-color">
                       {{ feedReduce(category.feeds) }}
                     </div>
                   </q-item-section>
@@ -81,7 +81,7 @@
               <q-item dense class="menuItem feed-select-item" clickable v-for="(feed, fi) in category.feeds"
                 :key="'ft' + fi" @click="changeItemMenu(MenuType.Feed, feed.id)"
                 :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && store.menu_choice.value === feed.id"
-                active-class="itemActiveStyle">
+                active-class="item-active-color">
                 <q-item-section avatar>
                   <!-- <q-icon :name="formatIconName(MenuType.Discover)" size="14px"></q-icon> -->
                   <img v-if="store.feeds_icon[feed.id] && store.feeds_icon[feed.id].data"
@@ -91,7 +91,7 @@
                   {{ feed.title }}
                 </q-item-section>
                 <q-item-section side>
-                  <div class="unreadCount">
+                  <div class="unreadCount text-minor-color">
                     {{ feed.unread ?? 0 }}
                   </div>
                 </q-item-section>
@@ -102,7 +102,7 @@
           <layout-left-item-menu :menu-type="MenuType.CreateNewFolder" :show-un-read-count="false" :dense="true"
             @item-on-click="addFolder()" :smallFontSize="true"/>
           <div class="row justify-between items-center folderInfo">
-            <span class="folder">Boards</span>
+            <span class="folder text-minor-color">Boards</span>
           </div>
 
 
@@ -152,6 +152,8 @@ import AddBoardDialog from 'components/dialog/AddBoardDialog.vue';
 import contextMenu, {RIGHT_MENU_TYPE} from 'components/RightMenuInstance';
 import {newsBus, newsBusMessage} from 'src/utils/utils';
 import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
+import { formatLocalImage } from '../utils/utils'
+
 
 export default defineComponent({
   name: 'MainLayout',
@@ -162,6 +164,7 @@ export default defineComponent({
   },
 
   setup() {
+
     const $q = useQuasar();
     const Router = useRouter();
     const Route = useRoute();
@@ -470,7 +473,8 @@ export default defineComponent({
       addBoard,
       addFeed,
       feedReduce,
-      todayCount
+      todayCount,
+      formatLocalImage
     };
   }
 });
@@ -515,15 +519,9 @@ export default defineComponent({
     margin-right: 16px;
     width: 32px;
     height: 32px;
-    border: 1px solid #FF8642;
+    border: 1px solid $main-style;
     border-radius: 6px;
   }
-}
-
-
-.itemActiveStyle {
-  color: #FF8642;
-  // background: #F2C037
 }
 
 .showDialog {
@@ -593,7 +591,6 @@ export default defineComponent({
   font-size: 12px;
   line-height: 12px;
   text-align: center;
-  color: #847C77;
 
   background: rgba(26, 19, 15, 0.05);
   padding: 2px 8px;
@@ -635,7 +632,6 @@ export default defineComponent({
     font-weight: 400;
     font-size: 14px;
     line-height: 14px;
-    color: #857C77;
   }
 }
 

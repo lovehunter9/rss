@@ -1,8 +1,8 @@
 <template>
-  <q-scroll-area style="height:100vh;background-color: white;">
+  <q-scroll-area style="height:100vh;" class="bg-color-white">
     <div class="discover-root">
       <div class="top-layout row justify-between items-center">
-        <span class="text-title">Discover</span>
+        <span class="text-title text-major-color">Discover</span>
         <div class="row justify-end items-center" v-if="!showDetail">
           <img class="icon-end" src="../assets/menu/input.svg">
           <img class="icon-end" src="../assets/menu/output.svg">

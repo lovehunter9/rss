@@ -1,10 +1,10 @@
 <template>
-  <div class="trend-root">
-    <div class="page-title"> Provide the best information based on trends </div>
+  <div class="trend-root bg-color-white">
+    <div class="page-title text-major-color"> Provide the best information based on trends </div>
     <TabsCompnent :tabs="tabs" @update-tab="updateTab" style="margin-bottom:16px"></TabsCompnent>
     <q-scroll-area style="height:calc(100% - 88px)">
 
-      <q-tab-panels v-model="tab" animated>
+      <q-tab-panels v-model="tab" animated class="bg-color-white">
         <q-tab-panel :name="tabs[0].name" style="padding: 0;">
           <ArticleSearchInputComponent></ArticleSearchInputComponent>
           <q-list>
@@ -47,20 +47,17 @@ const tabs = ref(
   [{
     name: 'Articles',
     disable: false,
-    normalIcon: 'img:/imgs/tabs/articles.svg',
-    selectedIcon: 'img:/imgs/tabs/articles_hover.svg'
+    tabIconName: 'articles',
   },
   {
     name: 'Feeds',
     disable: false,
-    normalIcon: 'img:/imgs/tabs/feeds.svg',
-    selectedIcon: 'img:/imgs/tabs/feeds_hover.svg'
+    tabIconName: 'feeds',
   },
   {
     name: 'Twitters',
     disable: false,
-    normalIcon: 'img:/imgs/tabs/twitter.svg',
-    selectedIcon: 'img:/imgs/tabs/twitter_hover.svg'
+    tabIconName: 'twitter',
   }]
 )
 
@@ -186,7 +183,6 @@ const searchResults = ref([
 .trend-root {
   width: 100%;
   height: 100vh;
-  background-color: white;
   padding-left: 120px;
   padding-right: 120px;
   padding-top: 20px;

@@ -1,6 +1,6 @@
 <template>
-  <div class="trend-root">
-    <div class="page-title"> Provide the best information based on trends </div>
+  <div class="trend-root bg-color-white">
+    <div class="page-title text-major-color"> Provide the best information based on trends </div>
     <TabsCompnent :tabs="tabs"></TabsCompnent>
     <q-scroll-area style="height:calc(100% - 75px);margin-top: 8px;">
       <q-list>
@@ -21,20 +21,17 @@ import EntryTotalComponent from './common/EntryTotalComponent.vue'
 const tabs = [{
   name: 'Hot',
   disable: false,
-  normalIcon: 'img:/imgs/tabs/hot.svg',
-  selectedIcon: 'img:/imgs/tabs/hot_hover.svg'
+  tabIconName: 'hot',
 },
 {
   name: 'Top today',
   disable: false,
-  normalIcon: 'img:/imgs/tabs/toptoday.svg',
-  selectedIcon: 'img:/imgs/tabs/toptoday_hover.svg'
+  tabIconName: 'toptoday'
 },
 {
   name: 'Top this week',
   disable: false,
-  normalIcon: 'img:/imgs/tabs/topthisweek.svg',
-  selectedIcon: 'img:/imgs/tabs/topthisweek_hover.svg'
+  tabIconName: 'topthisweek'
 }]
 
 </script>
@@ -43,7 +40,6 @@ const tabs = [{
 .trend-root {
   width: 100%;
   height: 100vh;
-  background-color: white;
   padding-left: 120px;
   padding-right: 120px;
   padding-top: 20px;

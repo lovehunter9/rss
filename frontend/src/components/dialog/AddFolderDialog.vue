@@ -4,10 +4,10 @@
     ref="dialogRef"
     >
     <q-card class="q-dialog-plugin">
-      <div class="text-title">Add Folder</div>
+      <div class="text-title text-major-color">Add Folder</div>
 
       <div style="width: 100%;" class="column justify-start items-start">
-        <div class="edit-title">Title</div>
+        <div class="edit-title text-minor-color">Title</div>
         <edit-view class="edit-view" placeholder="input folder name" @input="onInput"/>
       </div>
 
@@ -80,7 +80,6 @@ function onInput(input: string) {
     font-size: 16px;
     line-height: 20px;
     text-align: center;
-    color: #1A130F;
   }
 
   .icon-close {
@@ -98,7 +97,6 @@ function onInput(input: string) {
     font-weight: 400;
     font-size: 12px;
     line-height: 16px;
-    color: #857C77;
   }
 
   .edit-title {
@@ -109,31 +107,6 @@ function onInput(input: string) {
   .edit-view {
     width: 100%;
     margin-top: 4px;
-  }
-
-  .btn-confirm {
-    text-transform: capitalize;
-    width: 92px;
-    height: 32px;
-    background: #FF8642;
-    border-radius: 6px;
-    margin-top: 50px;
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 14px;
-    text-align: center;
-    color: #FFFFFF;
-
-    &::before {
-      box-shadow: none;
-    }
-  }
-
-  .btn-vc[disabled] {
-    background: #ececec;
-    color: #7a7a7a;
   }
 
 }

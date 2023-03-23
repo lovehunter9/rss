@@ -4,7 +4,7 @@
     ref="dialogRef"
     >
     <q-card class="q-dialog-plugin">
-      <div class="text-title">Edit Feed</div>
+      <div class="text-title text-major-color">Edit Feed</div>
       <img class="icon-close" src="../../assets/menu/close.svg" @click="onDialogCancel">
 
       <q-scroll-area style="height: 478px">
@@ -13,20 +13,20 @@
 
           <div class="selected-button row justify-start items-center">
             <img class="button-icon" :src="store.feeds_icon[feed.id].data"/>
-            <div class="button-text">{{ feed.title }}</div>
+            <div class="button-text text-major-color">{{ feed.title }}</div>
           </div>
 
-          <div class="edit-label">Added in</div>
-          <q-checkbox dense size="md" class="check-box" v-model="parentCategoryRef" :label="feed.category.title"
+          <div class="edit-labe text-minor-colorl">Added in</div>
+          <q-checkbox dense size="md" class="check-box text-minor-color" v-model="parentCategoryRef" :label="feed.category.title"
                       color="orange" disable />
 
-          <div class="edit-label">Folders</div>
+          <div class="edit-label text-minor-color">Folders</div>
           <q-checkbox v-for="item in categoriesRef" v-model="item.selected" :key="item.id" dense size="md"
-                      class="check-box" color="orange" :label="item.data.title" @update:model-value="setSelected(item)"/>
+                      class="check-box text-minor-color" color="orange" :label="item.data.title" @update:model-value="setSelected(item)"/>
 
           <div class="folder-layout row justify-start items-center" @click="addFolder">
             <q-icon name="img:/imgs/createnewfolder.svg" size="16px"/>
-            <div class="text-folder">Create New Folder</div>
+            <div class="text-folder text-major-color">Create New Folder</div>
           </div>
 
           <div class="edit-title">Title</div>
@@ -84,26 +84,26 @@
               <edit-view class="edit-view" :text="model.urlrewrite_rules" emit-key="urlrewrite_rules"
                          placeholder="URL Rewrite Rules" @input="onInput"/>
 
-              <q-checkbox dense size="md" class="check-box" v-model="fetchOriginalRef" label="Fetch original content"
+              <q-checkbox dense size="md" class="check-box text-minor-color" v-model="fetchOriginalRef" label="Fetch original content"
                           color="orange"/>
 
-              <q-checkbox dense size="md" class="check-box" v-model="httpCacheRef" label="Ignore HTTP cache"
+              <q-checkbox dense size="md" class="check-box text-minor-color" v-model="httpCacheRef" label="Ignore HTTP cache"
                           color="orange"/>
 
-              <q-checkbox dense size="md" class="check-box" v-model="selfSignedRef"
+              <q-checkbox dense size="md" class="check-box text-minor-color" v-model="selfSignedRef"
                           label="Allow self-signed or invalid certificates"
                           color="orange"/>
 
-              <q-checkbox dense size="md" class="check-box" v-model="notRefreshFeedRef" label="Do not refresh this feed"
+              <q-checkbox dense size="md" class="check-box text-minor-color" v-model="notRefreshFeedRef" label="Do not refresh this feed"
                           color="orange"/>
 
-              <q-checkbox dense size="md" class="check-box" v-model="hideEntriesRef"
+              <q-checkbox dense size="md" class="check-box text-minor-color" v-model="hideEntriesRef"
                           label="Hide entries in global unread lists"
                           color="orange"/>
 
               <div class="bottom-background">
-                <div class="text-bottom">·Etag header:{{ feed.etag_header }}</div>
-                <div class="text-bottom">·LastModified header:{{ feed.last_modified_header }}</div>
+                <div class="text-bottom text-major-color">·Etag header:{{ feed.etag_header }}</div>
+                <div class="text-bottom text-major-color">·LastModified header:{{ feed.last_modified_header }}</div>
               </div>
 
             </div>
@@ -260,7 +260,6 @@ async function onConfirm() {
     font-size: 16px;
     line-height: 20px;
     text-align: center;
-    color: #1A130F;
   }
 
   .icon-close {
@@ -292,7 +291,6 @@ async function onConfirm() {
       font-weight: 400;
       font-size: 12px;
       line-height: 14px;
-      color: #1A130F;
     }
   }
 
@@ -305,7 +303,6 @@ async function onConfirm() {
       font-weight: 400;
       font-size: 14px;
       line-height: 16px;
-      color: #1A130F;
       margin-left: 10px;
     }
   }
@@ -317,7 +314,6 @@ async function onConfirm() {
     font-weight: 400;
     font-size: 12px;
     line-height: 16px;
-    color: #857C77;
   }
 
   .check-box {
@@ -327,7 +323,6 @@ async function onConfirm() {
     font-weight: 400;
     font-size: 14px;
     line-height: 16px;
-    color: #847C77;
   }
 
   .edit-title {
@@ -369,32 +364,9 @@ async function onConfirm() {
         font-weight: 400;
         font-size: 12px;
         line-height: 20px;
-        /* or 167% */
-        color: #1A130F;
       }
     }
   }
-
-  .btn-confirm {
-    text-transform: capitalize;
-    width: 92px;
-    height: 32px;
-    background: #FF8642;
-    border-radius: 6px;
-    margin-top: 50px;
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 14px;
-    text-align: center;
-    color: #FFFFFF;
-
-    &::before {
-      box-shadow: none;
-    }
-  }
-
 }
 </style>
 

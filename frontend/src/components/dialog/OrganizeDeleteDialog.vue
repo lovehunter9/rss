@@ -1,33 +1,28 @@
 <template>
-  <q-dialog
-    class="delete-root text-center"
-    ref="dialogRef"
-  >
+  <q-dialog class="delete-root text-center" ref="dialogRef">
     <q-card class="q-dialog-plugin">
 
-      <div class="text-title" v-show="type === DeleteType.FEED">Delete Feed</div>
-      <div class="text-title" v-show="type === DeleteType.Folder">Delete Folder</div>
-      <div class="text-title" v-show="type === DeleteType.Board">Delete Board</div>
+      <div class="text-title text-major-color" v-show="type === DeleteType.FEED">Delete Feed</div>
+      <div class="text-title text-major-color" v-show="type === DeleteType.Folder">Delete Folder</div>
+      <div class="text-title text-major-color" v-show="type === DeleteType.Board">Delete Board</div>
 
       <img class="icon-close" src="../../assets/menu/close.svg" @click="onDialogCancel">
 
-      <div class="text-label" v-show="type === DeleteType.FEED">Do you want to remove the selected RSS feeds？</div>
-      <div class="text-label" v-show="type === DeleteType.Folder">Do you want to delete this folder?</div>
-      <div class="text-label" v-show="type === DeleteType.Board">Do you want to delete this Board?</div>
+      <div class="text-content-base text-major-color" v-show="type === DeleteType.FEED">Do you want to remove the selected RSS
+        feeds？</div>
+      <div class="text-content-base text-major-color" v-show="type === DeleteType.Folder">Do you want to delete this folder?
+      </div>
+      <div class="text-content-base text-major-color" v-show="type === DeleteType.Board">Do you want to delete this Board?</div>
 
-      <div class="text-content" v-show="type === DeleteType.Folder">This will cause removal of all feeds under this
+      <div class="text-content-base text-minor-color" v-show="type === DeleteType.Folder">This will cause removal of all feeds under this
         folder.
       </div>
-      <div class="text-content" v-show="type === DeleteType.Board">This will cause removal of all feeds under this
+      <div class="text-content-base text-minor-color" v-show="type === DeleteType.Board">This will cause removal of all feeds under this
         Board.
       </div>
 
       <div class="row justify-end items-end" style="width: 100%">
-        <q-btn
-          dense
-          class="btn-confirm"
-          label="Confirm"
-          @click="onDialogOK"/>
+        <q-btn dense class="btn-confirm" label="Confirm" @click="onDialogOK" />
       </div>
     </q-card>
   </q-dialog>
@@ -35,9 +30,9 @@
 
 <script setup lang="ts">
 
-import {useDialogPluginComponent} from 'quasar';
-import {DeleteType} from 'src/types';
-import {PropType} from 'vue';
+import { useDialogPluginComponent } from 'quasar';
+import { DeleteType } from 'src/types';
+import { PropType } from 'vue';
 
 defineProps({
   type: {
@@ -46,7 +41,7 @@ defineProps({
   }
 })
 
-const {dialogRef, onDialogOK, onDialogCancel} = useDialogPluginComponent();
+const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent();
 
 </script>
 
@@ -69,10 +64,9 @@ const {dialogRef, onDialogOK, onDialogCancel} = useDialogPluginComponent();
     font-size: 16px;
     line-height: 20px;
     text-align: center;
-    color: #1A130F;
   }
 
-  .text-content {
+  .text-content-base {
     margin-top: 48px;
     margin-left: 8px;
     margin-right: 8px;
@@ -82,12 +76,6 @@ const {dialogRef, onDialogOK, onDialogCancel} = useDialogPluginComponent();
     font-size: 16px;
     line-height: 20px;
     text-align: center;
-    color: #857C77;
-  }
-
-  .text-label {
-    @extend .text-content;
-    color: #1A130F;
   }
 
   .icon-close {
@@ -96,31 +84,6 @@ const {dialogRef, onDialogOK, onDialogCancel} = useDialogPluginComponent();
     top: 26px;
     height: 16px;
     width: 16px
-  }
-
-  .btn-confirm {
-    text-transform: capitalize;
-    width: 92px;
-    height: 32px;
-    background: #FF8642;
-    border-radius: 6px;
-    margin-top: 50px;
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 14px;
-    text-align: center;
-    color: #FFFFFF;
-
-    &::before {
-      box-shadow: none;
-    }
-  }
-
-  .btn-vc[disabled] {
-    background: #ececec;
-    color: #7a7a7a;
   }
 
 }

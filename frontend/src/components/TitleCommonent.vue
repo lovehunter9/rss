@@ -2,7 +2,7 @@
   <div class="page-title-root row items-center">
     <div class="back-btn row items-center justify-center" @click="backToPrePage">
       <img src="../assets/menu/back_gray_arrow.svg" :width="9" :height="16">
-      <div class="title title-margin-left">
+      <div class="title title-margin-left text-major-color">
         {{ backTitle }}
       </div>
     </div>
@@ -41,12 +41,11 @@ const backToPrePage = () => {
 }
 
 .title {
-font-family: 'Roboto';
-font-style: normal;
-font-weight: 400;
-font-size: 16px;
-line-height: 20px;
-color: #1A130F;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
 }
 
 .title-margin-left {
@@ -54,14 +53,8 @@ color: #1A130F;
 }
 
 .back-btn {
-  // width: 32px;
   height: 32px;
-  // border-radius: 4px;
-  // border: 1px solid #E0E2E9;
 }
 
-// .back-btn:hover {
-//   background-color: #f5f8fb;
-// }
 </style>
 

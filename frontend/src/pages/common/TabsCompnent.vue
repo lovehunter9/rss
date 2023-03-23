@@ -4,8 +4,8 @@
       activeColor="color-FF8642" @update:model-value="updateTab">
       <q-tab class="normal-tab-class" v-for='rowItem in tabs' :key=rowItem.name :name='rowItem.name'
         :disable='rowItem.disable'>
-        <q-icon :name="tab === rowItem.name ? rowItem.selectedIcon : rowItem.normalIcon" size="16px"></q-icon>
-        <div :class="tab === rowItem.name ? 'active-items' : 'normal-items'">
+        <q-icon :name="formatIconName(rowItem.tabIconName,tab === rowItem.name)" size="16px"></q-icon>
+        <div class="active-base" :class="tab === rowItem.name ? 'text-primary-color' : 'normal-items'">
           {{ rowItem.name }}
         </div>
       </q-tab>
@@ -16,12 +16,12 @@
 
 <script setup lang='ts'>
 import { PropType, ref } from 'vue';
+import { Dark } from 'quasar'
 
 interface TabItem {
   name: string
-  normalIcon: string
-  selectedIcon: string
-  disable: boolean
+  disable: boolean,
+  tabIconName: string
 }
 
 const props = defineProps({
@@ -44,6 +44,36 @@ const updateTab = (tab: string) => {
   emits('updateTab',tab)
 }
 
+const formatIconName = (iconName: string, isSelected: boolean) => {
+  // let nameTypeName = menuTypeName(props.menuType)
+  // if (props.imageName) {
+  //   nameTypeName = props.imageName;
+  //   if ((props.menuType === store.menu_choice.type && props.menuValue === store.menu_choice.value) || (currentMenuType.value === props.menuType)) {
+  //     nameTypeName = nameTypeName + '_hover'
+  //   }
+  // } else {
+  //   nameTypeName = nameTypeName.toLowerCase()
+  //   nameTypeName = nameTypeName.replace(/\s*/g, '');
+  //   if (props.menuType === store.menu_choice.type || (currentMenuType.value === props.menuType)) {
+  //     nameTypeName = nameTypeName + '_hover'
+  //   }
+  // }
+
+  // if(!nameTypeName.endsWith('_hover')) {
+  //   nameTypeName = nameTypeName + '_dark'
+  // }
+
+  let formatIconName = iconName
+  if (isSelected) {
+    formatIconName = formatIconName + '_hover'
+  } else if (Dark.isActive) {
+    formatIconName = formatIconName + '_dark';
+  }
+
+  return `img:/imgs/tabs/${formatIconName}.svg`
+}
+
+
 </script>
 
 <style scoped lang='scss'>
@@ -65,16 +95,6 @@ const updateTab = (tab: string) => {
     line-height: 14px;
     margin-left: 6px;
     text-transform: capitalize;
-  }
-
-  .active-items {
-    @extend .active-base;
-    color: #FF8642
-  }
-
-  .normal-items {
-    @extend .active-base;
-    color: #1A130F;
   }
 
   .normal-tab-class {

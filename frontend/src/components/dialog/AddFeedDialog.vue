@@ -1,67 +1,43 @@
 <template>
-  <q-dialog
-    class="delete-root text-center"
-    ref="dialogRef"
-    >
+  <q-dialog class="delete-root text-center" ref="dialogRef">
     <q-card class="q-dialog-plugin">
-      <div class="text-title">Add Feeds</div>
+      <div class="text-title text-major-color">Add Feeds</div>
 
       <div style="width: 100%;" class="column justify-start items-start">
-        <div class="edit-title">Folder</div>
-        <q-btn-dropdown
-          dropdown-icon="img:/imgs/arrow-down.svg"
-          class="select-view"
-          :ripple="false"
-          no-caps
-          dense
-          menu-self="top left"
-          menu-anchor="bottom start"
-          :menu-offset="[0, 5]"
-          unelevated>
+        <div class="edit-title text-minor-color">Folder</div>
+        <q-btn-dropdown dropdown-icon="img:/imgs/arrow-down.svg" class="select-view" :ripple="false" no-caps dense
+          menu-self="top left" menu-anchor="bottom start" :menu-offset="[0, 5]" unelevated>
           <template v-slot:label>
-            <div
-              class="row items-center no-wrap justify-between"
-              style="width: 100%">
-              <div class="select-title-item">{{ folderRef ? folderRef.title : '' }}</div>
+            <div class="row items-center no-wrap justify-between" style="width: 100%">
+              <div class="select-title-item text-major-color">{{ folderRef ? folderRef.title : '' }}</div>
             </div>
           </template>
           <q-list class="rounded-borders">
-            <q-item
-              v-for="folder in folderOptionsRef"
-              :key="folder.id"
-              clickable
-              v-close-popup
+            <q-item v-for="folder in folderOptionsRef" :key="folder.id" clickable v-close-popup
               @click="folderChanged(folder)">
               <q-item-section>
-                <q-item-label :class="folder.id === folderRef.id ? 'selected-item' : 'normal-item'">
+                <q-item-label class="base-item" :class="folder.id === folderRef.id ? 'text-primary-color' : 'text-major-color'">
                   {{ folder.title }}
                 </q-item-label>
               </q-item-section>
             </q-item>
-            <q-item
-              clickable
-              v-close-popup
-              @click="createFolder()">
+            <q-item clickable v-close-popup @click="createFolder()">
               <q-item-section>
                 <div class="row justify-start items-center">
-                  <img src="../../assets/menu/add.svg" class="icon-add"/>
-                  <q-item-label style="margin-left: 9px" class="selected-item">Create New Folder</q-item-label>
+                  <img src="../../assets/menu/add.svg" class="icon-add" />
+                  <q-item-label style="margin-left: 9px" class="base-item text-primary-color">Create New Folder</q-item-label>
                 </div>
               </q-item-section>
             </q-item>
           </q-list>
         </q-btn-dropdown>
 
-        <div class="edit-title">RSS URL</div>
-        <edit-view class="edit-view" placeholder="Enter Rss URL" :text="props.text" @input="onInput"/>
+        <div class="edit-title text-minor-color">RSS URL</div>
+        <edit-view class="edit-view" placeholder="Enter Rss URL" :text="props.text" @input="onInput" />
       </div>
 
       <div class="row justify-end items-end" style="width: 100%">
-        <q-btn
-          dense
-          class="btn-confirm"
-          label="Confirm"
-          @click="addFeed"/>
+        <q-btn dense class="btn-confirm" label="Confirm" @click="addFeed" />
       </div>
     </q-card>
   </q-dialog>
@@ -69,16 +45,16 @@
 
 <script setup lang="ts">
 
-import {Loading, Notify, useDialogPluginComponent, useQuasar} from 'quasar';
+import { Loading, Notify, useDialogPluginComponent, useQuasar } from 'quasar';
 import EditView from 'components/rss/EditView.vue';
-import {ref,onMounted} from 'vue';
-import {useRssStore} from 'stores/rss';
+import { ref, onMounted } from 'vue';
+import { useRssStore } from 'stores/rss';
 import AddFolderDialog from 'components/dialog/AddFolderDialog.vue';
-import {create_feed, get_feeds} from 'src/api/api';
-import {Category, FeedCreationRequest} from 'src/types';
+import { create_feed, get_feeds } from 'src/api/api';
+import { Category, FeedCreationRequest } from 'src/types';
 
 const inputRef = ref()
-const {dialogRef, onDialogOK} = useDialogPluginComponent();
+const { dialogRef, onDialogOK } = useDialogPluginComponent();
 const store = useRssStore()
 const $q = useQuasar()
 
@@ -86,10 +62,10 @@ const folderOptionsRef = ref<Category[]>(store.categories ? store.categories : [
 const folderRef = ref<Category | null>(store.categories ? store.categories[0] : null)
 
 const props = defineProps({
-  text : {
-    type : String,
-    default : '',
-    require : false
+  text: {
+    type: String,
+    default: '',
+    require: false
   }
 })
 
@@ -191,7 +167,6 @@ function createFolder() {
       font-weight: 400;
       font-size: 12px;
       line-height: 16px;
-      color: #857C77;
     }
 
     .edit-title {
@@ -218,11 +193,10 @@ function createFolder() {
         font-weight: 400;
         font-size: 12px;
         line-height: 12px;
-        color: #1a130f;
       }
     }
 
-    .icon-add{
+    .icon-add {
       margin-left: 18px;
       width: 12px;
       height: 12px;
@@ -235,7 +209,6 @@ function createFolder() {
       font-size: 16px;
       line-height: 20px;
       text-align: center;
-      color: #1A130F;
     }
 
     .icon-close {
@@ -246,49 +219,18 @@ function createFolder() {
       width: 16px
     }
 
-    .btn-confirm {
-      text-transform: capitalize;
-      width: 92px;
-      height: 32px;
-      background: #FF8642;
-      border-radius: 6px;
-      margin-top: 50px;
-      font-family: 'Roboto';
-      font-style: normal;
-      font-weight: 500;
-      font-size: 14px;
-      line-height: 14px;
-      text-align: center;
-      color: #FFFFFF;
 
-      &::before {
-        box-shadow: none;
-      }
-    }
-
-    .btn-vc[disabled] {
-      background: #ececec;
-      color: #7a7a7a;
-    }
   }
 }
 
-.selected-item {
+
+.base-item {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 400;
   font-size: 12px;
   line-height: 12px;
-  color: #FF8642;
 }
 
-.normal-item {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 12px;
-  color: #1a130f;
-}
 </style>
 

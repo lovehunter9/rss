@@ -4,27 +4,27 @@
                 @update:model-value="onSelected" v-show="organizeStore.organizeData.type === ORGANIZE_TYPE.FEED"/>
     <div :class="organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'feed-text-layout' : 'folder-text-layout'"
          v-if="organizeStore.organizeData.status === false">
-      <span class="text-type" style="flex: 15">{{
+      <span class="text-type text-minor-color" style="flex: 15">{{
           organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'Feeds' : 'Folders'
         }}</span>
-      <span class="text" style="flex : 12">{{ organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'Folders' : 'Feeds' }}</span>
-      <span class="text" style="flex: 8">Last Update</span>
+      <span class="text text-minor-color" style="flex : 12">{{ organizeStore.organizeData.type === ORGANIZE_TYPE.FEED ? 'Folders' : 'Feeds' }}</span>
+      <span class="text text-minor-color" style="flex: 8">Last Update</span>
     </div>
-    <div class="text-end" v-if="organizeStore.organizeData.status === false">Option</div>
+    <div class="text-end text-minor-color" v-if="organizeStore.organizeData.status === false">Option</div>
     <div class="selection-layout row justify-between items-center" v-else>
-      <span class="text">Selected {{
+      <span class="text text-minor-color">Selected {{
           organizeStore.getSelectedList().length
         }} of {{ organizeStore.organizeData.dataList.length }}</span>
       <div class="row items-center">
         <q-btn flat dense class="selected-button row justify-start items-center"
                @click="edit">
           <img class="button-icon" src="../../assets/menu/reorganize.svg"/>
-          <div class="button-text">Reorganize</div>
+          <div class="button-text text-major-color">Reorganize</div>
         </q-btn>
         <q-btn flat dense class="selected-button row justify-start items-center" style="margin-left: 8px"
                @click="remove">
           <img class="button-icon" src="../../assets/menu/delete2.svg"/>
-          <div class="button-text">Delete</div>
+          <div class="button-text text-major-color">Delete</div>
         </q-btn>
       </div>
     </div>
@@ -121,7 +121,6 @@ watch(() => organizeStore.organizeData.status, (value) => {
       font-weight: 400;
       font-size: 12px;
       line-height: 12px;
-      color: #847C77;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
@@ -144,7 +143,6 @@ watch(() => organizeStore.organizeData.status, (value) => {
       font-weight: 400;
       font-size: 12px;
       line-height: 12px;
-      color: #847C77;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
@@ -162,7 +160,6 @@ watch(() => organizeStore.organizeData.status, (value) => {
       font-weight: 400;
       font-size: 12px;
       line-height: 12px;
-      color: #847C77;
       white-space: nowrap;
       text-overflow: ellipsis;
       text-overflow: ellipsis;
@@ -188,7 +185,6 @@ watch(() => organizeStore.organizeData.status, (value) => {
         font-weight: 400;
         font-size: 12px;
         line-height: 14px;
-        color: #1A130F;
       }
     }
 
@@ -200,7 +196,6 @@ watch(() => organizeStore.organizeData.status, (value) => {
     font-weight: 400;
     font-size: 12px;
     line-height: 12px;
-    color: #847C77;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;

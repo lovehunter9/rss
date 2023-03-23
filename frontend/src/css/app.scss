@@ -9,26 +9,13 @@
   background: #FF8642 !important;
 }
 
-
-.text-7EB6FF {
-  color: #7EB6FF;
-}
-.text-ADC3DF {
-  color: #ADC3DF;
+/// 主题文字颜色
+.text-primary-color {
+  color: #FF8642;
 }
 
-.text-title-16 {
-  font-size: 16px;
-  font-weight: 600;
-}
-.text-7A7A7A {
-  color: #7A7A7A;
-}
-.text-2787FF {
-  color: #2787FF;
-}
-.bg-FFFFFF {
-  color: #ffffff;
+.item-active-color {
+  color: #FF8642;
 }
 
 i {
@@ -36,82 +23,34 @@ i {
 }
 
 
-.filedMenu {
-  background: #F9F9F9;
-  .menuItem {
-    border-bottom: 1px solid #ECECEC;
+.btn-confirm {
+  margin-top: 50px;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 14px;
+  text-align: center;
+  color: #FFFFFF;
+  text-transform: capitalize;
+  padding: 8px 16px;
+  background: #FF8642;
+
+  &::before {
+    box-shadow: none;
   }
 }
 
-
-.titleBg {
-  background: #F5F5F5;
+.btn-confirm[disabled] {
+  background: #ececec;
+  color: #7a7a7a;
 }
 
 
-.h-common {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 700;
-  color: #1A130F
-}
-
-h1 {
-  @extend .h-common;
-  font-size: 24px;
-  line-height: 28px;
-}
-
-h2 {
-  @extend .h-common;
-  font-size: 22px;
-  line-height: 26px;
-}
-
-h3 {
-  @extend .h-common;
-  font-size: 20px;
-  line-height: 24px;
-}
-
-h4,h5,h6 {
-  @extend .h-common;
-  font-size: 18px;
-  line-height: 24px;
-}
-
-iframe {
-  width: 100%;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  // height: auto;
-}
-
-video {
-  margin-top: 10px;
-  margin-top: 10px;
-  width: 100%;
-}
-
-
-figure {
-  overflow: auto;
-  margin: 10px 0;
-  padding: 0;
-  // background-color: #f7f7f7;
-}
-
-figure table {
-  background-color: #f7f7f7;
-  margin: 0;
-  padding: 0;
-}
 
 // Dark mode
 body.body--dark {
-  .text-212322 {
-    color: #ffffff;
-  }
+
   .text-7A7A7A {
     color: #B2B8CA;
   }
@@ -124,103 +63,105 @@ body.body--dark {
     background-color: #EcEceC;
   }
 
-  .itemlist {
-    background-color: #23242A;
-    border-right: 1px solid #323741;
 
-    .vaultCard {
-      background-color: #23242A;
-      border-left: 2px solid #23242A;
-      border-bottom: 1px solid #323741;
-
-      &:hover {
-        border-left: 2px solid #2787FF;
-        background: #323741;
-      }
-    }
-
-    .vaultCardActive {
-      border-left: 2px solid #2787FF;
-      background: #323741;
+  .menuItem {
+    &:hover {
+      color: #FF8642;
     }
   }
 
 
-  .itemView {
-    background-color: #23242A;
-    .hearder-input {
-      .text {
-        color: #FFFFFF;
-      }
-    }
-
-    .tagSelect {
-      .tagChip {
-        background-color: #23242A;
-        border: 1px solid #ffffff;
-      }
-    }
-
-    .listRow {
-      border-bottom: 1px solid #323741;
-    }
-    .footer {
-      background: #323741;
-      box-shadow: 0px -2px 4px rgba(17, 17, 18, 0.35);
-      .reset {
-        color: #9298A8;
-        background: #23242A;
-      }
-    }
-
-  }
-
-  .d-creatVault {
-    .item {
-      border: 1px solid #7c7c7c;
-    }
-    .activeItem {
-      border: 1px solid #2787FF;
-    }
-    .but-cancel {
-      background: #23242A;
-      color: #9298A8;
-    }
-
+  .bg-color-white {
+    background-color: #2A2D35;
   }
 
 
-  .uploadTitle {
-    color: #ffffff;
-  }
-  .attachType {
-    color: #ffffff;
-  }
-  .hasValue {
-    color: #FFFFFF;;
+
+  .text-major-color {
+    color: white;
   }
 
-  .biIcon {
-    &:first-child {
-      background-color: #212121;
-    }
+  .text-minor-color {
+    color: #857C77;
   }
 
+
+  .h-common {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    color: white
+  }
+
+  h1 {
+    @extend .h-common;
+    font-size: 24px;
+    line-height: 28px;
+  }
+
+  h2 {
+    @extend .h-common;
+    font-size: 22px;
+    line-height: 26px;
+  }
+
+  h3 {
+    @extend .h-common;
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  h4,
+  h5,
+  h6 {
+    @extend .h-common;
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  iframe {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    // height: auto;
+  }
+
+  video {
+    margin-top: 10px;
+    margin-top: 10px;
+    width: 100%;
+  }
+
+
+  figure {
+    overflow: auto;
+    margin: 10px 0;
+    padding: 0;
+  }
+
+  figure table {
+    background-color: #f7f7f7;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 
 // Light Mode
 body.body--light {
-  .text-212322 {
-    color: #212322;
-  }
+
   .text-7A7A7A {
     color: #7A7A7A;
   }
 
   .drawer {
-    background-color: #f5f5f5;
+    background-color: #F8F8F8;
   }
+
+  .lauout-app {
+    background-color: #EcEceC;
+  }
+
   .menuItem {
     &:hover {
       // background: #F3F8FE;
@@ -228,112 +169,79 @@ body.body--light {
     }
   }
 
-  .lauout-app {
-    background-color: #EcEceC;
+  .bg-color-white {
+    background-color: white;
   }
 
-  .itemlist {
-    background-color: #ffffff;
-    border-right: 1px solid #ECECEC;
-    .vaultCard {
-      border-left: 2px solid #ffffff;
-      border-bottom: 1px solid #ECECEC;
-      &:hover {
-        border-left: 2px solid #2787FF;
-        background: #F3F8FE;
-      }
-    }
+  .text-major-color {
+    color: #1A130F;
+  }
 
-    .vaultCardActive {
-      border-left: 2px solid #2787FF;
-      background: #F3F8FE;
-    }
+  .text-minor-color {
+    color: #857C77;
   }
 
 
-  .itemView {
-    background-color: #FFFFFF;
-    .hearder-input {
-      .text {
-        color: #212322;
-      }
-    }
-
-    .tagSelect {
-      .tagChip {
-        border: 1px solid #212322;
-      }
-    }
-
-    .listRow {
-      border-bottom: 1px solid #ECECEC;
-    }
-
-    .footer {
-      background-color: #ffffff;
-      .reset {
-        background: #ECECEC;
-        color: #7A7A7A;
-      }
-    }
-
+  .h-common {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    color: #1A130F
   }
 
-  .d-creatVault {
-    .item {
-      border: 1px solid #ECECEC;
-    }
-    .activeItem {
-      border: 1px solid #2787FF;
-    }
-    .but-cancel {
-      background: #f5f5f5;
-      color: #7a7a7a;
-    }
+  h1 {
+    @extend .h-common;
+    font-size: 24px;
+    line-height: 28px;
   }
 
-  .uploadTitle {
-    color: #212322;
+  h2 {
+    @extend .h-common;
+    font-size: 22px;
+    line-height: 26px;
   }
-  .attachType {
-    color: #212322;
+
+  h3 {
+    @extend .h-common;
+    font-size: 20px;
+    line-height: 24px;
   }
-  .hasValue {
-    color: #7A7A7A;;
+
+  h4,
+  h5,
+  h6 {
+    @extend .h-common;
+    font-size: 18px;
+    line-height: 24px;
   }
-}
+
+  iframe {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    // height: auto;
+  }
+
+  video {
+    margin-top: 10px;
+    margin-top: 10px;
+    width: 100%;
+  }
 
 
-@mixin platform-height-scroll-area-conf($height) {
-  width: 100%;
-  height: $height;
-}
+  figure {
+    overflow: auto;
+    margin: 10px 0;
+    padding: 0;
+  }
 
-.nav-bottom-button-height-scroll-area-conf {
-  @include platform-height-scroll-area-conf((calc(100% - 74px - 160px)));
+  figure table {
+    background-color: #f7f7f7;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 .margin-bottom-safe-area {
   margin-bottom: env(safe-area-inset-bottom);
-}
-
-//input
-.input-rule {
-  margin-left: 30px;
-  font-family: 'Avenir';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 17px;
-  color: #7a7a7a
-}
-
-.input-rule-red {
-  @extend .input-rule;
-  color: #FF3826;
-}
-
-.input-rule-green {
-  @extend .input-rule;
-  color: #6DD400;
 }

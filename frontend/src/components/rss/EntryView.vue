@@ -7,11 +7,11 @@
         <div class="row justify-start" style="width: 100%;">
           <q-img class="entry-icon" :src="store.feeds_icon[entry.feed_id].data"/>
           <div class="column feed-layout justify-start">
-            <span class="text-feed-name">{{ entry.feed.title }}</span>
-            <span class="text-feed-create">{{ getTime() }}</span>
+            <span class="text-feed-name text-major-color">{{ entry.feed.title }}</span>
+            <span class="text-feed-create text-minor-color">{{ getTime() }}</span>
           </div>
         </div>
-        <span class="text-entry-title">{{ entry.title }}</span>
+        <span class="text-entry-title text-major-color">{{ entry.title }}</span>
         <!--        <span>{{ entry.time }}</span>-->
       </div>
     </div>
@@ -121,7 +121,6 @@ function getTime() {
         font-weight: 400;
         font-size: 14px;
         line-height: 14px;
-        color: #1A130F;
       }
 
       .text-feed-create {
@@ -130,7 +129,6 @@ function getTime() {
         font-weight: 400;
         font-size: 12px;
         line-height: 14px;
-        color: #857C77;
         margin-top: 4px;
       }
     }
@@ -142,7 +140,6 @@ function getTime() {
       font-weight: 500;
       font-size: 16px;
       line-height: 24px;
-      color: #1A130F;
     }
 
     .text-entry-desc {
@@ -152,12 +149,8 @@ function getTime() {
       font-weight: 400;
       font-size: 14px;
       line-height: 20px;
-      color: #1A130F;
     }
   }
-
-
-
 }
 
 .itemActiveStyle {

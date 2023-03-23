@@ -18,16 +18,16 @@
 
       <div class="row justify-between items-center">
         <div class="author">
-          <a href="javascript:;" @click="jumpToFeed()">{{ item.feed.title }}</a>
+          <a href="javascript:;" class="text-major-color" @click="jumpToFeed()">{{ item.feed.title }}</a>
         </div>
         <img class="entry-icon" :src="store.feeds_icon[item.feed_id].data">
       </div>
       <q-separator style="margin-top:16px;margin-bottom: 16px;" />
       <h1> {{ item.title }} </h1>
-      <span class="time">
+      <span class="time text-minor-color">
         {{ getTime() }}
       </span>
-      <div class="html-content" v-if="item">
+      <div class="html-content text-major-color" v-if="item">
         <div v-html="entry"></div>
       </div>
     </div>
@@ -233,7 +233,6 @@ function getTime() {
     .author {
       a:link {
         text-decoration: none;
-        color: #1A130F;
       }
 
       a:hover {
@@ -253,7 +252,6 @@ function getTime() {
       font-weight: 400;
       font-size: 14px;
       line-height: 14px;
-      color: #857C77;
     }
 
     .html-content {
@@ -268,7 +266,6 @@ function getTime() {
       font-size: 14px;
       line-height: 20px;
 
-      color: #1A130F;
       word-break: break-all;
       padding-bottom: 30px;
     }

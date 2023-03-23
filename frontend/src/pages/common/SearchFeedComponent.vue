@@ -5,10 +5,10 @@
         <div class="item-total-info row items-center justify-start">
           <img :src="getRequireImage(feed.logo || '')" :width="48" :height="48" />
           <div class="item-total">
-            <div class="item-name">
+            <div class="item-name text-major-color">
               {{ feed.title }}
             </div>
-            <div class="item-url">
+            <div class="item-url text-minor-color ">
               {{ feed.url }}
             </div>
           </div>
@@ -16,11 +16,11 @@
         <div v-if="!feed.isSubsribe" class="row justify-center items-center subscribe-btn"
           @click="addToFeed(feed.subsribeUrl)">
           <img src="../../assets/menu/subsribe.svg" :width="16" :height="16" />
-          <div class="subscribe-title">
+          <div class="subscribe-title text-primary-color">
             Subscribe
           </div>
         </div>
-        <div class="subscribe-title" v-if="feed.isSubsribe">
+        <div class="subscribe-title text-primary-color" v-if="feed.isSubsribe">
           Subscribed
         </div>
       </div>
@@ -28,11 +28,11 @@
     <div class="item-content row justify-between">
       <div v-for="content, indexj in feed.details" :key="indexj"
         style="width: calc(100%/3 - 16px);">
-        <div class="item-content-content">
+        <div class="item-content-content text-minor-color ">
           {{ content.content }}
         </div>
 
-        <div class="item-conente-time">
+        <div class="item-conente-time text-minor-color ">
           {{ content.time }}
         </div>
       </div>
@@ -116,7 +116,6 @@ const addToFeed = (url: string) => {
         font-weight: 500;
         font-size: 14px;
         line-height: 16px;
-        color: #1A130F;
       }
 
       .item-url {
@@ -126,7 +125,6 @@ const addToFeed = (url: string) => {
         font-weight: 400;
         font-size: 14px;
         line-height: 16px;
-        color: #847C77;
       }
     }
 
@@ -145,7 +143,6 @@ const addToFeed = (url: string) => {
       font-weight: 400;
       font-size: 12px;
       line-height: 14px;
-      color: #FF8642;
       margin-left: 8px;
     }
   }
@@ -161,7 +158,6 @@ const addToFeed = (url: string) => {
       font-weight: 400;
       font-size: 14px;
       line-height: 20px;
-      color: #847C77;
     }
 
     .item-conente-time {
@@ -170,7 +166,6 @@ const addToFeed = (url: string) => {
       font-weight: 400;
       font-size: 12px;
       line-height: 16px;
-      color: #847C77;
       margin-top: 8px;
     }
   }

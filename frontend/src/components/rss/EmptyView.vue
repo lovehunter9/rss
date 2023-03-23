@@ -1,12 +1,12 @@
 <template>
   <div class="root column justify-center items-center">
     <img class="empty" src="../../assets/empty.svg">
-    <span class="title">{{ 'Personalize your Feedly' }}</span>
+    <span class="title text-major-color">{{ 'Personalize your Feedly' }}</span>
     <span
-      class="label">{{
+      class="label text-minor-color">{{
         'The most interesting articles published by the feeds you personally follow will be here'
       }}</span>
-    <q-btn class="add-btn" flat dense label="Add feeds" @click="addFeed" v-show="addFee"/>
+    <q-btn class="btn-confirm add-btn" flat dense label="Add feeds" @click="addFeed" v-show="addFee"/>
   </div>
 </template>
 
@@ -62,7 +62,6 @@ const addFeed = () => {
     font-size: 16px;
     line-height: 24px;
     text-align: center;
-    color: #1A130F;
   }
 
   .label {
@@ -75,21 +74,10 @@ const addFeed = () => {
     font-size: 14px;
     line-height: 20px;
     text-align: center;
-    color: #857C77;
   }
 
   .add-btn{
     margin-top: 24px;
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 14px;
-    text-align: center;
-    color: #FFFFFF;
-    text-transform: capitalize;
-    padding: 8px 16px;
-    background: #FF8642;
   }
 }
 

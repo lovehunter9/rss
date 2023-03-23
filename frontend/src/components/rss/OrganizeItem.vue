@@ -8,8 +8,8 @@
       <div class="row" style="flex: 15">
         <q-img class="feed-icon" :src="imgRef" v-show="imgRef"/>
         <div class="column justify-start items-start">
-          <span class="text-title">{{ first }}</span>
-          <span class="text-url" v-show="second">{{ second }}</span>
+          <span class="text-title text-major-color">{{ first }}</span>
+          <span class="text-url text-minor-color" v-show="second">{{ second }}</span>
         </div>
       </div>
       <span class="text" style="margin-left:8px;flex: 12" v-show="!parent">{{ third }}</span>
@@ -229,7 +229,6 @@ function getLatestTime(list: Feed[]): string {
       max-width: 260px;
       line-height: 14px;
       margin-left: 10px;
-      color: #1A130F;
       white-space: nowrap;
       text-overflow: ellipsis;
       text-overflow: ellipsis;
@@ -238,7 +237,6 @@ function getLatestTime(list: Feed[]): string {
 
     .text-url {
       @extend .text-title;
-      color: #857C77;
       margin-top: 4px;
     }
   }
@@ -253,7 +251,6 @@ function getLatestTime(list: Feed[]): string {
       font-size: 12px;
       max-width: 400px;
       line-height: 14px;
-      color: #1A130F;
       white-space: nowrap;
       text-overflow: ellipsis;
       text-overflow: ellipsis;

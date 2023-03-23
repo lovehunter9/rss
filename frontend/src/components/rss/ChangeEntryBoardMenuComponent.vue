@@ -1,7 +1,7 @@
 <template>
   <q-menu :offset="[10, 8]" class="board-mark-menu">
     <q-list class="menu-list">
-      <q-item v-for="item in boardSelectStatusRef " class="menu-item-normal" dense :key="item.id"
+      <q-item v-for="item in boardSelectStatusRef " class="menu-item-normal menuItem bg-color-white" dense :key="item.id"
         @click="addToBoard(item.id)" clickable v-close-popup @mouseover="item.isHover = true"
         @mouseout="item.isHover = false">
         <q-item-section avatar>
@@ -9,14 +9,14 @@
             :src="item.selected ? require('../../assets/menu/bookmark.svg') : require('../../assets/menu/unbookmark.svg')"
             :width="16" :height="16" />
         </q-item-section>
-        <q-item-section class="menu-title">
+        <q-item-section class="menu-title text-major-color">
           {{ item.title }}
         </q-item-section>
         <q-item-section side v-if="item.selected || item.isHover">
           <img :src="getBoardStatusImg(item.isHover, item.selected)" :width="16" :height="16">
         </q-item-section>
       </q-item>
-      <q-item dense v-close-popup clickable @click="createBoard()" class="menu-item-normal">
+      <q-item dense v-close-popup clickable @click="createBoard()" class="menu-item-normal menuItem bg-color-white">
         <q-item-section avatar>
           <img src="../../assets/menu/add.svg" :width="16" :height="16" />
         </q-item-section>
@@ -136,12 +136,7 @@ async function createBoard() {
     min-width: 236px;
 
     .menu-item-normal {
-      background-color: white;
       height: 28px;
-
-      &:hover {
-        color: #FF8642;
-      }
     }
 
     .menu-title {
@@ -150,13 +145,12 @@ async function createBoard() {
       font-weight: 400;
       font-size: 12px;
       line-height: 12px;
-      color: #1A130F;
       margin-left: -30px;
     }
 
     .add-board-title {
       @extend .menu-title;
-      color: #FF8642;
+      color: $main-style;
     }
   }
 }

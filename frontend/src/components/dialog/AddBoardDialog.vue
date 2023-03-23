@@ -1,13 +1,13 @@
 <template>
   <q-dialog class="delete-root text-center" ref="dialogRef">
     <q-card class="q-dialog-plugin">
-      <div class="text-title">{{ dialogTitleRef }}</div>
+      <div class="text-title text-major-color">{{ dialogTitleRef }}</div>
 
       <div style="width: 100%;" class="column justify-start items-start">
-        <div class="edit-title">Title</div>
+        <div class="edit-title text-minor-color">Title</div>
         <edit-view class="edit-view" placeholder="Board Title" :text="titleRef" @input="onTitleChanged" />
 
-        <div class="edit-title">Description</div>
+        <div class="edit-title text-minor-color">Description</div>
         <q-input v-model="descRef" outlined standout type="textarea" class="message-input"
           placeholder="Describe this board, example: monitor AI industry trends, Discover, etc." />
       </div>
@@ -110,7 +110,6 @@ async function onConfirm() {
       font-weight: 400;
       font-size: 12px;
       line-height: 16px;
-      color: #857C77;
     }
 
     .edit-title {
@@ -137,7 +136,6 @@ async function onConfirm() {
         font-weight: 400;
         font-size: 12px;
         line-height: 12px;
-        color: #1a130f;
       }
     }
 
@@ -154,7 +152,6 @@ async function onConfirm() {
       font-size: 16px;
       line-height: 20px;
       text-align: center;
-      color: #1A130F;
     }
 
     .icon-close {
@@ -165,49 +162,8 @@ async function onConfirm() {
       width: 16px
     }
 
-    .btn-confirm {
-      text-transform: capitalize;
-      width: 92px;
-      height: 32px;
-      background: #FF8642;
-      border-radius: 6px;
-      margin-top: 50px;
-      font-family: 'Roboto';
-      font-style: normal;
-      font-weight: 500;
-      font-size: 14px;
-      line-height: 14px;
-      text-align: center;
-      color: #FFFFFF;
 
-      &::before {
-        box-shadow: none;
-      }
-    }
-
-    .btn-vc[disabled] {
-      background: #ececec;
-      color: #7a7a7a;
-    }
   }
-}
-
-.selected-item {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 12px;
-  color: #FF8642;
-}
-
-.normal-item {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 12px;
-  color: #1a130f;
 }
 
 .message-input {
