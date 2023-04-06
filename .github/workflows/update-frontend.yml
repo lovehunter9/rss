@@ -1,34 +1,41 @@
 name: Frontend
 
 on:
-    workflow_dispatch:
+  workflow_dispatch:
 
-    push:
-        branches:
-            - "main"
+  push:
+    branches:
+      - "main"
+    tags:
+      - "v*"
 
 jobs:
-    update_dockerhub:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Check out the repo
-              uses: actions/checkout@v3
+  update_dockerhub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
 
-            - name: Login to GitHub Container Registry
-              uses: docker/login-action@v1
-              with:
-                  registry: ghcr.io
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.GITHUB_TOKEN }}
-            - name: Setup Node
-              uses: actions/setup-node@v1
-              with:
-                node-version: "16.18"
-            - name: Install
-              run: npm i -g @quasar/cli
-            - name: Build
-              run: cd frontend/;yarn;quasar build
-            - name: Build the hello-docker Docker image
-              run: |
-                  docker build . -f Dockerfile.frontend --tag ghcr.io/above-os/rss-v1:latest
-                  docker push ghcr.io/above-os/rss-v1:latest
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: get latest tag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        id: get-latest-tag
+        with:
+          fallback: latest
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16.18"
+      - name: Install
+        run: npm i -g @quasar/cli
+      - name: Build
+        run: cd frontend/;yarn;quasar build
+      - name: Build the hello-docker Docker image
+        run: |
+          docker build . -f Dockerfile.frontend --tag ghcr.io/above-os/rss-v1:${{ steps.get-latest-tag.outputs.tag }}
+          docker push ghcr.io/above-os/rss-v1:${{ steps.get-latest-tag.outputs.tag }}
