@@ -141,6 +141,9 @@ type Options struct {
 	watchdog                           bool
 	invidiousInstance                  string
 	proxyPrivateKey                    []byte
+	osSystemServer                     string
+	osAppSecret                        string
+	osAppKey                           string
 }
 
 // NewOptions returns Options with default values.
@@ -507,6 +510,18 @@ func (o *Options) InvidiousInstance() string {
 // ProxyPrivateKey returns the private key used by the media proxy
 func (o *Options) ProxyPrivateKey() []byte {
 	return o.proxyPrivateKey
+}
+
+func (o *Options) OsSystemServer() string {
+	return o.osSystemServer
+}
+
+func (o *Options) OsAppSecret() string {
+	return o.osAppSecret
+}
+
+func (o *Options) OsAppKey() string {
+	return o.osAppKey
 }
 
 // SortedOptions returns options as a list of key value pairs, sorted by keys.

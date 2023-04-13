@@ -38,7 +38,8 @@ type Entry struct {
 	ReadingTime int           `json:"reading_time"`
 	Enclosures  EnclosureList `json:"enclosures"`
 	Feed        *Feed         `json:"feed,omitempty"`
-	BoardIDS    string     `json:"board_ids"`
+	BoardIDS    string        `json:"board_ids"`
+	DocId       string        `json:"doc_id"`
 }
 
 // Entries represents a list of entries.

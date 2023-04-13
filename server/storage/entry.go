@@ -585,8 +585,8 @@ func (s *Storage) EntryURLExistswZ(feedID int64, entryURL string) bool {
 func (s *Storage) EntryForFullContent(entryId int64) (*model.Entry, error) {
 	var entry model.Entry
 
-	query := `SELECT id, user_id, feed_id, url FROM entries WHERE id>$1 and  status <> $2 and full_content is null order by id limit 1`
-	err := s.db.QueryRow(query, entryId, model.EntryStatusRemoved).Scan(&entry.ID, &entry.UserID, &entry.FeedID, &entry.URL)
+	query := `SELECT id, user_id, feed_id, url,title,published_at FROM entries WHERE id>$1 and  status <> $2 and full_content is null order by id limit 1`
+	err := s.db.QueryRow(query, entryId, model.EntryStatusRemoved).Scan(&entry.ID, &entry.UserID, &entry.FeedID, &entry.URL, &entry.Title, &entry.Date)
 
 	switch {
 	case err == sql.ErrNoRows:
@@ -606,9 +606,9 @@ func (s *Storage) GetFullContent(entryId int64) string {
 
 }
 
-func (s *Storage) UpdateEntryFullContent(entryId int64, fullContent string) error {
-	query := `UPDATE entries SET full_content=$1 WHERE id=$2 `
-	_, err := s.db.Exec(query, fullContent, entryId)
+func (s *Storage) UpdateEntryFullContent(entryId int64, docId string, fullContent string) error {
+	query := `UPDATE entries SET full_content=$1,doc_id=$2 WHERE id=$3 `
+	_, err := s.db.Exec(query, fullContent, docId, entryId)
 	if err != nil {
 		return fmt.Errorf(`store: unable to update full content  %v: %v`, entryId, err)
 	}
@@ -633,4 +633,54 @@ func (s *Storage) ReadLater(userID int64, entryID int64) error {
 	}
 
 	return nil
+}
+
+func (s *Storage) GetEntryBaseInfoByFeed(feedId int64) (model.Entries, error) {
+
+	query := `SELECT id, doc_id FROM entries WHERE feed_id=$1 `
+	rows, err := s.db.Query(query, feedId)
+	if err != nil {
+		return nil, fmt.Errorf(`store: unable to fetch feeds: %w`, err)
+	}
+	defer rows.Close()
+
+	entries := make(model.Entries, 0)
+	for rows.Next() {
+		var entry model.Entry
+		err := rows.Scan(
+			&entry.ID,
+			&entry.DocId,
+		)
+		if err != nil {
+			return nil, fmt.Errorf(`store: unable to fetch feeds row: %w`, err)
+		}
+		entries = append(entries, &entry)
+	}
+
+	return entries, nil
+
+}
+
+func (s *Storage) GetEntryBaseInfoByIds(entryIDs []int64) (model.Entries, error) {
+
+	query := `SELECT id, doc_id FROM entries WHERE id=ANY($1) `
+	rows, err := s.db.Query(query, entryIDs)
+	if err != nil {
+		return nil, fmt.Errorf(`store: unable to fetch feeds: %w`, err)
+	}
+	defer rows.Close()
+
+	entries := make(model.Entries, 0)
+	for rows.Next() {
+		var entry model.Entry
+		err := rows.Scan(
+			&entry.ID,
+			&entry.DocId,
+		)
+		if err != nil {
+			return nil, fmt.Errorf(`store: unable to fetch feeds row: %w`, err)
+		}
+		entries = append(entries, &entry)
+	}
+	return entries, nil
 }

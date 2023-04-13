@@ -200,11 +200,18 @@ func (p *Parser) parseLines(lines []string) (err error) {
 			p.opts.watchdog = parseBool(value, defaultWatchdog)
 		case "INVIDIOUS_INSTANCE":
 			p.opts.invidiousInstance = parseString(value, defaultInvidiousInstance)
+		case "OS_SYSTEM_SERVER":
+			p.opts.osSystemServer = value
+		case "OS_APP_SECRET":
+			p.opts.osAppSecret = value
+		case "OS_APP_KEY":
+			p.opts.osAppKey = value
 		case "PROXY_PRIVATE_KEY":
 			randomKey := make([]byte, 16)
 			rand.Read(randomKey)
 			p.opts.proxyPrivateKey = parseBytes(value, randomKey)
 		}
+
 	}
 
 	if port != "" {

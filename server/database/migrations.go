@@ -670,4 +670,12 @@ var migrations = []func(tx *sql.Tx) error{
 		_, err = tx.Exec(sql)
 		return err
 	},
+
+	func(tx *sql.Tx) (err error) {
+		sql := `
+			ALTER TABLE entries ADD COLUMN doc_id text not null default '';
+		`
+		_, err = tx.Exec(sql)
+		return err
+	},
 }

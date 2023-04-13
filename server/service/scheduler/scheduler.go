@@ -12,6 +12,7 @@ import (
 	"miniflux.app/metric"
 	"miniflux.app/model"
 	"miniflux.app/reader/processor"
+	"miniflux.app/service/search"
 	"miniflux.app/storage"
 	"miniflux.app/worker"
 )
@@ -73,7 +74,31 @@ func fullContentScheduler(store *storage.Storage) {
 				logger.Error("[Scheduler:fullContentScheduler get webpage error %d]", fullContentCheckId)
 			}
 
-			store.UpdateEntryFullContent(entry.ID, entry.Content)
+			icon, _ := store.IconByID(feed.Icon.IconID)
+			var iconContent string
+
+			if icon != nil {
+				iconContent = string(icon.Content)
+			}
+			var feedNoList []search.FeedNotification
+			feedNotification := search.FeedNotification{
+				FeedId:   feed.ID,
+				FeedName: feed.Title,
+				FeedIcon: iconContent,
+			}
+			feedNoList = append(feedNoList, feedNotification)
+
+			var boardNoList []search.BoarderNotification
+			notificationData := search.NotificationData{
+				Name:      entry.Title,
+				EntryId:   entry.ID,
+				Created:   entry.Date.Unix(),
+				FeedInfos: feedNoList,
+				Boarders:  boardNoList,
+				Content:   entry.Content,
+			}
+			docId := search.IntputRSS(&notificationData)
+			store.UpdateEntryFullContent(entry.ID, docId, entry.Content)
 		}
 		logger.Info("fullContentScheduler ...")
 	}
