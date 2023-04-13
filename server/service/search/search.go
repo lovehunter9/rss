@@ -142,7 +142,7 @@ func getAccessToken(dataType, group string, ops []string) (string, error) {
 
 func IntputRSS(notificationData *NotificationData) string {
 
-	accessToken, err := getAccessToken("search", "service.notification", []string{"InputRSS"})
+	accessToken, err := getAccessToken("search", "service.search", []string{"InputRSS"})
 	if err != nil {
 		logger.Error("get access token failed: %+v", err)
 		return ""
@@ -201,7 +201,7 @@ func IntputRSS(notificationData *NotificationData) string {
 }
 
 func DeleteRSS(entries model.Entries) {
-	accessToken, err := getAccessToken("search", "service.notification", []string{"DeleteRSS"})
+	accessToken, err := getAccessToken("search", "service.search", []string{"DeleteRSS"})
 	if err != nil {
 		logger.Error("get access token failed: %+v", err)
 		return
