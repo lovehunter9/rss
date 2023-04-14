@@ -74,17 +74,17 @@ func fullContentScheduler(store *storage.Storage) {
 				logger.Error("[Scheduler:fullContentScheduler get webpage error %d]", fullContentCheckId)
 			}
 
-			icon, _ := store.IconByID(feed.Icon.IconID)
-			var iconContent string
+			//icon, _ := store.IconByID(feed.Icon.IconID)
+			//var iconContent string
 
-			if icon != nil {
-				iconContent = icon.DataURL()
-			}
+			//if icon != nil {
+			//	iconContent = icon.DataURL()
+			//}
 			var feedNoList []search.FeedNotification
 			feedNotification := search.FeedNotification{
 				FeedId:   feed.ID,
 				FeedName: feed.Title,
-				FeedIcon: iconContent,
+				FeedIcon: "",
 			}
 			feedNoList = append(feedNoList, feedNotification)
 
