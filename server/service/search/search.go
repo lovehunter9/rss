@@ -126,6 +126,7 @@ func getAccessToken(dataType, group string, ops []string) (string, error) {
 	}
 	defer resp.Body.Close()
 
+	logger.Info("resp body: %+v", resp.Body)
 	var r SystemServerResponse
 	err = json.NewDecoder(resp.Body).Decode(&r)
 	if err != nil {
