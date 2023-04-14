@@ -78,7 +78,7 @@ func fullContentScheduler(store *storage.Storage) {
 			var iconContent string
 
 			if icon != nil {
-				iconContent = string(icon.Content)
+				iconContent = icon.DataURL()
 			}
 			var feedNoList []search.FeedNotification
 			feedNotification := search.FeedNotification{
