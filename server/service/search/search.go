@@ -248,7 +248,7 @@ func DeleteRSS(entries model.Entries) {
 			logger.Error("client: could not create request: %s\n", err)
 			return
 		}
-		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Content-Type", "multipart/form-data")
 		req.Header.Set("Access-Control-Allow-Origin", "*")
 		req.Header.Set("Access-Control-Allow-Headers", "X-Requested-With,Content-Type")
 		req.Header.Set("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS")
