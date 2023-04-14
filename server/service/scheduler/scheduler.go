@@ -89,6 +89,11 @@ func fullContentScheduler(store *storage.Storage) {
 			feedNoList = append(feedNoList, feedNotification)
 
 			var boardNoList []search.BoarderNotification
+			boardNotification := search.BoarderNotification{
+				Id:   1,
+				Name: "ALL",
+			}
+			boardNoList = append(boardNoList, boardNotification)
 			notificationData := search.NotificationData{
 				Name:      entry.Title,
 				EntryId:   entry.ID,
