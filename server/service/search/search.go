@@ -7,8 +7,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
-	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -195,12 +195,6 @@ func IntputRSS(notificationData *NotificationData) string {
 	}
 	defer resp.Body.Close()
 
-	/*	body2, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-		logger.Info("resp body2: %+v", string(body2))*/
-
 	var r MessageNotificationResponse
 	err = json.NewDecoder(resp.Body).Decode(&r)
 	if err != nil {
@@ -228,13 +222,20 @@ func DeleteRSS(entries model.Entries) {
 	logger.Info(requestUrl)
 	for _, entry := range entries {
 
-		req, err := http.NewRequest("POST", requestUrl, strings.NewReader("docId="+entry.DocId))
+		formValues := url.Values{}
+		formValues.Set("docId", entry.DocId)
+		formDataStr := formValues.Encode()
+		formDataBytes := []byte(formDataStr)
+		formBytesReader := bytes.NewReader(formDataBytes)
 
+		//req, err := http.NewRequest("POST", requestUrl, strings.NewReader("docId="+entry.DocId))
+		req, err := http.NewRequest("POST", requestUrl, formBytesReader)
+		logger.Info("request deleteRss docId:%s", entry.DocId)
 		if err != nil {
 			logger.Error("client: could not create request: %s\n", err)
 			return
 		}
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		req.Header.Set("Content-Type", "multipart/form-data")
 		req.Header.Set("Access-Control-Allow-Origin", "*")
 		req.Header.Set("Access-Control-Allow-Headers", "X-Requested-With,Content-Type")
 		req.Header.Set("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS")
@@ -250,7 +251,7 @@ func DeleteRSS(entries model.Entries) {
 			return
 		}
 		defer resp.Body.Close()
-		logger.Info("%+v", resp)
+		logger.Info("delete rss resp:%+v", resp)
 
 		body2, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
