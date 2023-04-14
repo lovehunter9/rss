@@ -37,9 +37,15 @@ type NotificationData struct {
 	Content   string                `json:"content"`
 }
 
-type MessageNotificationResponse struct {
+type MessageDataResponse struct {
 	Code int    `json:"code"`
 	Data string `json:"data"`
+}
+
+type MessageNotificationResponse struct {
+	Code    int                 `json:"code"`
+	Message string              `json:"message,omitempty"`
+	Data    MessageDataResponse `json:"data"`
 }
 
 type AccessTokenPostRequest struct {
@@ -207,7 +213,7 @@ func IntputRSS(notificationData *NotificationData) string {
 		return ""
 	}
 
-	return r.Data
+	return r.Data.Data
 
 }
 
