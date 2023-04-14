@@ -133,7 +133,7 @@ func getAccessToken(dataType, group string, ops []string) (string, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	logger.Info("resp body2: %+v", body2)
+	logger.Info("resp body2: %+v", string(body2))
 	var r SystemServerResponse
 	err = json.NewDecoder(resp.Body).Decode(&r)
 	if err != nil {
