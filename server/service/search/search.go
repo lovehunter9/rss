@@ -156,6 +156,7 @@ func IntputRSS(notificationData *NotificationData) string {
 	if err != nil {
 		return ""
 	}
+	logger.Info("request bodys:%s", string(requestBytes))
 	bodyReader := bytes.NewReader(requestBytes)
 	requestUrl := "http://" + config.Opts.OsSystemServer() + "/system-server/v1alpha1/search/service.search/v1/InputRSS"
 	logger.Info(requestUrl)
