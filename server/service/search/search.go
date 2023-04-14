@@ -195,11 +195,11 @@ func IntputRSS(notificationData *NotificationData) string {
 	}
 	defer resp.Body.Close()
 
-	body2, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	logger.Info("resp body2: %+v", string(body2))
+	/*	body2, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		logger.Info("resp body2: %+v", string(body2))*/
 
 	var r MessageNotificationResponse
 	err = json.NewDecoder(resp.Body).Decode(&r)
