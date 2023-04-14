@@ -157,7 +157,7 @@ func IntputRSS(notificationData *NotificationData) string {
 		return ""
 	}
 	bodyReader := bytes.NewReader(requestBytes)
-	requestUrl := "http://" + config.Opts.OsSystemServer() + "/system-server/v1alpha1/message/service.notification/v1"
+	requestUrl := "http://" + config.Opts.OsSystemServer() + "/system-server/v1alpha1/search/service.search/v1/InputRSS"
 	logger.Info(requestUrl)
 	req, err := http.NewRequest(http.MethodPost, requestUrl, bodyReader)
 
@@ -217,7 +217,7 @@ func DeleteRSS(entries model.Entries) {
 		return
 	}
 
-	requestUrl := "http://" + config.Opts.OsSystemServer() + "/system-server/v1alpha1/message/service.notification/v1"
+	requestUrl := "http://" + config.Opts.OsSystemServer() + "/system-server/v1alpha1/search/service.search/v1/DeleteRSS"
 	logger.Info(requestUrl)
 	for _, entry := range entries {
 
@@ -244,6 +244,12 @@ func DeleteRSS(entries model.Entries) {
 		}
 		defer resp.Body.Close()
 		logger.Info("%+v", resp)
+
+		body2, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		logger.Info("resp body2: %+v", string(body2))
 	}
 
 }
