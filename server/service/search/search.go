@@ -129,11 +129,7 @@ func getAccessToken(dataType, group string, ops []string) (string, error) {
 	defer resp.Body.Close()
 
 	logger.Info("resp body: %+v", resp.Body)
-	body2, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	logger.Info("resp body2: %+v", string(body2))
+
 	var r SystemServerResponse
 	err = json.NewDecoder(resp.Body).Decode(&r)
 	if err != nil {
@@ -191,6 +187,12 @@ func IntputRSS(notificationData *NotificationData) string {
 		return ""
 	}
 	defer resp.Body.Close()
+
+	body2, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	logger.Info("resp body2: %+v", string(body2))
 
 	var r MessageNotificationResponse
 	err = json.NewDecoder(resp.Body).Decode(&r)
