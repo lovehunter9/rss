@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -211,6 +210,10 @@ func IntputRSS(notificationData *NotificationData) string {
 
 }
 
+type DelRssReqStru struct {
+	DocId string `json:"docId"`
+}
+
 func DeleteRSS(entries model.Entries) {
 	accessToken, err := getAccessToken("search", "service.search", []string{"DeleteRSS"})
 	if err != nil {
@@ -224,20 +227,28 @@ func DeleteRSS(entries model.Entries) {
 		if entry.DocId == "" {
 			continue
 		}
+
+		reqStr := DelRssReqStru{
+			DocId: entry.DocId,
+		}
+
+		requestBytes, _ := json.Marshal(reqStr)
+		bodyReader := bytes.NewReader(requestBytes)
 		/*formValues := url.Values{}
 		formValues.Set("docId", entry.DocId)
 		formDataStr := formValues.Encode()
 		formDataBytes := []byte(formDataStr)
-		formBytesReader := bytes.NewReader(formDataBytes)
+		formBytesReader := bytes.NewReader(formDataBytes)*/
 
-		//req, err := http.NewRequest("POST", requestUrl, formBytesReader)*/
-		req, err := http.NewRequest("POST", requestUrl, strings.NewReader("docId="+entry.DocId))
+		//req, err := http.NewRequest("POST", requestUrl, formValues.Encode())
+		//req, err := http.NewRequest("POST", requestUrl, strings.NewReader("docId="+entry.DocId))
+		req, err := http.NewRequest("POST", requestUrl, bodyReader)
 		logger.Info("request deleteRss docId:%s", entry.DocId)
 		if err != nil {
 			logger.Error("client: could not create request: %s\n", err)
 			return
 		}
-		req.Header.Set("Content-Type", "multipart/form-data")
+		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Access-Control-Allow-Origin", "*")
 		req.Header.Set("Access-Control-Allow-Headers", "X-Requested-With,Content-Type")
 		req.Header.Set("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS")
