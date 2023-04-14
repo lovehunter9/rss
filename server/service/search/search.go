@@ -233,22 +233,17 @@ func DeleteRSS(entries model.Entries) {
 		}
 
 		requestBytes, _ := json.Marshal(reqStr)
-		bodyReader := bytes.NewReader(requestBytes)
-		/*formValues := url.Values{}
-		formValues.Set("docId", entry.DocId)
-		formDataStr := formValues.Encode()
-		formDataBytes := []byte(formDataStr)
-		formBytesReader := bytes.NewReader(formDataBytes)*/
+		logger.Info("request bodys:%s", string(requestBytes))
 
-		//req, err := http.NewRequest("POST", requestUrl, formValues.Encode())
-		//req, err := http.NewRequest("POST", requestUrl, strings.NewReader("docId="+entry.DocId))
+		bodyReader := bytes.NewReader(requestBytes)
+
 		req, err := http.NewRequest("POST", requestUrl, bodyReader)
 		logger.Info("request deleteRss docId:%s", entry.DocId)
 		if err != nil {
 			logger.Error("client: could not create request: %s\n", err)
 			return
 		}
-		req.Header.Set("Content-Type", "multipart/form-data")
+		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Access-Control-Allow-Origin", "*")
 		req.Header.Set("Access-Control-Allow-Headers", "X-Requested-With,Content-Type")
 		req.Header.Set("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS")
