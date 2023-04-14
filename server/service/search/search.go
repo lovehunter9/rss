@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -127,6 +129,11 @@ func getAccessToken(dataType, group string, ops []string) (string, error) {
 	defer resp.Body.Close()
 
 	logger.Info("resp body: %+v", resp.Body)
+	body2, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	logger.Info("resp body2: %+v", body2)
 	var r SystemServerResponse
 	err = json.NewDecoder(resp.Body).Decode(&r)
 	if err != nil {
