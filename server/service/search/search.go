@@ -7,8 +7,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -221,15 +221,17 @@ func DeleteRSS(entries model.Entries) {
 	requestUrl := "http://" + config.Opts.OsSystemServer() + "/system-server/v1alpha1/search/service.search/v1/DeleteRSS"
 	logger.Info(requestUrl)
 	for _, entry := range entries {
-
-		formValues := url.Values{}
+		if entry.DocId == "" {
+			continue
+		}
+		/*formValues := url.Values{}
 		formValues.Set("docId", entry.DocId)
 		formDataStr := formValues.Encode()
 		formDataBytes := []byte(formDataStr)
 		formBytesReader := bytes.NewReader(formDataBytes)
 
-		//req, err := http.NewRequest("POST", requestUrl, strings.NewReader("docId="+entry.DocId))
-		req, err := http.NewRequest("POST", requestUrl, formBytesReader)
+		//req, err := http.NewRequest("POST", requestUrl, formBytesReader)*/
+		req, err := http.NewRequest("POST", requestUrl, strings.NewReader("docId="+entry.DocId))
 		logger.Info("request deleteRss docId:%s", entry.DocId)
 		if err != nil {
 			logger.Error("client: could not create request: %s\n", err)
