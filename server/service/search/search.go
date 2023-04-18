@@ -32,7 +32,7 @@ type NotificationData struct {
 	EntryId   int64                 `json:"entry_id"`
 	Created   int64                 `json:"created"`
 	FeedInfos []FeedNotification    `json:"feed_infos"`
-	Boarders  []BoarderNotification `json:"boards"`
+	Boarders  []BoarderNotification `json:"borders"`
 	Content   string                `json:"content"`
 }
 
