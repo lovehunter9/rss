@@ -276,3 +276,58 @@ func DeleteRSS(entries model.Entries) {
 	}
 
 }
+
+type QueryRssReqStru struct {
+	Query string `json:"query"`
+	Limit int    `json:"limit"`
+}
+
+func QueryRSS(query string) string {
+	accessToken, err := getAccessToken("search", "service.search", []string{"QueryRSS"})
+	if err != nil {
+		logger.Error("get access token failed: %+v", err)
+		return ""
+	}
+
+	requestUrl := "http://" + config.Opts.OsSystemServer() + "/system-server/v1alpha1/search/service.search/v1/QueryRSS"
+	logger.Info(requestUrl)
+
+	reqStr := QueryRssReqStru{
+		Query: query,
+		Limit: 10,
+	}
+
+	requestBytes, _ := json.Marshal(reqStr)
+	logger.Info("query Rss request bodys:%s", string(requestBytes))
+
+	bodyReader := bytes.NewReader(requestBytes)
+	req, err := http.NewRequest("POST", requestUrl, bodyReader)
+	if err != nil {
+		logger.Error("client: could not create request: %s\n", err)
+		return ""
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Access-Control-Allow-Origin", "*")
+	req.Header.Set("Access-Control-Allow-Headers", "X-Requested-With,Content-Type")
+	req.Header.Set("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS")
+	req.Header.Set("X-Access-Token", accessToken)
+
+	client := http.Client{
+		Timeout: 3 * time.Second,
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		logger.Error("client: error making http request: %s\n", err)
+		return ""
+	}
+	defer resp.Body.Close()
+	logger.Info("query rss resp:%+v", resp)
+
+	body2, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return string(body2)
+
+}

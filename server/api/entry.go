@@ -431,3 +431,13 @@ func (h *handler) getBoardEntries(w http.ResponseWriter, r *http.Request) {
 
 	json.OK(w, r, &entriesResponse{Total: count, Entries: entries})
 }
+
+func (h *handler) queryTest(w http.ResponseWriter, r *http.Request) {
+	queryData := request.QueryStringParam(r, "query", "")
+	result := ""
+	if queryData != "" {
+		result = search.QueryRSS(queryData)
+	}
+
+	json.OK(w, r, result)
+}
