@@ -13,6 +13,7 @@ import (
 	"miniflux.app/http/response/json"
 	"miniflux.app/model"
 	feedHandler "miniflux.app/reader/handler"
+	"miniflux.app/service/search"
 	"miniflux.app/validator"
 )
 
@@ -225,6 +226,9 @@ func (h *handler) removeFeed(w http.ResponseWriter, r *http.Request) {
 		json.NotFound(w, r)
 		return
 	}
+
+	entries, _ := h.store.GetEntryBaseInfoByFeed(feedID)
+	search.DeleteRSS(entries)
 
 	if err := h.store.RemoveFeed(userID, feedID); err != nil {
 		json.ServerError(w, r, err)

@@ -88,4 +88,6 @@ func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
 	sr.HandleFunc("/boards/{boardID}/entries", handler.getBoardEntries).Methods(http.MethodGet)
 	sr.HandleFunc("/entries/{entryID}/readlater", handler.readlater).Methods(http.MethodPut)
 	sr.HandleFunc("/readlater", handler.getReadLaterEntries).Methods(http.MethodGet)
+
+	sr.HandleFunc("/searchTest", handler.queryTest).Methods(http.MethodGet)
 }

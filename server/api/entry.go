@@ -18,6 +18,7 @@ import (
 	"miniflux.app/model"
 	"miniflux.app/proxy"
 	"miniflux.app/reader/processor"
+	"miniflux.app/service/search"
 	"miniflux.app/storage"
 	"miniflux.app/url"
 	"miniflux.app/validator"
@@ -187,6 +188,12 @@ func (h *handler) setEntryStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if entriesStatusUpdateRequest.Status == model.EntryStatusRemoved {
+		entries, _ := h.store.GetEntryBaseInfoByIds(entriesStatusUpdateRequest.EntryIDs)
+		search.DeleteRSS(entries)
+
+	}
+
 	json.NoContent(w, r)
 }
 
@@ -253,7 +260,7 @@ func (h *handler) fetchContent(w http.ResponseWriter, r *http.Request) {
 		json.ServerError(w, r, err)
 		return
 	}
-	h.store.UpdateEntryFullContent(entryID, entry.Content)
+	h.store.UpdateEntryFullContent(entryID, entry.DocId, entry.Content)
 	json.OK(w, r, map[string]string{"content": entry.Content})
 }
 
@@ -423,4 +430,14 @@ func (h *handler) getBoardEntries(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.OK(w, r, &entriesResponse{Total: count, Entries: entries})
+}
+
+func (h *handler) queryTest(w http.ResponseWriter, r *http.Request) {
+	queryData := request.QueryStringParam(r, "query", "")
+	result := ""
+	if queryData != "" {
+		result = search.QueryRSS(queryData)
+	}
+
+	json.OK(w, r, result)
 }
