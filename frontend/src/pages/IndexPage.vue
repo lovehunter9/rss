@@ -257,6 +257,9 @@ const loadMoreEnable = ref(true)
 
 
 const requestEntries = async (hasMore = false) => {
+  if (store.menu_choice.type === MenuType.Search || store.menu_choice.type === MenuType.Trend) {
+    return
+  }
   if (store.menu_choice.type === MenuType.Today || store.menu_choice.type === MenuType.ReadLater || store.menu_choice.type === MenuType.Board) {
     if (store.menu_choice.type === MenuType.Today) {
       return

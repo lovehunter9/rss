@@ -56,15 +56,17 @@
           <div class="row justify-between items-center folderInfo" @click="goFolderSetting">
             <span class="folder text-minor-color">Folder</span>
             <q-img style="width: 16px;height: 16px"
-              :src="isFolderManager ? formatLocalImage('setting','/menu',undefined,true) : formatLocalImage('setting','/menu',undefined,false,true)" />
+              :src="formatLocalImage('setting','/menu',undefined,isFolderManager)" />
           </div>
 
           <q-item class="item" dense v-for="(category, index) in store.categories" :key="'ct' + index"
-            style="padding: 0;">
-            <q-expansion-item dense switchToggleSide :disable="category.feeds.length === 0" :defaultOpened="index === 0 && category.feeds.length > 0">
+            style="padding: 0;padding-left: 5px;width: calc(100%-10px);">
+            <q-expansion-item dense switchToggleSide :disable="category.feeds.length === 0" :defaultOpened="index === 0 &&
+            category.feeds.length > 0">
               <template v-slot:header>
                 <q-item class="menuItem"
-                  :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && category.feeds.find(e => e.id === store.menu_choice.value) !== undefined"
+                  :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed &&
+                  category.feeds.find(e => e.id === store.menu_choice.value) !== undefined"
                   active-class="item-active-color" dense
                   :class="category.feeds.length > 0 ? 'folder-extension-margin-left' : 'folder-extension-margin-none'"
                   @click="changeItemMenu(MenuType.Category, category.id)">
@@ -80,7 +82,8 @@
               </template>
               <q-item dense class="menuItem feed-select-item" clickable v-for="(feed, fi) in category.feeds"
                 :key="'ft' + fi" @click="changeItemMenu(MenuType.Feed, feed.id)"
-                :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed && store.menu_choice.value === feed.id"
+                :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed &&
+                store.menu_choice.value === feed.id"
                 active-class="item-active-color">
                 <q-item-section avatar>
                   <!-- <q-icon :name="formatIconName(MenuType.Discover)" size="14px"></q-icon> -->
@@ -101,7 +104,7 @@
 
           <layout-left-item-menu :menu-type="MenuType.CreateNewFolder" :show-un-read-count="false" :dense="true"
             @item-on-click="addFolder()" :smallFontSize="true"/>
-          <div class="row justify-between items-center folderInfo">
+          <div class="row justify-between items-center folderInfo" style="margin-top:20px;">
             <span class="folder text-minor-color">Boards</span>
           </div>
 
@@ -109,7 +112,8 @@
 
           <layout-left-item-menu v-for="item in store.boards" :key="item.id + item.title" :menu-type="MenuType.Board"
             :menu-value="item.id" :title="item.title" image-name="board" :show-un-read-count="false"
-            @item-on-click="changeItemMenu(MenuType.Board, item.id)" @click.right="showContextMenu($event,item.id)" :smallFontSize="true"/>
+            @item-on-click="changeItemMenu(MenuType.Board, item.id)"
+            @click.right="showContextMenu($event,item.id)" :smallFontSize="true"/>
           <layout-left-item-menu :menu-type="MenuType.CreateNewBoard" :show-un-read-count="false" :dense="true" :smallFontSize="true"
             @item-on-click="addBoard()" />
 
@@ -621,10 +625,10 @@ export default defineComponent({
 
 .folderInfo {
   height: 36px;
-  margin-left: 8px;
+  margin-left: 12px;
   margin-right: 8px;
   padding-left: 8px;
-  padding-right: 8px;
+  padding-right: 16px;
 
   .folder {
     font-family: 'Roboto';
@@ -645,13 +649,13 @@ export default defineComponent({
 
 .folder-extension-margin-left {
   margin-left: -25px;
-  width: 228px;
+  width: 223px;
   height: 36px;
   padding: 0;
 }
 
 .folder-extension-margin-none {
-  width: 260px;
+  width: 255px;
   height: 36px;
   padding: 0;
   // background-color: red;
@@ -659,7 +663,7 @@ export default defineComponent({
 
 .feed-select-item {
   margin-left: 10px;
-  width: 280px;
+  width: 275px;
   // margin-top: 10px;
   // margin-bottom: 10px;
   // height: 36px;
