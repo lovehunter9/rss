@@ -678,4 +678,68 @@ var migrations = []func(tx *sql.Tx) error{
 		_, err = tx.Exec(sql)
 		return err
 	},
+	func(tx *sql.Tx) (err error) {
+		sql := `
+			ALTER TABLE feeds ADD COLUMN is_recommend bool default 'f';
+			CREATE TABLE recommend (
+				id serial not null,
+				batch int not null,
+				fetch_at timestamp with time zone default now(),
+				num int not null,
+				primary key (id)
+			);
+			CREATE TABLE recommend_entries (
+				id serial not null,
+				feed_id int not null,
+				created_at timestamp with time zone default now(),
+				published_at timestamp with time zone default now(),
+				title text default '',
+				author text default '',
+				url text default '',
+				content text default '',
+				full_content text default '',
+				hash text ,
+				primary key (id)
+			);
+			CREATE TABLE recommend_feed (
+				id serial not null,
+				title text default '',
+				feed_url text default '',
+				site_url text default '',
+				icon_type text default '',
+				icon_content bytea default '',
+				category_id int not null,
+				category_title text default '',
+				primary key (id)
+			);
+			CREATE TABLE recommend_result (
+				id serial not null,
+				batch int not null,
+				entry_id int not null,
+				score int not null,
+				rank int not null,
+				primary key (id)
+			);
+			CREATE TABLE stat_entry_read (
+				id serial not null,
+				batch int not null,
+				entry_id int not null,
+				rank int not null,
+				read_complete bool default 'f',
+				readlater_tag bool default 'f',
+				board_tag bool default 'f',
+				click_num int not null default 1,
+				primary key (id)
+			);
+			CREATE TABLE stat_active (
+				id serial not null,
+				day text not null,
+				hour int not null,
+				count int not null,
+				primary key (id)
+			);
+		`
+		_, err = tx.Exec(sql)
+		return err
+	},
 }

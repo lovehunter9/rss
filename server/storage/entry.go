@@ -103,6 +103,65 @@ func (s *Storage) UpdateEntryContent(entry *model.Entry) error {
 	return tx.Commit()
 }
 
+// CreateFeed creates a new feed.
+func (s *Storage) CreateEntrySingle(entry *model.Entry) error {
+	sql := `
+		INSERT INTO entries
+			(
+				title,
+				hash,
+				url,
+				comments_url,
+				published_at,
+				content,
+				author,
+				user_id,
+				feed_id,
+				reading_time,
+				changed_at,
+				full_content,
+				readlater_tag
+			)
+		VALUES
+			(
+				$1,
+				$2,
+				$3,
+				$4,
+				$5,
+				$6,
+				$7,
+				$8,
+				$9,
+				$10,
+				now(),
+				$11,
+				$12
+			)
+		RETURNING
+			id
+	`
+	err := s.db.QueryRow(
+		sql,
+		entry.Title,
+		entry.Hash,
+		entry.URL,
+		entry.CommentsURL,
+		entry.Date,
+		entry.Content,
+		entry.Author,
+		entry.UserID,
+		entry.FeedID,
+		entry.ReadingTime,
+		entry.FullContent,
+		entry.ReadLater,
+	).Scan(&entry.ID)
+	if err != nil {
+		return fmt.Errorf(`store: unable to create entry  %v`, err)
+	}
+	return nil
+}
+
 // createEntry add a new entry.
 func (s *Storage) createEntry(tx *sql.Tx, entry *model.Entry) error {
 	query := `
@@ -537,6 +596,13 @@ func (s *Storage) MarkTodayAsRead(userID int64, after time.Time) error {
 func (s *Storage) EntryURLExists(feedID int64, entryURL string) bool {
 	var result bool
 	query := `SELECT true FROM entries WHERE feed_id=$1 AND url=$2`
+	s.db.QueryRow(query, feedID, entryURL).Scan(&result)
+	return result
+}
+
+func (s *Storage) GetEntryIDByURL(feedID int64, entryURL string) int64 {
+	var result int64
+	query := `SELECT id FROM entries WHERE feed_id=$1 AND url=$2`
 	s.db.QueryRow(query, feedID, entryURL).Scan(&result)
 	return result
 }

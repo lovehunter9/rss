@@ -10,6 +10,7 @@ sdk/logs
 sdk/node_modules
 .vscode
 sserver/miniflux
+recommend/model
 
 
 

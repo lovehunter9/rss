@@ -50,6 +50,13 @@ func (s *Storage) FeedURLExists(userID int64, feedURL string) bool {
 	return result
 }
 
+func (s *Storage) FeedIDByURL(userID int64, feedURL string) int64 {
+	var result int64
+	query := `SELECT id FROM feeds WHERE user_id=$1 AND feed_url=$2`
+	s.db.QueryRow(query, userID, feedURL).Scan(&result)
+	return result
+}
+
 // AnotherFeedURLExists checks if the user a duplicated feed.
 func (s *Storage) AnotherFeedURLExists(userID, feedID int64, feedURL string) bool {
 	var result bool

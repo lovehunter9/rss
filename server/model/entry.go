@@ -40,6 +40,7 @@ type Entry struct {
 	Feed        *Feed         `json:"feed,omitempty"`
 	BoardIDS    string        `json:"board_ids"`
 	DocId       string        `json:"doc_id"`
+	FullContent string        `json:"full_content"`
 }
 
 // Entries represents a list of entries.
