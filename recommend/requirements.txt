@@ -3,3 +3,6 @@ gensim==4.3.1
 protobuf==4.21.8
 nltk==3.8.1
 boto3
+peewee
+peewee-db-evolve
+psycopg2-binary

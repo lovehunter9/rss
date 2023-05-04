@@ -11,6 +11,7 @@ sdk/node_modules
 .vscode
 sserver/miniflux
 recommend/model
+**/__pycache__/
 
 
 

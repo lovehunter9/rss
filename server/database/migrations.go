@@ -699,6 +699,7 @@ var migrations = []func(tx *sql.Tx) error{
 				content text default '',
 				full_content text default '',
 				hash text ,
+				embedding numeric(15,12)[],
 				primary key (id)
 			);
 			CREATE TABLE recommend_feed (

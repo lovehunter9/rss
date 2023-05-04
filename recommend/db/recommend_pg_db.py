@@ -2,47 +2,101 @@ import logging
 import os
 from peewee import *
 from playhouse.pool import PooledPostgresqlDatabase
+from playhouse.postgres_ext import *
 
 from common_util.common_tool import CommonTool
-from embedding.embedding_enum import EmbeddingStatus
 
 current_logger = CommonTool().get_logger()
 peewee_logger = logging.getLogger('peewee')
 peewee_logger.addHandler(logging.StreamHandler())
 
-def read_recommend_db_config():
-    current_common_tool = CommonTool()
-    current_logger.debug("project_root {project_root}".format(project_root=current_common_tool.get_project_directory()))
-    recommend_pg_db_path = os.path.join(os.path.join(current_common_tool.get_project_directory(),'resources'), 'recommend_pg_db.json')
-    recommend_pg_db_config = current_common_tool.read_json(recommend_pg_db_path)
-    return recommend_pg_db_config
+dbhost = os.environ.get('dbhost', '124.222.40.95')
+dbuser = os.environ.get('dbuser', 'postgres')
+dbpassword = os.environ.get('dbpassword', 'liujx123')
+database = os.environ.get('database', 'miniflux2')
+RECOMMEND_PG_DB = PooledPostgresqlDatabase(database=database,
+                                           user=dbuser,
+                                           password=dbpassword,
+                                           host=dbhost,
+                                           stale_timeout=300,
+                                           max_connections=100)
 
-
-pg_config = read_recommend_db_config()
-RECOMMEND_PG_DB = PooledPostgresqlDatabase(database=pg_config['database'],user=pg_config["user"],password=pg_config["password"],host=pg_config["host"],stale_timeout=300,max_connections=100)
 
 class RecommendPGBaseModel(Model):
+
     class Meta:
         database = RECOMMEND_PG_DB
 
 
-class EntryModel(RecommendPGBaseModel):
-    id = BigIntegerField(null=False,unique=True,index=True)
+class EntriesModel(RecommendPGBaseModel):
+    id = BigIntegerField(null=False, unique=True, index=True)
+    status = TextField(null=True)
     full_content = TextField(null=True)
-    url = TextField(null=True)
-    created_at = DateTimeField(null=False,index=True)
-    published_at = DateTimeField(null=False,index=True)
+    created_at = DateTimeField(null=False, index=True)
+    published_at = DateTimeField(null=False, index=True)
+    model_name = TextField(null=True)
+    model_version = TextField(null=True)
+    embedding = ArrayField(DecimalField, null=False)
+
     class Meta:
         db_table = 'entries'
         primary_key = False
-  
-class EntryEmbeddingModel(RecommendPGBaseModel):
-    entry_id = BigIntegerField(unique=True,null=False,index=True)
-    article_clean = IntegerField(null=True,default=int(EmbeddingStatus.UNPROCESSED))
-    word2vec_google_embedding = IntegerField(null=True,default=int(EmbeddingStatus.UNPROCESSED))
-    bert_embedding = IntegerField(null=True,default=int(EmbeddingStatus.UNPROCESSED))
-    doc2vec_embedding = IntegerField(null=True,default=int(EmbeddingStatus.UNPROCESSED))
+
+
+class RecommendModel(RecommendPGBaseModel):
+    id = BigIntegerField(null=False, unique=True, index=True)
+    batch = IntegerField(null=False)
+    fetch_at = DateTimeField(null=False, index=True)
+    num = IntegerField(null=False, index=True)
+
     class Meta:
-        db_table = 'entries_embedding'
+        db_table = 'recommend'
         primary_key = False
 
+
+class RecommendEntriesModel(RecommendPGBaseModel):
+    id = BigIntegerField(null=False, unique=True, index=True)
+    feed_id = BigIntegerField(null=False)
+    created_at = DateTimeField(null=False, index=True)
+    published_at = DateTimeField(null=False, index=True)
+    hash = TextField(null=True)
+    title = TextField(null=True)
+    author = TextField(null=True)
+    url = TextField(null=True)
+    content = TextField(null=True)
+    full_content = TextField(null=True)
+    model_name = TextField(null=True)
+    model_version = TextField(null=True)
+    embedding = ArrayField(DecimalField, null=False)
+
+    class Meta:
+        db_table = 'recommend_entries'
+        primary_key = False
+
+
+class RecommendFeedModel(RecommendPGBaseModel):
+    id = BigIntegerField(null=False, unique=True, index=True)
+    title = TextField(null=True)
+    feed_url = TextField(null=True)
+    site_url = TextField(null=True)
+    icon_type = TextField(null=True)
+    icon_content = BlobField(null=True)
+    category_id = BigIntegerField(null=True)
+    category_title = TextField(null=True)
+
+    class Meta:
+        db_table = 'recommend_feed'
+        primary_key = False
+
+
+class RecommendResultModel(RecommendPGBaseModel):
+    id = BigIntegerField(null=False, unique=True, index=True)
+    batch = IntegerField(null=True)
+    url = BigIntegerField(null=True)
+    entry_id = DateTimeField(null=False, index=True)
+    score = IntegerField(null=True)
+    rank = IntegerField(null=True)
+
+    class Meta:
+        db_table = 'recommend_result'
+        primary_key = False
