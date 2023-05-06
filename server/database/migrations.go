@@ -681,6 +681,8 @@ var migrations = []func(tx *sql.Tx) error{
 	func(tx *sql.Tx) (err error) {
 		sql := `
 			ALTER TABLE feeds ADD COLUMN is_recommend bool default 'f';
+			ALTER TABLE users ADD COLUMN model_name text default 'word2vec_google';
+			ALTER TABLE users ADD COLUMN model_version text default 'v1';
 			CREATE TABLE recommend (
 				id serial not null,
 				batch int not null,
@@ -699,6 +701,21 @@ var migrations = []func(tx *sql.Tx) error{
 				content text default '',
 				full_content text default '',
 				hash text ,
+				primary key (id)
+			);
+			CREATE TABLE recommend_entries_embedding (
+				id serial not null,
+				url text default '',
+				model_name text not null,
+				model_version text not null,
+				embedding numeric(15,12)[],
+				primary key (id)
+			);
+			CREATE TABLE entries_embedding (
+				id serial not null,
+				entry_id int not null,
+				model_name text not null,
+				model_version text not null,
 				embedding numeric(15,12)[],
 				primary key (id)
 			);
@@ -711,6 +728,12 @@ var migrations = []func(tx *sql.Tx) error{
 				icon_content bytea default '',
 				category_id int not null,
 				category_title text default '',
+				primary key (id)
+			);
+			CREATE TABLE recommend_model (
+				id serial not null,
+				model_name text not null,
+				model_version text not null,
 				primary key (id)
 			);
 			CREATE TABLE recommend_result (

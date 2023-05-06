@@ -1,12 +1,14 @@
 import os
-
+from datetime import datetime
+from newspaper import fulltext
 from recommend_model_sdk.tools.model_tool import ModelTool
 from db.recommend_pg_db_tool import *
 
-path = os.environ.get(
-    'model_path', "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model")
+path = os.environ.get('model_path', "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model")
 
 #path = os.environ.get(model_path, "/model")
+read_entries_num = os.environ.get('read_entries_num', 50)
+down_latest_number = os.environ.get('down_latest_number', 1000)
 
 
 class RecommendHandler:
@@ -18,16 +20,14 @@ class RecommendHandler:
         model_version = "v1"
         print(current_model_tool.infer(model_name, model_version, docList))
 
-    def initModel():
+    def init_model():
         current_model_tool = ModelTool(path)
         model_name = "word2vec_google"
         model_version = "v1"
         current_model_tool.init_model(model_name, model_version)
 
-    def download():
-
+    def download_model():
         latest_package_key = f'{model_name}_{model_version}_latest_package_{latest_number}'
-
         # print(article_embedding_list)
         article_list = article_embedding_dict["articles"]
         embedding_list = article_embedding_dict["embeddings"]
@@ -35,57 +35,96 @@ class RecommendHandler:
         print(article_list[0]["url"])
         print(embedding_list[0].keys())
 
-    def recommendGenerate():
-        model_name = "word2vec_google"
-        model_version = "v1"
-        latest_number = 1000
+    def get_readed_entries():
         tool = RecommendPGDBTool()
+        current_model_tool = ModelTool(path)
+        entries = tool.select_read_entries(read_entries_num)
+        user = tool.select_users_model()
+
+        result_list = []
+        id_to_document = dict()
+        embedding_cal_list = []
+        for current_entry in entries:
+            entry = {'id': current_entry['id'], 'published_at': current_entry['published_at']}
+            current_embedding = tool.select_entries_embedding_model(current_entry["id"], user.model_name, user.model_version)
+            if current_embedding is None:
+                id_to_document[str(current_entry["id"])] = fulltext(current_entry['full_content'])
+                embedding_cal_list.append(entry)
+            else:
+                entry['embedding'] = current_embedding.embedding
+                result_list.append(entry)
+        if len(embedding_cal_list) > 0:
+            saveEmbeddingList = []
+            inferList = current_model_tool.infer(user.model_name, user.model_version, id_to_document)
+            for to_call in embedding_cal_list:
+                if inferList[str(to_call["id"])]["success"]:
+                    current_vec = inferList[str(to_call["id"])]['vec'].tolist()
+                    to_call['embedding'] = current_vec
+                    result_list.append(to_call)
+                    toSaveEmbedding = {'entry_id': to_call['id'], 'model_name': user.model_name, 'model_version': user.model_version, 'embedding': to_call['embedding']}
+                    saveEmbeddingList.append(toSaveEmbedding)
+            tool.batch_insert_entries_embedding_model(saveEmbeddingList)
+        return result_list
+
+    def down_latest_article_embedding_package():
+        tool = RecommendPGDBTool()
+        user = tool.select_users_model()
         current_model_tool = ModelTool(path)
 
         baseModel = tool.select_recommend_model()
-        if baseModel is None:
+        if len(baseModel) == 0:
             batch = 1
-            url_to_articles, url_to_embeddings = current_model_tool.download_latest_article_embedding_package(
-                model_name, model_version, latest_number)
+            url_to_articles, url_to_embeddings = current_model_tool.download_latest_article_embedding_package(user.model_name, user.model_version, down_latest_number)
         else:
-            batch = baseModel.batch + 1
-            url_to_articles, url_to_embeddings = current_model_tool.download_latest_article_embedding_package(
-                model_name, model_version, latest_number, baseModel.fetch_at)
-
+            print(baseModel[0].fetch_at)
+            batch = baseModel[0].batch + 1
+            url_to_articles, url_to_embeddings = current_model_tool.download_latest_article_embedding_package(user.model_name, user.model_version, down_latest_number,
+                                                                                                              baseModel[0].fetch_at)
         num = 0
-        if print(len(url_to_articles)) > 0:
+        if len(url_to_articles) > 0:
             num = len(url_to_articles)
-            article_list = dict()
-            for current_url, current_articles in url_to_articles.items():
-                #url = current_articles['url']
-                article_list[current_url]['url'] = url
-                article_list[current_url]['model_name'] = current_articles[
-                    'model_name']
-                article_list[current_url]['model_version'] = current_articles[
-                    'model_version']
-                article_list[current_url]['embeddings'] = current_articles[
-                    'embeddings']
+            article_list = []
+            embedding_list = []
+            for current_url, current_articles in url_to_embeddings.items():
+                embedding = {
+                    'url': current_url,
+                    'model_name': current_articles['model_name'],
+                    'model_version': current_articles['model_version'],
+                    'embedding': current_articles['embeddings']
+                }
+                embedding_list.append(embedding)
 
             for current_url, current_articles in url_to_articles.items():
-                article_list[current_url]['feed_id'] = current_articles[
-                    'feed_id']
-                article_list[current_url]['created_at'] = current_articles[
-                    'created_at']
-                article_list[current_url]['published_at'] = current_articles[
-                    'published_at']
-                article_list[current_url]['hash'] = current_articles['hash']
-                article_list[current_url]['author'] = current_articles[
-                    'author']
-                article_list[current_url]['content'] = current_articles[
-                    'content']
-                article_list[current_url]['full_content'] = current_articles[
-                    'full_content']
+                article = {
+                    'url': current_url,
+                    'feed_id': current_articles['feed_id'],
+                    'created_at': datetime.fromtimestamp(current_articles['created_at'] / 1000.0),
+                    'published_at': datetime.fromtimestamp(current_articles['published_at'] / 1000.0),
+                    'hash': current_articles['hash'],
+                    #'author': current_articles['author'],
+                    #'content': current_articles['content'],
+                    'full_content': current_articles['full_text'],
+                    'title': current_articles['title']
+                }
+                if 'author' in current_articles:
+                    article['author'] = current_articles['author']
+                if 'content' in current_articles:
+                    article['content'] = current_articles['content']
+                article_list.append(article)
+            tool.batch_insert_recommend_entries(article_list)
+            tool.batch_insert_recommend_entries_embedding(embedding_list)
 
-        newBaseModel = {'batch': batch, 'num': num}
-        tool.insert_recommend_model(newBaseModel)
-        tool.batch_insert_recommend_entries(article_list.items())
+        tool.insert_recommend_model(batch, num)
 
-    def downloadFeed():
+    def down_valid_model_and_version():
+        tool = RecommendPGDBTool()
+        current_model_tool = ModelTool(path)
+        result = current_model_tool.get_valid_model_and_version()
+        for model, versionList in result.items():
+            for v in versionList:
+                tool.check_model_and_version(model, v)
+
+    def download_feed():
         tool = RecommendPGDBTool()
         tool.empty_recommend_feed_model()
         feedList = []

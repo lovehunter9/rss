@@ -14,12 +14,7 @@ dbhost = os.environ.get('dbhost', '124.222.40.95')
 dbuser = os.environ.get('dbuser', 'postgres')
 dbpassword = os.environ.get('dbpassword', 'liujx123')
 database = os.environ.get('database', 'miniflux2')
-RECOMMEND_PG_DB = PooledPostgresqlDatabase(database=database,
-                                           user=dbuser,
-                                           password=dbpassword,
-                                           host=dbhost,
-                                           stale_timeout=300,
-                                           max_connections=100)
+RECOMMEND_PG_DB = PooledPostgresqlDatabase(database=database, user=dbuser, password=dbpassword, host=dbhost, stale_timeout=300, max_connections=100)
 
 
 class RecommendPGBaseModel(Model):
@@ -28,26 +23,56 @@ class RecommendPGBaseModel(Model):
         database = RECOMMEND_PG_DB
 
 
+class UsersModel(RecommendPGBaseModel):
+    id = BigIntegerField(null=False, unique=True, index=True)
+    model_name = TextField(null=False)
+    model_version = TextField(null=False)
+
+    class Meta:
+        db_table = 'users'
+        primary_key = False
+
+
+class RecommendModelAndVersion(RecommendPGBaseModel):
+    id = BigIntegerField(null=False, unique=True, index=True)
+    model_name = TextField(null=False)
+    model_version = TextField(null=False)
+
+    class Meta:
+        db_table = 'recommend_model'
+        primary_key = False
+
+
 class EntriesModel(RecommendPGBaseModel):
     id = BigIntegerField(null=False, unique=True, index=True)
+    url = TextField(null=True)
     status = TextField(null=True)
     full_content = TextField(null=True)
     created_at = DateTimeField(null=False, index=True)
     published_at = DateTimeField(null=False, index=True)
-    model_name = TextField(null=True)
-    model_version = TextField(null=True)
-    embedding = ArrayField(DecimalField, null=False)
 
     class Meta:
         db_table = 'entries'
         primary_key = False
 
 
+class EntriesEmbedingModel(RecommendPGBaseModel):
+    id = BigIntegerField(null=False, unique=True, index=True)
+    entry_id = BigIntegerField(null=False)
+    model_name = TextField(null=False)
+    model_version = TextField(null=False)
+    embedding = ArrayField(DecimalField, null=False)
+
+    class Meta:
+        db_table = 'entries_embedding'
+        primary_key = False
+
+
 class RecommendModel(RecommendPGBaseModel):
     id = BigIntegerField(null=False, unique=True, index=True)
     batch = IntegerField(null=False)
-    fetch_at = DateTimeField(null=False, index=True)
-    num = IntegerField(null=False, index=True)
+    fetch_at = DateTimeField(null=False)
+    num = IntegerField(null=False)
 
     class Meta:
         db_table = 'recommend'
@@ -65,12 +90,21 @@ class RecommendEntriesModel(RecommendPGBaseModel):
     url = TextField(null=True)
     content = TextField(null=True)
     full_content = TextField(null=True)
-    model_name = TextField(null=True)
-    model_version = TextField(null=True)
-    embedding = ArrayField(DecimalField, null=False)
 
     class Meta:
         db_table = 'recommend_entries'
+        primary_key = False
+
+
+class RecommendEntriesEmbedingModel(RecommendPGBaseModel):
+    id = BigIntegerField(null=False, unique=True, index=True)
+    url = TextField(null=False)
+    model_name = TextField(null=False)
+    model_version = TextField(null=False)
+    embedding = ArrayField(DecimalField, null=False)
+
+    class Meta:
+        db_table = 'recommend_entries_embedding'
         primary_key = False
 
 
