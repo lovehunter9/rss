@@ -6,3 +6,4 @@ boto3
 peewee
 peewee-db-evolve
 psycopg2-binary
+faiss-cpu-1.7.4

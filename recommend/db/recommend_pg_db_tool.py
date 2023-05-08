@@ -18,16 +18,11 @@ class RecommendPGDBTool:
     def select_entries_embedding_model(self, entry_id, model_name, model_version):
         return EntriesEmbedingModel.select().where((EntriesEmbedingModel.entry_id == entry_id)
                                                    & (EntriesEmbedingModel.model_name == model_name)
-                                                   & (EntriesEmbedingModel.model_version == model_version)).get()
+                                                   & (EntriesEmbedingModel.model_version == model_version)).execute()
 
     def batch_insert_entries_embedding_model(self, model_list):
         q = EntriesEmbedingModel.insert_many(model_list)
         q.execute()
-
-    def select_recommend_entries_embedding_model(self, entry_id, model_name, model_version):
-        return RecommendEntriesEmbedingModel.select().where((RecommendEntriesEmbedingModel.entry_id == entry_id)
-                                                            & (RecommendEntriesEmbedingModel.model_name == model_name)
-                                                            & (RecommendEntriesEmbedingModel.model_version == model_version)).get()
 
     def select_recommend_model(self):
         return RecommendModel.select().order_by(RecommendModel.id.desc()).limit(1).execute()
@@ -46,9 +41,26 @@ class RecommendPGDBTool:
         q = RecommendResultModel.insert_many(model_list)
         q.execute()
 
+    def select_exist_recommend_entries(self, url_list):
+        result_list = list(RecommendEntriesModel.select(RecommendEntriesModel.url).where(RecommendEntriesModel.url << url_list))
+        result_dict_list = dict()
+        for current in result_list:
+            result_dict_list[current.url] = current.url
+        return result_dict_list
+
     def batch_insert_recommend_entries(self, model_list):
         q = RecommendEntriesModel.insert_many(model_list)
         q.execute()
+
+    def select_exist_recommend_entries_embedding(self, url_list, model, version):
+        result_list = list(
+            RecommendEntriesEmbedingModel.select(RecommendEntriesEmbedingModel.url).where((RecommendEntriesEmbedingModel.url << url_list)
+                                                                                          & (RecommendEntriesEmbedingModel.model_name == model)
+                                                                                          & (RecommendEntriesEmbedingModel.model_version == version)))
+        result_dict_list = dict()
+        for current in result_list:
+            result_dict_list[current.url] = current.url
+        return result_dict_list
 
     def batch_insert_recommend_entries_embedding(self, model_list):
         q = RecommendEntriesEmbedingModel.insert_many(model_list)
@@ -61,6 +73,25 @@ class RecommendPGDBTool:
         result_dict_list = list()
         for current_model in result_list:
             result_dict_list.append(model_to_dict(current_model))
+        return result_dict_list
+
+    def select_tobe_recommended_entries(self, model, version, resultLimit):
+        result_list = list(
+            RecommendEntriesModel.select(RecommendEntriesModel,
+                                         RecommendEntriesEmbedingModel).join(RecommendEntriesEmbedingModel,
+                                                                             on=(RecommendEntriesModel.url == RecommendEntriesEmbedingModel.url),
+                                                                             attr='relation').where((RecommendEntriesEmbedingModel.model_name == model)
+                                                                                                    & (RecommendEntriesEmbedingModel.model_version == version)).order_by(
+                                                                                                        RecommendEntriesModel.id.desc()).limit(resultLimit).execute())
+
+        result_dict_list = list()
+        for current_model in result_list:
+            entries = {
+                'url': current_model['url'],
+                'published_at': datetime.fromtimestamp(current_model['published_at'] / 1000.0),
+                'embedding': current_model['relation']['embedding'],
+            }
+            result_dict_list.append(entries)
         return result_dict_list
 
     def check_model_and_version(self, model, version):

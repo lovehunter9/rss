@@ -739,7 +739,7 @@ var migrations = []func(tx *sql.Tx) error{
 			CREATE TABLE recommend_result (
 				id serial not null,
 				batch int not null,
-				entry_id int not null,
+				url text not null,
 				score int not null,
 				rank int not null,
 				primary key (id)
@@ -762,6 +762,13 @@ var migrations = []func(tx *sql.Tx) error{
 				count int not null,
 				primary key (id)
 			);
+
+			CREATE UNIQUE INDEX index_recommend_entries_url on recommend_entries using btree(url);
+			CREATE INDEX index_recommend_entries_embedding_url on recommend_entries_embedding using btree(url);
+			CREATE INDEX index_recommend_entries_embedding_model on recommend_entries_embedding using btree(url,model_name,model_version);
+			CREATE INDEX index_entries_embedding_entryid on entries_embedding using btree(entry_id);
+			CREATE INDEX index_entries_embedding_model on entries_embedding using btree(entry_id,model_version,model_version);
+			CREATE INDEX index_recommend_result_batch on recommend_result using btree(batch);
 		`
 		_, err = tx.Exec(sql)
 		return err

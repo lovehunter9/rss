@@ -67,10 +67,10 @@ func (s *Storage) GetRecommendCount(batch int) int {
 
 }
 func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, error) {
-	query := `SELECT r.batch, r.entry_id, e.title, e.author,e.url,e.content,e.published_at,r.score,r.rank,
+	query := `SELECT r.batch, e.entry_id, e.title, e.author,e.url,e.content,e.published_at,r.score,r.rank,
 	 f.title feed_title,f.feed_url,f.site_url,f.icon_type,f.icon_content icon_byte_content,f.category_id,f.category_title
 	 FROM recommend_result r,recommend_entries e,recommend_feed f 
-	 WHERE r.batch=$1 and r.entry_id=e.id and e.feed_id=f.id
+	 WHERE r.batch=$1 and r.url=e.url and e.feed_id=f.id
 	 ORDER BY r.rank desc OFFSET $2 limit $3`
 	rows, err := s.db.Query(query, batch, offset, limit)
 	if err != nil {
@@ -98,8 +98,8 @@ func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, err
 
 func (s *Storage) GetRecommendResult(batch int, entryId int64) *model.RecommendResult {
 	var result model.RecommendResult
-	query := `SELECT batch,entry_id,rank,score FROM recommend_result WHERE batch=$1 and entry_id=$2`
-	s.db.QueryRow(query, batch, entryId).Scan(&result.Batch, &result.EntryID, &result.Rank, &result.Score)
+	query := `SELECT r.batch,r.url,r.rank,r.score FROM recommend_result r, recommend_entries e WHERE r.url=e.url and r.batch=$1 and e.entry_id=$2`
+	s.db.QueryRow(query, batch, entryId).Scan(&result.Batch, &result.URL, &result.Rank, &result.Score)
 
 	return &result
 

@@ -1,7 +1,8 @@
 import unittest
 from recommend_model_sdk.tools.model_tool import ModelTool
 
-from handler.recommend_handler import *
+from handler.data import *
+from handler.rank import *
 from db.recommend_pg_db_tool import *
 from newspaper import fulltext
 
@@ -56,18 +57,18 @@ class ModelToolUnitTest(unittest.TestCase):
         # print(article_embedding_list)
         for current_url, current_articles in url_to_articles.items():
             print(current_articles.keys())  # content,author may not exist, becase there is no value
-        for current_url, current_embeddings in url_to_embeddings.items():
-            print(current_embeddings.keys())
-        from datetime import datetime
-        first_datetime = datetime(year=2023, month=3, day=1)  # publish_time
-        second_datetime = datetime(year=2023, month=1, day=1)
-        url_to_articles, url_to_embeddings = current_model_tool.download_latest_article_embedding_package(model_name, model_version, 10000, first_datetime)
-        print(len(url_to_articles))
-        url_to_articles, url_to_embeddings = current_model_tool.download_latest_article_embedding_package(model_name, model_version, 10000, second_datetime)
-        print(len(url_to_articles))
-        for current_url, current_articles in url_to_articles.items():
-            print(current_articles.keys())
-            break
+        #for current_url, current_embeddings in url_to_embeddings.items():
+        #    print(current_embeddings.keys())
+        #from datetime import datetime
+        #first_datetime = datetime(year=2023, month=3, day=1)  # publish_time
+        #second_datetime = datetime(year=2023, month=1, day=1)
+        #url_to_articles, url_to_embeddings = current_model_tool.download_latest_article_embedding_package(model_name, model_version, 10000, first_datetime)
+        #print(len(url_to_articles))
+        #url_to_articles, url_to_embeddings = current_model_tool.download_latest_article_embedding_package(model_name, model_version, 10000, second_datetime)
+        #print(len(url_to_articles))
+        #for current_url, current_articles in url_to_articles.items():
+        #    print(current_articles.keys())
+        #    break
 
     def test_init_model(self):
         # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_init_model
@@ -87,10 +88,21 @@ class ModelToolUnitTest(unittest.TestCase):
         for current_id, current_feed in feed_id_to_feed.items():
             print(current_feed.keys())
 
+    def test_db_handler(self):
+        # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_db_handler
+        tool = RecommendPGDBTool()
+        l = ['a', 'b']
+        result = tool.select_exist_recommend_entries(l)
+        if 'a' not in result:
+            print('a')
+        if 'c' not in result:
+            print('c')
+
     def test_handler(self):
         # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_handler
         #RecommendHandler.downloadFeed()
-        RecommendHandler.down_latest_article_embedding_package()
+        #DataHandler.down_latest_article_embedding_package()
+        RankHandler.rank()
 
     def test_newspaper(self):
         # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_newspaper
