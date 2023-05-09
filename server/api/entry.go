@@ -211,6 +211,7 @@ func (h *handler) fetchContent(w http.ResponseWriter, r *http.Request) {
 	loggedUserID := request.UserID(r)
 	entryID := request.RouteInt64Param(r, "entryID")
 
+	h.store.UpdateEntryLastReadTime(entryID)
 	content := h.store.GetFullContent(entryID)
 	if content != "" {
 		json.OK(w, r, map[string]string{"content": content})

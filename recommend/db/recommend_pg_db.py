@@ -50,6 +50,7 @@ class EntriesModel(RecommendPGBaseModel):
     full_content = TextField(null=True)
     created_at = DateTimeField(null=False, index=True)
     published_at = DateTimeField(null=False, index=True)
+    last_read_at = DateTimeField(null=False, index=True)
 
     class Meta:
         db_table = 'entries'
@@ -72,7 +73,6 @@ class RecommendModel(RecommendPGBaseModel):
     id = BigIntegerField(null=False, unique=True, index=True)
     batch = IntegerField(null=False)
     fetch_at = DateTimeField(null=False)
-    num = IntegerField(null=False)
 
     class Meta:
         db_table = 'recommend'
@@ -128,7 +128,7 @@ class RecommendResultModel(RecommendPGBaseModel):
     batch = IntegerField(null=True)
     url = BigIntegerField(null=True)
     entry_id = DateTimeField(null=False, index=True)
-    score = IntegerField(null=True)
+    score = DecimalField(null=True)
     rank = IntegerField(null=True)
 
     class Meta:

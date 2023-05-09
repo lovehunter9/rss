@@ -1,4 +1,5 @@
 import os
+import numpy as np
 from datetime import datetime
 from newspaper import fulltext
 from recommend_model_sdk.tools.model_tool import ModelTool
@@ -50,11 +51,11 @@ class DataHandler:
 
             if len(current_embedding) == 0:
                 print(current_entry['full_content'])
-                id_to_document[str(current_entry["id"])] = fulltext(current_entry['full_content'])
-                embedding_cal_list.append(entry)
+                #id_to_document[str(current_entry["id"])] = fulltext(current_entry['full_content'])
+                #embedding_cal_list.append(entry)
             else:
-                entry['embedding'] = current_embedding[0].embedding
-                result_list[current_entry['url']] = entry['embedding']
+                entry['embedding'] = np.array(current_embedding[0].embedding, dtype=np.float32)
+                result_list[current_entry['url']] = {"embedding": entry['embedding'], "last_reviewed": current_entry['published_at'].replace(tzinfo=None)}
         if len(embedding_cal_list) > 0:
             saveEmbeddingList = []
             inferList = current_model_tool.infer(user.model_name, user.model_version, id_to_document)
@@ -62,7 +63,7 @@ class DataHandler:
                 if inferList[str(to_call["id"])]["success"]:
                     current_vec = inferList[str(to_call["id"])]['vec'].tolist()
                     to_call['embedding'] = current_vec
-                    result_list[current_entry['url']] = current_vec
+                    result_list[current_entry['url']] = {"embedding": np.array(current_vec, dtype=np.float32), "last_reviewed": to_call["published_at"].replace(tzinfo=None)}
                     toSaveEmbedding = {'entry_id': to_call['id'], 'model_name': user.model_name, 'model_version': user.model_version, 'embedding': to_call['embedding']}
                     saveEmbeddingList.append(toSaveEmbedding)
             tool.batch_insert_entries_embedding_model(saveEmbeddingList)
@@ -73,17 +74,8 @@ class DataHandler:
         user = tool.select_users_model()
         current_model_tool = ModelTool(path)
 
-        baseModel = tool.select_recommend_model()
-        if len(baseModel) == 0:
-            batch = 1
-        else:
-            print(baseModel[0].fetch_at)
-            batch = baseModel[0].batch + 1
-
         url_to_articles, url_to_embeddings = current_model_tool.download_latest_article_embedding_package(user.model_name, user.model_version, down_latest_number)
-        num = 0
         if len(url_to_articles) > 0:
-            num = len(url_to_articles)
             article_list = []
             embedding_list = []
             url_list = []
@@ -115,16 +107,11 @@ class DataHandler:
                         'full_content': current_articles['full_text'],
                         'title': current_articles['title']
                     }
-                    #if 'author' in current_articles:
-                    #    article['author'] = current_articles['author']
-                    #if 'content' in current_articles:
-                    #    article['content'] = current_articles['content']
                     article_list.append(article)
             if len(article_list) > 0:
                 tool.batch_insert_recommend_entries(article_list)
             if len(embedding_list) > 0:
                 tool.batch_insert_recommend_entries_embedding(embedding_list)
-        tool.insert_recommend_model(batch, num)
 
     def get_tobe_recommended_entries():
         tool = RecommendPGDBTool()
@@ -132,7 +119,7 @@ class DataHandler:
         entries = tool.select_tobe_recommended_entries(user.model_name, user.model_version, down_latest_number)
         result_list = dict()
         for current_entry in entries:
-            result_list[current_entry['url']] = {"embedding": current_entry['embedding'], "last_reviewed": current_entry['published_at']}
+            result_list[current_entry['url']] = np.array(current_entry['embedding'], dtype=np.float32)
         return result_list
 
     def down_valid_model_and_version():

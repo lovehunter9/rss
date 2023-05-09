@@ -682,6 +682,16 @@ func (s *Storage) UpdateEntryFullContent(entryId int64, docId string, fullConten
 	return nil
 }
 
+func (s *Storage) UpdateEntryLastReadTime(entryId int64) error {
+	query := `UPDATE entries SET last_read_at=now() WHERE id=$1 `
+	_, err := s.db.Exec(query, entryId)
+	if err != nil {
+		return fmt.Errorf(`store: unable to update last read time  %v: %v`, entryId, err)
+	}
+
+	return nil
+}
+
 func (s *Storage) ReadLater(userID int64, entryID int64) error {
 	query := `UPDATE entries SET readlater_tag = NOT readlater_tag WHERE user_id=$1 AND id=$2`
 	result, err := s.db.Exec(query, userID, entryID)

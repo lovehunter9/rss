@@ -27,8 +27,8 @@ class RecommendPGDBTool:
     def select_recommend_model(self):
         return RecommendModel.select().order_by(RecommendModel.id.desc()).limit(1).execute()
 
-    def insert_recommend_model(self, batch, num):
-        RecommendModel.insert(batch=batch, num=num).execute()
+    def insert_recommend_model(self, batch):
+        RecommendModel.insert(batch=batch).execute()
 
     def empty_recommend_feed_model(self):
         RecommendFeedModel.delete().execute()
@@ -69,7 +69,7 @@ class RecommendPGDBTool:
     def select_read_entries(self, resultLimit):
         result_list = list(
             EntriesModel.select(EntriesModel.id, EntriesModel.published_at, EntriesModel.url,
-                                EntriesModel.full_content).where(EntriesModel.status == 'read').order_by(EntriesModel.published_at.desc()).limit(resultLimit).execute())
+                                EntriesModel.full_content).where(~EntriesModel.last_read_at.is_null()).order_by(EntriesModel.last_read_at.desc()).limit(resultLimit).execute())
         result_dict_list = list()
         for current_model in result_list:
             result_dict_list.append(model_to_dict(current_model))
@@ -77,19 +77,19 @@ class RecommendPGDBTool:
 
     def select_tobe_recommended_entries(self, model, version, resultLimit):
         result_list = list(
-            RecommendEntriesModel.select(RecommendEntriesModel,
-                                         RecommendEntriesEmbedingModel).join(RecommendEntriesEmbedingModel,
-                                                                             on=(RecommendEntriesModel.url == RecommendEntriesEmbedingModel.url),
-                                                                             attr='relation').where((RecommendEntriesEmbedingModel.model_name == model)
-                                                                                                    & (RecommendEntriesEmbedingModel.model_version == version)).order_by(
-                                                                                                        RecommendEntriesModel.id.desc()).limit(resultLimit).execute())
+            RecommendEntriesModel.select(RecommendEntriesModel.url, RecommendEntriesModel.published_at,
+                                         RecommendEntriesEmbedingModel.embedding).join(RecommendEntriesEmbedingModel,
+                                                                                       on=(RecommendEntriesModel.url == RecommendEntriesEmbedingModel.url),
+                                                                                       attr='relation').where((RecommendEntriesEmbedingModel.model_name == model)
+                                                                                                              & (RecommendEntriesEmbedingModel.model_version == version)).order_by(
+                                                                                                                  RecommendEntriesModel.id.desc()).limit(resultLimit).execute())
 
         result_dict_list = list()
         for current_model in result_list:
             entries = {
-                'url': current_model['url'],
-                'published_at': datetime.fromtimestamp(current_model['published_at'] / 1000.0),
-                'embedding': current_model['relation']['embedding'],
+                'url': current_model.url,
+                'published_at': current_model.published_at,
+                'embedding': current_model.relation.embedding,
             }
             result_dict_list.append(entries)
         return result_dict_list
