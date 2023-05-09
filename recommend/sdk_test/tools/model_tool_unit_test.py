@@ -108,7 +108,7 @@ class ModelToolUnitTest(unittest.TestCase):
         # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_newspaper
         tool = RecommendPGDBTool()
         current_model_tool = ModelTool("/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model")
-        entries = tool.select_read_entries(1)
+        entries = tool.select_read_entries(100)
         user = tool.select_users_model()
 
         id_to_document = dict()
@@ -119,11 +119,12 @@ class ModelToolUnitTest(unittest.TestCase):
             #print(current_entry['id'])
             #print(user.model_name)
             #print(user.model_version)
-            #print(current_entry['full_content'])
-            current_embedding = tool.select_entries_embedding_model(current_entry["id"], user.model_name, user.model_version)
-            if len(current_embedding) == 0:
-                print('none............')
-                id_to_document["5"] = fulltext(current_entry['full_content'])
-                #print(id_to_document["1"])
+            print(current_entry['id'])
+            print(fulltext(current_entry['full_content']))
+            #current_embedding = tool.select_entries_embedding_model(current_entry["id"], user.model_name, user.model_version)
+            #if len(current_embedding) == 0:
+            #print('none............')
+            #id_to_document["5"] = fulltext(current_entry['full_content'])
+            #print(id_to_document["1"])
 
-        print(current_model_tool.infer(user.model_name, user.model_version, id_to_document))
+        #print(current_model_tool.infer(user.model_name, user.model_version, id_to_document))

@@ -51,8 +51,8 @@ class DataHandler:
 
             if len(current_embedding) == 0:
                 print(current_entry['full_content'])
-                #id_to_document[str(current_entry["id"])] = fulltext(current_entry['full_content'])
-                #embedding_cal_list.append(entry)
+                id_to_document[str(current_entry["id"])] = fulltext(current_entry['full_content'])
+                embedding_cal_list.append(entry)
             else:
                 entry['embedding'] = np.array(current_embedding[0].embedding, dtype=np.float32)
                 result_list[current_entry['url']] = {"embedding": entry['embedding'], "last_reviewed": current_entry['published_at'].replace(tzinfo=None)}
