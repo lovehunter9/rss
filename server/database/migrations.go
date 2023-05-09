@@ -768,8 +768,9 @@ var migrations = []func(tx *sql.Tx) error{
 			CREATE INDEX index_entries_embedding_entryid on entries_embedding using btree(entry_id);
 			CREATE INDEX index_entries_embedding_model on entries_embedding using btree(entry_id,model_version,model_version);
 			CREATE INDEX index_recommend_result_batch on recommend_result using btree(batch);
-		`
 			ALTER TABLE entries ADD COLUMN last_read_at timestamp with time zone;
+		`
+
 		_, err = tx.Exec(sql)
 		return err
 	},
