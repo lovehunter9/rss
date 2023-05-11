@@ -8,8 +8,8 @@ from db.recommend_pg_db_tool import *
 #path = os.environ.get('model_path', "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model")
 
 path = os.environ.get('model_path', "/model")
-read_entries_num = os.environ.get('read_entries_num', 50)
-down_latest_number = os.environ.get('down_latest_number', 1000)
+read_entries_num = int(os.environ.get('read_entries_num', 50))
+down_latest_number = int(os.environ.get('down_latest_number', 1000))
 
 
 class DataHandler:
