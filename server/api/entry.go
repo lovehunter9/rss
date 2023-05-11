@@ -18,6 +18,8 @@ import (
 	"miniflux.app/model"
 	"miniflux.app/proxy"
 	"miniflux.app/reader/processor"
+	"miniflux.app/reader/sanitizer"
+	"miniflux.app/reader/scraper"
 	"miniflux.app/service/search"
 	"miniflux.app/storage"
 	"miniflux.app/url"
@@ -441,4 +443,27 @@ func (h *handler) queryTest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.OK(w, r, result)
+}
+
+func (h *handler) getFullContentTest(w http.ResponseWriter, r *http.Request) {
+	url := request.QueryStringParam(r, "url", "")
+	/*res, _ := http.Get(url)
+
+	defer res.Body.Close()
+
+	res_body, _ := ioutil.ReadAll(res.Body)
+	content := string(res_body)*/
+
+	content, _ := scraper.Fetch(
+		url,
+		"",
+		"",
+		"",
+		false,
+		false,
+	)
+
+	content = sanitizer.Sanitize(url, content)
+	json.OK(w, r, content)
+
 }

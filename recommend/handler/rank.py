@@ -7,14 +7,19 @@ from recommend_model_sdk.tools.model_tool import ModelTool
 from recommend_model_sdk.rank.rank_tool import RankTool
 from db.recommend_pg_db_tool import *
 
-path = os.environ.get('model_path', "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model")
-#path = os.environ.get(model_path, "/model")
+#path = os.environ.get('model_path', "model/workspace/pp/apps/rss/recommend/model")
+path = os.environ.get('model_path', "/model")
 
 
 class RankHandler:
 
     def rank():
         tool = RecommendPGDBTool()
+
+        user = tool.select_users_model()
+        DataHandler.down_valid_model_and_version()
+        DataHandler.init_model(user)
+
         baseModel = tool.select_recommend_model()
         if len(baseModel) == 0:
             batch = 1
@@ -23,11 +28,10 @@ class RankHandler:
         tool.insert_recommend_model(batch)
 
         DataHandler.download_feed()
-        DataHandler.down_latest_article_embedding_package()
+        DataHandler.down_latest_article_embedding_package(user)
 
-        query_url_to_embedding_dict = DataHandler.get_readed_entries()
-
-        base_url_to_embedding_dict = DataHandler.get_tobe_recommended_entries()
+        query_url_to_embedding_dict = DataHandler.get_readed_entries(user)
+        base_url_to_embedding_dict = DataHandler.get_tobe_recommended_entries(user)
 
         rank_tool = RankTool(base_url_to_embedding_dict)
         result = rank_tool.rank(query_url_to_embedding_dict, 100)
