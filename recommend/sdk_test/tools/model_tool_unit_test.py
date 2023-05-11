@@ -4,7 +4,7 @@ from recommend_model_sdk.tools.model_tool import ModelTool
 from handler.data import *
 from handler.rank import *
 from db.recommend_pg_db_tool import *
-from newspaper import fulltext
+from newspaper import *
 
 
 class ModelToolUnitTest(unittest.TestCase):
@@ -128,3 +128,14 @@ class ModelToolUnitTest(unittest.TestCase):
             #print(id_to_document["1"])
 
         #print(current_model_tool.infer(user.model_name, user.model_version, id_to_document))
+
+    def download_html(self):
+        #python  -m unittest model_tool_unit_test.ModelToolUnitTest.download_html
+        url = "https://themerkle.com/solana-sol-and-dogecoin-doge-face-off-with-tms-network-tmsn-in-the-2023-race-for-700-returns/"
+        article = Article(url)
+        article.download()
+        filename = '3.html'
+        with open(filename, 'w') as file_object:
+            file_object.write(article.html)
+
+        #html = requests.get(url).text

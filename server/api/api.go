@@ -78,6 +78,8 @@ func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
 	sr.HandleFunc("/entries/{entryID}/bookmark", handler.toggleBookmark).Methods(http.MethodPut) //star
 	sr.HandleFunc("/entries/{entryID}/fetch-content", handler.fetchContent).Methods(http.MethodGet)
 
+	sr.HandleFunc("/test/fullcontent", handler.getFullContentTest).Methods(http.MethodGet)
+
 	sr.HandleFunc("/entry/status", handler.updateEntriesStatus).Name("updateEntriesStatus").Methods(http.MethodPost) //add 当前页设置已读
 
 	sr.HandleFunc("/boards", handler.createBoard).Methods(http.MethodPost)
