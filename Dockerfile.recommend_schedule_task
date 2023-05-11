@@ -1,6 +1,6 @@
 # FROM continuumio/anaconda3:2022.10-amazonlinux amazon vm
-FROM continuumio/anaconda3:2022.10
-# FROM python:3.8-alpine
+# FROM continuumio/anaconda3:2022.10
+FROM python:3.8-slim
 ENV BASE_PATH /opt/recommend
 ENV MODEL_PATH /opt/model
 VOLUME [$MODEL_PATH]
