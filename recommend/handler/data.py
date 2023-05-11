@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from datetime import datetime
-from newspaper import fulltext
+from bs4 import BeautifulSoup
 from recommend_model_sdk.tools.model_tool import ModelTool
 from db.recommend_pg_db_tool import *
 
@@ -39,7 +39,9 @@ class DataHandler:
 
             if len(current_embedding) == 0:
                 print(current_entry['full_content'])
-                id_to_document[str(current_entry["id"])] = fulltext(current_entry['full_content'], language='en')
+                soup = BeautifulSoup(current_entry['full_content'], 'html.parser')
+                id_to_document[str(current_entry["id"])] = soup.get_text()
+                #id_to_document[str(current_entry["id"])] = fulltext(current_entry['full_content'])
                 embedding_cal_list.append(entry)
             else:
                 entry['embedding'] = np.array(current_embedding[0].embedding, dtype=np.float32)

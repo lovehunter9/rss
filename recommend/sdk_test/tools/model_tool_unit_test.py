@@ -6,6 +6,9 @@ from handler.rank import *
 from db.recommend_pg_db_tool import *
 from newspaper import *
 
+from lxml import etree
+from bs4 import BeautifulSoup
+
 
 class ModelToolUnitTest(unittest.TestCase):
 
@@ -120,7 +123,11 @@ class ModelToolUnitTest(unittest.TestCase):
             #print(user.model_name)
             #print(user.model_version)
             print(current_entry['id'])
-            print(fulltext(current_entry['full_content'], language='en'))
+            #print(fulltext(current_entry['full_content'], language='en'))
+            #response = etree.HTML(current_entry['full_content'])
+            #print(response.xpath('string(.)'))
+            soup = BeautifulSoup(current_entry['full_content'], 'html.parser')
+            print(soup.get_text())
             #current_embedding = tool.select_entries_embedding_model(current_entry["id"], user.model_name, user.model_version)
             #if len(current_embedding) == 0:
             #print('none............')
