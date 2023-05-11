@@ -1,15 +1,15 @@
 import os
 import numpy as np
 from datetime import datetime
-from newspaper import fulltext
+from bs4 import BeautifulSoup
 from recommend_model_sdk.tools.model_tool import ModelTool
 from db.recommend_pg_db_tool import *
 
 #path = os.environ.get('model_path', "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model")
 
 path = os.environ.get('model_path', "/model")
-read_entries_num = os.environ.get('read_entries_num', 50)
-down_latest_number = os.environ.get('down_latest_number', 1000)
+read_entries_num = int(os.environ.get('read_entries_num', 50))
+down_latest_number = int(os.environ.get('down_latest_number', 1000))
 
 
 class DataHandler:
@@ -39,7 +39,8 @@ class DataHandler:
 
             if len(current_embedding) == 0:
                 print(current_entry['full_content'])
-                id_to_document[str(current_entry["id"])] = fulltext(current_entry['full_content'])
+                soup = BeautifulSoup(current_entry['full_content'], 'html.parser')
+                id_to_document[str(current_entry["id"])] = soup.get_text()
                 embedding_cal_list.append(entry)
             else:
                 entry['embedding'] = np.array(current_embedding[0].embedding, dtype=np.float32)
