@@ -24,6 +24,7 @@ def schedule_probe():
 if __name__ == '__main__':
     import nltk
     nltk.download('stopwords')
+    schedule_rank_task()
     schedule_task_interval = int(os.environ.get('schedule_task_interval', 240))
     schedule.every(schedule_task_interval).minutes.do(schedule_rank_task)
     schedule.every(1).minutes.do(schedule_probe)
