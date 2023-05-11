@@ -22,8 +22,8 @@ class RankHandler:
             batch = baseModel[0].batch + 1
         tool.insert_recommend_model(batch)
 
-        #DataHandler.download_feed()
-        #DataHandler.down_latest_article_embedding_package()
+        DataHandler.download_feed()
+        DataHandler.down_latest_article_embedding_package()
 
         query_url_to_embedding_dict = DataHandler.get_readed_entries()
 
