@@ -7,9 +7,6 @@ from recommend_model_sdk.tools.model_tool import ModelTool
 from recommend_model_sdk.rank.rank_tool import RankTool
 from db.recommend_pg_db_tool import *
 
-#path = os.environ.get('model_path', "model/workspace/pp/apps/rss/recommend/model")
-path = os.environ.get('model_path', "/model")
-
 
 class RankHandler:
 
