@@ -7,6 +7,6 @@ peewee
 peewee-db-evolve
 psycopg2-binary
 faiss-cpu==1.7.4
-bytetrade-recommend-model-sdk
+bytetrade-recommend-model-sdk==0.0.14
 schedule==1.2.0
 beautifulsoup4
