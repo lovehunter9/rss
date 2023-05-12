@@ -13,15 +13,15 @@ type RecommendBase struct {
 }
 
 type RecommendFeed struct {
-	ID              int64  `json:"id"`
-	Title           string `json:"feed_title"`
-	FeedUrl         string `json:"feed_url"`
-	SiteUrl         string `json:"site_url"`
-	IconType        string `json:"icon_type"`
-	IconByteContent []byte `json:"icon_byte_content"`
-	IconContent     string `json:"icon_content"`
-	CategoryID      int64  `json:"category_id"`
-	CategoryTitle   string `json:"category_title"`
+	ID              int64   `json:"id"`
+	Title           string  `json:"feed_title"`
+	FeedUrl         string  `json:"feed_url"`
+	SiteUrl         string  `json:"site_url"`
+	IconType        *string `json:"icon_type"`
+	IconByteContent []byte  `json:"icon_byte_content"`
+	IconContent     string  `json:"icon_content"`
+	CategoryID      int64   `json:"category_id"`
+	CategoryTitle   string  `json:"category_title"`
 }
 
 type RecommendEntry struct {
@@ -45,17 +45,17 @@ type RecommendResult struct {
 
 // Category represents a feed category.
 type Recommend struct {
-	Batch   int    `json:"batch"`
-	EntryID int64  `json:"entry_id"`
-	Title   string `json:"title"`
-	Author  string `json:"author"`
+	Batch   int     `json:"batch"`
+	EntryID int64   `json:"entry_id"`
+	Title   string  `json:"title"`
+	Author  *string `json:"author"`
 
 	PublishedAt time.Time `json:"published_at"`
 	URL         string    `json:"url"`
-	Content     string    `json:"content"`
+	Content     *string   `json:"content"`
 
 	Feed  *RecommendFeed `json:"feed,omitempty"`
-	Score int            `json:"score"`
+	Score float32        `json:"score"`
 	Rank  int            `json:"rank"`
 }
 
