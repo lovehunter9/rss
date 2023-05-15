@@ -22,3 +22,8 @@ type entriesResponse struct {
 type feedCreationResponse struct {
 	FeedID int64 `json:"feed_id"`
 }
+
+type recommendResponse struct {
+	Total   int              `json:"total"`
+	Entries model.Recommends `json:"entries"`
+}

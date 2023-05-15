@@ -27,6 +27,7 @@ func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
 	middleware := newMiddleware(store)
 	sr.Use(middleware.handleCORS)
 	sr.Use(middleware.apiKeyAuth)
+	sr.Use(middleware.handleStatActive)
 	//sr.Use(middleware.basicAuth)
 	sr.Methods(http.MethodOptions)
 	//sr.HandleFunc("/users", handler.createUser).Methods(http.MethodPost)
@@ -77,6 +78,8 @@ func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
 	sr.HandleFunc("/entries/{entryID}/bookmark", handler.toggleBookmark).Methods(http.MethodPut) //star
 	sr.HandleFunc("/entries/{entryID}/fetch-content", handler.fetchContent).Methods(http.MethodGet)
 
+	sr.HandleFunc("/test/fullcontent", handler.getFullContentTest).Methods(http.MethodGet)
+
 	sr.HandleFunc("/entry/status", handler.updateEntriesStatus).Name("updateEntriesStatus").Methods(http.MethodPost) //add 当前页设置已读
 
 	sr.HandleFunc("/boards", handler.createBoard).Methods(http.MethodPost)
@@ -90,4 +93,12 @@ func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
 	sr.HandleFunc("/readlater", handler.getReadLaterEntries).Methods(http.MethodGet)
 
 	sr.HandleFunc("/searchTest", handler.queryTest).Methods(http.MethodGet)
+
+	sr.HandleFunc("/recommendList", handler.getRecommendList).Methods(http.MethodGet)
+	sr.HandleFunc("/recommend/{entryID}/readlater", handler.recommendReadLater).Methods(http.MethodPut)
+	sr.HandleFunc("/recommend/saveToBoard", handler.recommendSaveToBoard).Methods(http.MethodPut)
+	sr.HandleFunc("/recommend/addFeed", handler.recommendAddFeed).Methods(http.MethodPost)
+	sr.HandleFunc("/recommend/{entryID}/fetch-content", handler.fetchRecommendContent).Methods(http.MethodGet)
+	sr.HandleFunc("/recommend/{entryID}/readComplete", handler.recommendReadCompleteStat).Methods(http.MethodPut)
+
 }
