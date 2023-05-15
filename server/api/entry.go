@@ -18,6 +18,8 @@ import (
 	"miniflux.app/model"
 	"miniflux.app/proxy"
 	"miniflux.app/reader/processor"
+	"miniflux.app/reader/sanitizer"
+	"miniflux.app/reader/scraper"
 	"miniflux.app/service/search"
 	"miniflux.app/storage"
 	"miniflux.app/url"
@@ -129,13 +131,13 @@ func (h *handler) findEntries(w http.ResponseWriter, r *http.Request, feedID int
 	userID := request.UserID(r)
 	categoryID = request.QueryInt64Param(r, "category_id", categoryID)
 	if categoryID > 0 && !h.store.CategoryIDExists(userID, categoryID) {
-		json.BadRequest(w, r, errors.New("Invalid category ID"))
+		json.BadRequest(w, r, errors.New("invalid category ID"))
 		return
 	}
 
 	feedID = request.QueryInt64Param(r, "feed_id", feedID)
 	if feedID > 0 && !h.store.FeedExists(userID, feedID) {
-		json.BadRequest(w, r, errors.New("Invalid feed ID"))
+		json.BadRequest(w, r, errors.New("invalid feed ID"))
 		return
 	}
 
@@ -211,6 +213,7 @@ func (h *handler) fetchContent(w http.ResponseWriter, r *http.Request) {
 	loggedUserID := request.UserID(r)
 	entryID := request.RouteInt64Param(r, "entryID")
 
+	h.store.UpdateEntryLastReadTime(entryID)
 	content := h.store.GetFullContent(entryID)
 	if content != "" {
 		json.OK(w, r, map[string]string{"content": content})
@@ -440,4 +443,27 @@ func (h *handler) queryTest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.OK(w, r, result)
+}
+
+func (h *handler) getFullContentTest(w http.ResponseWriter, r *http.Request) {
+	url := request.QueryStringParam(r, "url", "")
+	/*res, _ := http.Get(url)
+
+	defer res.Body.Close()
+
+	res_body, _ := ioutil.ReadAll(res.Body)
+	content := string(res_body)*/
+
+	content, _ := scraper.Fetch(
+		url,
+		"",
+		"",
+		"",
+		false,
+		false,
+	)
+
+	content = sanitizer.Sanitize(url, content)
+	json.OK(w, r, content)
+
 }

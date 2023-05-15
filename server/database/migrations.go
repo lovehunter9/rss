@@ -678,4 +678,100 @@ var migrations = []func(tx *sql.Tx) error{
 		_, err = tx.Exec(sql)
 		return err
 	},
+	func(tx *sql.Tx) (err error) {
+		sql := `
+			ALTER TABLE feeds ADD COLUMN is_recommend bool default 'f';
+			ALTER TABLE users ADD COLUMN model_name text default 'word2vec_google';
+			ALTER TABLE users ADD COLUMN model_version text default 'v1';
+			CREATE TABLE recommend (
+				id serial not null,
+				batch int not null,
+				fetch_at timestamp with time zone default now(),
+				primary key (id)
+			);
+			CREATE TABLE recommend_entries (
+				id serial not null,
+				feed_id int not null,
+				created_at timestamp with time zone default now(),
+				published_at timestamp with time zone default now(),
+				title text default '',
+				author text default '',
+				url text default '',
+				content text default '',
+				full_content text default '',
+				hash text ,
+				primary key (id)
+			);
+			CREATE TABLE recommend_entries_embedding (
+				id serial not null,
+				url text default '',
+				model_name text not null,
+				model_version text not null,
+				embedding numeric(15,12)[],
+				primary key (id)
+			);
+			CREATE TABLE entries_embedding (
+				id serial not null,
+				entry_id int not null,
+				model_name text not null,
+				model_version text not null,
+				embedding numeric(15,12)[],
+				primary key (id)
+			);
+			CREATE TABLE recommend_feed (
+				id serial not null,
+				title text default '',
+				feed_url text default '',
+				site_url text default '',
+				icon_type text default '',
+				icon_content bytea default '',
+				category_id int not null,
+				category_title text default '',
+				primary key (id)
+			);
+			CREATE TABLE recommend_model (
+				id serial not null,
+				model_name text not null,
+				model_version text not null,
+				primary key (id)
+			);
+			CREATE TABLE recommend_result (
+				id serial not null,
+				batch int not null,
+				url text not null,
+				score numeric(5,2) not null,
+				rank int not null,
+				primary key (id)
+			);
+			CREATE TABLE stat_entry_read (
+				id serial not null,
+				batch int not null,
+				entry_id int not null,
+				rank int not null,
+				read_complete bool default 'f',
+				readlater_tag bool default 'f',
+				board_tag bool default 'f',
+				click_num int not null default 1,
+				primary key (id)
+			);
+			CREATE TABLE stat_active (
+				id serial not null,
+				day text not null,
+				hour int not null,
+				count int not null,
+				primary key (id)
+			);
+
+			CREATE UNIQUE INDEX index_recommend_entries_url on recommend_entries using btree(url);
+			CREATE INDEX index_recommend_entries_embedding_url on recommend_entries_embedding using btree(url);
+			CREATE INDEX index_recommend_entries_embedding_model on recommend_entries_embedding using btree(url,model_name,model_version);
+			CREATE INDEX index_entries_embedding_entryid on entries_embedding using btree(entry_id);
+			CREATE INDEX index_entries_embedding_model on entries_embedding using btree(entry_id,model_version,model_version);
+			CREATE INDEX index_recommend_result_batch on recommend_result using btree(batch);
+			ALTER TABLE entries ADD COLUMN last_read_at timestamp with time zone;
+		`
+
+		_, err = tx.Exec(sql)
+		return err
+	},
 }

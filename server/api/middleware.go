@@ -7,10 +7,12 @@ package api // import "miniflux.app/api"
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"miniflux.app/http/request"
 	"miniflux.app/http/response/json"
 	"miniflux.app/logger"
+	"miniflux.app/model"
 	"miniflux.app/storage"
 )
 
@@ -30,6 +32,25 @@ func (m *middleware) handleCORS(next http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Max-Age", "3600")
 			w.WriteHeader(http.StatusOK)
 			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (m *middleware) handleStatActive(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		t := time.Now()
+		stat, _ := m.store.StatActive(t.Format("2006/01/02"), t.Hour())
+		if stat == nil {
+			insertStat := model.StatActive{
+				Day:   t.Format("2006/01/02"),
+				Hour:  t.Hour(),
+				Count: 1,
+			}
+			m.store.CreateStatActive(&insertStat)
+		} else {
+			stat.Count = stat.Count + 1
+			m.store.UpdateStatActive(stat)
 		}
 		next.ServeHTTP(w, r)
 	})

@@ -92,7 +92,7 @@ func CreateFeed(store *storage.Storage, userID int64, feedCreationRequest *model
 
 	logger.Debug("[CreateFeed] Feed saved with ID: %d", subscription.ID)
 
-	checkFeedIcon(
+	CheckFeedIcon(
 		store,
 		subscription.ID,
 		subscription.SiteURL,
@@ -185,7 +185,7 @@ func RefreshFeed(store *storage.Storage, userID, feedID int64) error {
 		// We update caching headers only if the feed has been modified,
 		// because some websites don't return the same headers when replying with a 304.
 		originalFeed.WithClientResponse(response)
-		checkFeedIcon(
+		CheckFeedIcon(
 			store,
 			originalFeed.ID,
 			originalFeed.SiteURL,
@@ -208,7 +208,7 @@ func RefreshFeed(store *storage.Storage, userID, feedID int64) error {
 	return nil
 }
 
-func checkFeedIcon(store *storage.Storage, feedID int64, websiteURL, userAgent string, fetchViaProxy, allowSelfSignedCertificates bool) {
+func CheckFeedIcon(store *storage.Storage, feedID int64, websiteURL, userAgent string, fetchViaProxy, allowSelfSignedCertificates bool) {
 	if !store.HasIcon(feedID) {
 		icon, err := icon.FindIcon(websiteURL, userAgent, fetchViaProxy, allowSelfSignedCertificates)
 		if err != nil {
