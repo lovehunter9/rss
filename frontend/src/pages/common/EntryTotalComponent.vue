@@ -2,9 +2,9 @@
   <q-item dense class="entry-total-root column">
     <div class="entry-header row items-center justify-between">
       <div class="enter-header-start row items-center">
-        <q-img class="entry-icon row item-center" />
+
         <div class="enter-time text-minor-color ">
-          marginalrevolution.com · 1 mins ago
+          {{ recommend.author }} · {{ getTime() }}
         </div>
       </div>
       <div class="row justify-end items-center">
@@ -13,21 +13,44 @@
       </div>
     </div>
     <div class="entry-title text-major-color">
-      What is the single best way of improving your GPT prompts?
+      {{ recommend.title }}
     </div>
 
-    <div class="entry-content text-minor-color">
-      Memphis Grizzlies guard Ja Morant has been suspended by the NBA for eight games without pay for "conduct detrimental
-      to the league," officials announced Wednesday.
+    <div class="entry-content text-minor-color" v-html="recommend.content"></div>
+    <div>
+      {{ recommend.score }}
+    </div>
+    <div>
+      {{ recommend.rank }}
+    </div>
+    <div>
+      {{ recommend.url }}
     </div>
   </q-item>
 </template>
 
 <script setup lang='ts'>
-import { ref } from 'vue';
+import { PropType, ref } from 'vue';
+import { Recommend } from 'src/types'
+import { getPastTime, utcToStamp } from 'src/utils/utils';
 // import ChangeEntryBoardMenuComponent from 'components/rss/ChangeEntryBoardMenuComponent.vue'
 const markRef = ref(require('../../assets/menu/unbookmark.svg'))
 const markTextRef = ref('Add to board')
+
+const props = defineProps({
+  recommend: {
+    type: Object as PropType<Recommend>,
+      required: true
+  }
+})
+
+
+function getTime() {
+  if (props.recommend) {
+    return getPastTime(new Date, utcToStamp(props.recommend.published_at))
+  }
+  return '';
+}
 
 </script>
 
@@ -50,7 +73,7 @@ const markTextRef = ref('Add to board')
         font-weight: 400;
         font-size: 12px;
         line-height: 16px;
-        margin-left: 12px;
+        // margin-left: 12px;
       }
     }
   }

@@ -16,6 +16,7 @@ import {
   MenuChoice,
   MenuType,
   SDKQueryRequest,
+  Recommend
 } from 'src/types';
 
 import {
@@ -31,6 +32,7 @@ import {
   get_feed_icon,
   get_feeds,
   get_readLater,
+  get_recommendList,
   get_today,
   remove_category,
   remove_feed,
@@ -58,12 +60,13 @@ export type DataState = {
 
   leftDrawerOpen: boolean;
   dialogShow: boolean;
+  recommends: Recommend[]
 };
 
 export const useRssStore = defineStore('rss', {
   state: () => {
     return {
-      url: '',//'http://127.0.0.1:8080',
+      url: '',
       sdkUrl: '',
       menu_choice: {
         type: MenuType.Empty,
@@ -77,10 +80,10 @@ export const useRssStore = defineStore('rss', {
       entries_total: 0,
       contents: {},
       //entry_choice: undefined,
-
       leftDrawerOpen: false,
       dialogShow: false,
-    } as DataState;
+      recommends: []
+    } as unknown as DataState;
   },
   getters: {
     //doubleCount: (state) => state.counter * 2,
@@ -433,6 +436,16 @@ export const useRssStore = defineStore('rss', {
       this.entries.filter(e => e.id === entry_id).map(e => {
         e.board_ids = board_ids
       })
+    },
+
+    async get_recommendList(page = 0, pageSize = 20) {
+      try {
+        const recommendList = await get_recommendList(page * pageSize, pageSize)
+        this.recommends = recommendList.entries
+        return recommendList
+      } catch (error) {
+        console.log(error);
+      }
     }
   },
 });
