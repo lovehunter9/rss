@@ -47,7 +47,8 @@ const props = defineProps({
 
 function getTime() {
   if (props.recommend) {
-    return getPastTime(new Date, utcToStamp(props.recommend.published_at))
+    // return getPastTime(new Date, utcToStamp(props.recommend.published_at))
+    return props.recommend.published_at
   }
   return '';
 }
