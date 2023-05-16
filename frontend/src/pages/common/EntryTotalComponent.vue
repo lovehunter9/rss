@@ -1,5 +1,5 @@
 <template>
-  <q-item dense class="entry-total-root column">
+  <q-item dense clickable class="entry-total-root column" @click="itemClick">
     <div class="entry-header row items-center justify-between">
       <div class="enter-header-start row items-center">
 
@@ -18,13 +18,19 @@
 
     <div class="entry-content text-minor-color" v-html="recommend.content"></div>
     <div>
-      {{ recommend.score }}
+      score: {{ recommend.score }}
     </div>
     <div>
-      {{ recommend.rank }}
+      rank: {{ recommend.rank }}
     </div>
     <div>
-      {{ recommend.url }}
+      url: {{ recommend.url }}
+    </div>
+    <div>
+      category_id: {{ recommend.feed.category_id }}
+    </div>
+    <div>
+      category_title: {{ recommend.feed.category_title }}
     </div>
   </q-item>
 </template>
@@ -51,6 +57,10 @@ function getTime() {
     return props.recommend.published_at
   }
   return '';
+}
+
+const itemClick = () => {
+  window.open(props.recommend.url)
 }
 
 </script>
