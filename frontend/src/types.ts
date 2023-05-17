@@ -657,3 +657,32 @@ export interface SDKSearchPathItem {
   pubDate: string
   title: string
 }
+
+
+
+export interface RecommendListQueryResponse {
+  total: number
+  entries: Recommend[]
+}
+
+export interface Recommend {
+  batch: number
+  entry_id: number
+  title: string
+  author: string
+  published_at: string
+  url: string
+  content: string
+  feed: {
+    id: number
+    feed_title: string
+    site_url: string
+    icon_type?: string
+    icon_byte_content?: string
+    icon_content: string
+    category_id: number
+    category_title: string
+  }
+  score: number
+  rank: number
+}

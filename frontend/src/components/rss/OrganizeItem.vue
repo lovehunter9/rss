@@ -19,7 +19,8 @@
     <img class="modify-icon" src="../../assets/menu/modify.svg" @click="edit">
     <img class="delete-icon" src="../../assets/menu/delete.svg" @click="remove">
   </div>
-  <div class="line"/>
+  <!-- <div class="line"/> -->
+  <q-separator inset />
 </template>
 
 <script setup lang="ts">

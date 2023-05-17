@@ -106,7 +106,10 @@ class DataHandler:
         entries = tool.select_tobe_recommended_entries(user.model_name, user.model_version, down_latest_number)
         result_list = dict()
         for current_entry in entries:
-            result_list[current_entry['url']] = np.array(current_entry['embedding'], dtype=np.float32)
+            result_list[current_entry['url']] = {
+                "embedding": np.array(current_entry['embedding'], dtype=np.float32),
+                "created_at": current_entry['published_at'].replace(tzinfo=None)
+            }
         return result_list
 
     def down_valid_model_and_version():
