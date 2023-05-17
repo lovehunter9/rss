@@ -1,0 +1,9 @@
+FROM continuumio/anaconda3:2022.10-amazonlinux
+# FROM alpine:3.16
+# Run conda update -n base -c defaults conda
+# FROM apache/airflow:2.5.3
+RUN pip install gensim==4.3.1 pandas==2.0.0 protobuf==4.21.8 nltk==3.8.1 \
+boto3==1.26.119 psycopg2-binary==2.9.6  peewee==3.16.2    \
+numpy==1.24.3  newspaper3k==0.2.8 pymongo==4.3.3 rake-nltk==1.0.6 \
+beautifulsoup4==4.12.2
+COPY build_base_image_script/credentials  /root/.aws/
