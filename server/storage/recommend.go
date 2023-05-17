@@ -67,7 +67,7 @@ func (s *Storage) GetRecommendCount(batch int) int {
 
 }
 func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, error) {
-	query := `SELECT r.batch, e.entry_id, e.title, e.author,e.url,e.content,e.published_at,r.score,r.rank,
+	query := `SELECT r.batch, e.id entry_id, e.title, e.author,e.url,e.content,e.published_at,r.score,r.rank,
 	 f.title feed_title,f.feed_url,f.site_url,f.icon_type,f.icon_content icon_byte_content,f.category_id,f.category_title
 	 FROM recommend_result r,recommend_entries e,recommend_feed f 
 	 WHERE r.batch=$1 and r.url=e.url and e.feed_id=f.id

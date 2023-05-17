@@ -15,7 +15,7 @@ import {
   FeedModificationRequest,
   BoardRequest,
   Board,
-  BoardEntriesQueryRequest, EntryToBoardRequest,
+  BoardEntriesQueryRequest, EntryToBoardRequest, RecommendListQueryResponse,
 } from 'src/types';
 import { useRssStore } from 'src/stores/rss';
 
@@ -392,6 +392,21 @@ export async function get_today(): Promise<EntriesQueryResponse> {
   const data: EntriesQueryResponse = await axios.get(
     rssStore.url + '/api/today'
   );
+
+  return data;
+}
+
+export async function get_recommendList(offset: number,limit = 20):Promise<RecommendListQueryResponse> {
+  const rssStore = useRssStore();
+
+  const data: RecommendListQueryResponse = await axios.get(
+    rssStore.url + '/api/recommendList'
+  , {
+    params: {
+      offset,
+      limit
+    }
+  });
 
   return data;
 }
