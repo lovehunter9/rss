@@ -66,6 +66,16 @@ class RecommendPGDBTool:
             result_dict_list.append(model_to_dict(current_model))
         return result_dict_list
     
+    
+    def select_all_bert_tokenize_valid_entry(self,pg_column_name):
+        CURRENT_MDEOL_FIELD = ENTRIES_EMBEDDING_COLUMN_NAME_TO_PEEWEE_ATTRIBUTE.get_peewee_attribute_to_column_name(pg_column_name)
+
+
+        result_list = list(EntryModel.select(EntryModel.url,EntryModel.full_content).join(EntryEmbeddingModel,JOIN.LEFT_OUTER,on=(EntryModel.id==EntryEmbeddingModel.entry_id)).where((CURRENT_MDEOL_FIELD.is_null(False) & (CURRENT_MDEOL_FIELD == int(EmbeddingStatus.PROCESSED)) ) &  EntryModel.full_content.is_null(False) ).execute())
+        result_dict_list = self.convert_peewee_model_to_dict(result_list)
+        return result_dict_list
+        
+        
     def select_entry_according_embedding_exist_latest(self,pg_column_name,limit_number):
 
         if isinstance(limit_number,int) is False:
@@ -94,7 +104,7 @@ class RecommendPGDBTool:
         
         if start_time > end_time:
             raise ValueError("start_time bigger than end time")  
-        RECOMMEND_PG_DB.close_stale()
+        
         result_list = list(EntryModel.select(EntryModel.id,EntryModel.full_content,EntryModel.url).where(EntryModel.created_at.between(start_time,end_time)).execute())
         result_dict_list = list()
         for current_model in result_list:
@@ -104,7 +114,7 @@ class RecommendPGDBTool:
     def select_entry_embedding_according_entry_id(self,entry_id):
         if isinstance(entry_id,int) is False:
             raise ValueError('entry_id is not str')
-        RECOMMEND_PG_DB.close_stale()
+        
         result_list = list(EntryEmbeddingModel.select(EntryEmbeddingModel.entry_id).where(EntryEmbeddingModel.entry_id == entry_id).execute())
         result_dict_list = list()
         for current_model in result_list:
@@ -114,7 +124,7 @@ class RecommendPGDBTool:
     def select_entry_according_id(self,id):
         if isinstance(id,int) is False:
             raise ValueError('entry_id is not str')
-        RECOMMEND_PG_DB.close_stale()
+        
         result_list = list(EntryModel.select(EntryModel.id,EntryModel.full_content,EntryModel.url).where(EntryModel.id == id).execute())
         result_dict_list = list()
         for current_model in result_list:
@@ -256,3 +266,21 @@ class RecommendPGDBTool:
                 
         
         return feee_model_dict_list
+    
+    def select_category_labels(self):
+        category_model_list = list(CategoriesModel.select().execute())
+        category_model_dict_list = self.convert_peewee_model_to_dict(category_model_list)
+        first_category_to_id = dict()
+        second_category_to_id = dict()
+        id_to_first_category = dict()
+        id_to_second_category = dict()
+        second_id_to_first_id = dict()
+        for current_category_model in category_model_dict_list:
+            if current_category_model["parent_id"] == 0: 
+                first_category_to_id[current_category_model["title"]] = current_category_model["id"]
+                id_to_first_category[current_category_model["id"]] = current_category_model["title"]
+            else:
+                second_category_to_id[current_category_model["title"]] = current_category_model["id"]
+                id_to_second_category[current_category_model["id"]] = current_category_model["title"]
+                second_id_to_first_id[current_category_model["id"]] = current_category_model["parent_id"]
+        return first_category_to_id,id_to_first_category,second_category_to_id,id_to_second_category,second_id_to_first_id   
