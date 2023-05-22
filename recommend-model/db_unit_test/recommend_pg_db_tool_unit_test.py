@@ -10,6 +10,7 @@ from db.recommend_mongo_article_collection import RecommendMongoArticleCollectio
 from db.recommend_pg_db_tool import RecommendPGDBTool
 from embedding.embedding_enum import EmbeddingEnum,EmbeddingStatus
 from embedding.word2vec_embedding import Word2VecEmbedding
+import sys
 
 
 class RecommendPGDBToolUnitTest(unittest.TestCase):
@@ -176,3 +177,21 @@ class RecommendPGDBToolUnitTest(unittest.TestCase):
         recommend_tool = RecommendPGDBTool()
         recommend_tool.update_entry_embedding_common_eval_version(4,EmbeddingStatus.UNPROCESSED,EmbeddingEnum.BERT)
     
+    
+    def test_select_category_labels(self):
+        # python  -m unittest recommend_pg_db_tool_unit_test.RecommendPGDBToolUnitTest.test_select_category_labels
+        recommend_tool = RecommendPGDBTool()
+        first_category_to_id,id_to_first_category,second_category_to_id,id_to_second_category,second_id_to_first_id   = recommend_tool.select_category_labels()
+        print(first_category_to_id)
+        print(second_category_to_id)
+        
+    
+    def test_select_all_bert_tokenize_valid_entry(self):
+        # python  -m unittest recommend_pg_db_tool_unit_test.RecommendPGDBToolUnitTest.test_select_all_bert_tokenize_valid_entry   
+        recommend_tool = RecommendPGDBTool()
+        result = recommend_tool.select_all_bert_tokenize_valid_entry("whether_bert_base_cased_tokenize")
+        # 191372
+        # 1671784
+
+ 
+        

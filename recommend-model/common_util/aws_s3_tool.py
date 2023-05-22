@@ -1,4 +1,5 @@
 import boto3
+import json
 import sys 
 
 from common_util.common_tool import CommonTool
@@ -104,6 +105,50 @@ class AWSS3Tool:
             result["response"] = response
             result["bytes"] = current_byte
         return result
+    
+    def get_object_dict(self,bucket_name,key):
+        if isinstance(bucket_name,str) is False:
+            raise ValueError("bucket name is not str")
+        if isinstance(key,str) is False:
+            raise ValueError("key is not str")
+        response = self.__client.get_object(
+            Bucket=bucket_name,
+            Key=key,
+        )
+        result=dict()
+        if ("ResponseMetadata" not in response or 
+            "HTTPStatusCode" not in response["ResponseMetadata"] or
+            response["ResponseMetadata"]["HTTPStatusCode"] != 200):
+            self.__logger.error(f"get bucket {bucket_name} key {key} fail, response {response}")
+            result["success"] = False
+            result["response"] = response
+            
+        else:
+            current_byte = response["Body"].read()
+            result["success"] = True
+            result["response"] = response
+            result["dict"] = json.loads(current_byte)
+        return result
+    
+    def put_oject_dict(self,bucket_name,key,meta_data_dict,data_dict):
+        if isinstance(bucket_name,str) is False:
+            raise ValueError("bucket name is not str")
+        if isinstance(key,str) is False:
+            raise ValueError("key is not str")
+        if isinstance(meta_data_dict,dict) is False:
+            raise ValueError("meta_data_dict is not dict")
+        if isinstance(data_dict,dict) is False:
+            raise ValueError("data_dict is not dict")
+        
+        response = self.__client.put_object(
+            Body=json.dumps(data_dict).encode("utf-8"),
+            Bucket=bucket_name,
+            Key=key,
+            # ContentType=content_type,
+            Metadata=meta_data_dict
+        )
+        return response
+        
     
     def put_object_with_md5(self,byte_body,bucket_name,key,content_type,uncompress_hash= None):
         if isinstance(byte_body, (bytes, bytearray)) is False:

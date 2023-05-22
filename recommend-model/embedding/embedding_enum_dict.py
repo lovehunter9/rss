@@ -72,6 +72,8 @@ class EntriesEmbeddingColumnNameToPeeweeAttributeDict:
         self.__peewee_attribute_to_column_name[EntryEmbeddingModel.doc2vec_v1] = 'doc2vec_v1'
         self.__peewee_attribute_to_column_name[EntryEmbeddingModel.word2vec_google_v2] = 'word2vec_google_v2'
         self.__column_name_to_peewee_attribute['word2vec_google_v2'] = EntryEmbeddingModel.word2vec_google_v2
+        self.__column_name_to_peewee_attribute['whether_bert_base_cased_tokenize'] = EntryEmbeddingModel.whether_bert_base_cased_tokenize
+        self.__peewee_attribute_to_column_name[EntryEmbeddingModel.whether_bert_base_cased_tokenize] = 'whether_bert_base_cased_tokenize'
     
     def get_peewee_attribute_to_column_name(self,column_name):
         if isinstance(column_name,str) is False:

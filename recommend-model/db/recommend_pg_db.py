@@ -48,6 +48,7 @@ class EntryEmbeddingModel(RecommendPGBaseModel):
     bert_v1 = IntegerField(null=True,default=int(EmbeddingStatus.UNPROCESSED))
     doc2vec_v1 = IntegerField(null=True,default=int(EmbeddingStatus.UNPROCESSED))
     word2vec_google_v2 = IntegerField(null=True,default=int(EmbeddingStatus.UNPROCESSED))
+    whether_bert_base_cased_tokenize = IntegerField(null=True,default=int(EmbeddingStatus.UNPROCESSED))
     class Meta:
         db_table = 'entries_embedding'
         primary_key = False
