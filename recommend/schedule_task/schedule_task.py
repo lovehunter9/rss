@@ -24,10 +24,19 @@ def schedule_probe():
 if __name__ == '__main__':
     import nltk
     nltk.download('stopwords')
-    schedule_rank_task()
+    # schedule_rank_task()
     schedule_task_interval = int(os.environ.get('schedule_task_interval', 240))
     schedule.every(schedule_task_interval).minutes.do(schedule_rank_task)
     schedule.every(1).minutes.do(schedule_probe)
+    init_first = False
+    start_time = datetime.now()
+    common_tool = CommonTool()
     while True:
+        if init_first is False:
+            diff_time = common_tool.compute_diff_time(start_time,datetime.now())
+            if diff_time > 1800:
+                current_logger.debug(f"first init time {datetime.now()}")
+                schedule_rank_task()
+                init_first = True
         schedule.run_pending()
         time.sleep(60)
