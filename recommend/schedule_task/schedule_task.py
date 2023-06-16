@@ -8,18 +8,22 @@ from handler.rank import RankHandler
 
 current_logger = CommonTool().get_logger()
 
+
 def schedule_rank_task():
     handler = RankHandler()
     current_logger.debug(f'schedule_rank_task')
     try:
+        current_logger.debug(f'schedule_rank_task start {datetime.now()}')
         RankHandler.rank()
+        current_logger.debug(f'schedule_rank_task end  {datetime.now()}')
     except Exception as ex:
         tb = traceback.format_exc()
         current_logger.error(f'error {tb}')
 
+
 def schedule_probe():
     current_logger.debug(f'schedule_probe datetime {datetime.now()}')
-    
+
 
 if __name__ == '__main__':
     import nltk
@@ -33,8 +37,8 @@ if __name__ == '__main__':
     common_tool = CommonTool()
     while True:
         if init_first is False:
-            diff_time = common_tool.compute_diff_time(start_time,datetime.now())
-            if diff_time > 1800:
+            diff_time = common_tool.compute_diff_time(start_time, datetime.now())
+            if diff_time > 60:
                 current_logger.debug(f"first init time {datetime.now()}")
                 schedule_rank_task()
                 init_first = True
