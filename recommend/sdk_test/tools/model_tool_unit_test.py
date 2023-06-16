@@ -31,7 +31,7 @@ class ModelToolUnitTest(unittest.TestCase):
         # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_download
 
         model_name = "word2vec_google"
-        model_version = "v1"
+        model_version = "v2"
         download_dir = "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model"
         current_model_tool = ModelTool(download_dir)
         current_model_tool.download(model_name, model_version, download_dir)
@@ -78,7 +78,7 @@ class ModelToolUnitTest(unittest.TestCase):
         download_dir = "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model"
         current_model_tool = ModelTool(download_dir)
         model_name = "word2vec_google"
-        model_version = "v1"
+        model_version = "v2"
         current_model_tool.init_model(model_name, model_version)
 
     def test_download_latest_all_feed(self):
