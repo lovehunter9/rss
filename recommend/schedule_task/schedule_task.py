@@ -36,6 +36,7 @@ if __name__ == '__main__':
     start_time = datetime.now()
     common_tool = CommonTool()
     while True:
+        current_logger.debug(f"checker init_first {init_first} {datetime.now()}")
         if init_first is False:
             diff_time = common_tool.compute_diff_time(start_time, datetime.now())
             if diff_time > 60:
