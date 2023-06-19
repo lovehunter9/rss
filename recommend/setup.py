@@ -21,7 +21,7 @@ def parse_requiremnt():
 
 sys.path.append(os.path.dirname(__file__) + "/recommend-client")
 
-setup(name="recommend client",
+setup(name="recommend_client",
       packages=find_packages(),
       version="1.0",
       install_requires=parse_requiremnt())
