@@ -1,3 +1,4 @@
+from datetime import datetime
 import gzip
 import json
 import os
@@ -112,4 +113,15 @@ class CommonTool:
                     break
                 m.update( buf )
         return m.hexdigest()
+
+    def compute_diff_time(self,start_time,end_time):
+        if isinstance(start_time,datetime) is False:
+            raise ValueError('start_time is not datetime')
+        if isinstance(end_time,datetime) is False:
+            raise ValueError('end_time is not datetime')
+        if end_time < start_time:
+            raise ValueError('end_time is small than start_time')
+        diff = end_time-start_time 
+        diff_in_seconds = diff.total_seconds() 
+        return diff_in_seconds
     
