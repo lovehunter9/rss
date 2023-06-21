@@ -13,6 +13,7 @@ class RecommendPGDBTool:
         self.__logger = CommonTool().get_logger()
 
     def select_users_model(self):
+        RECOMMEND_PG_DB.connect(reuse_if_open=True)
         return UsersModel.get(UsersModel.id == 1)
 
     def select_entries_embedding_model(self, entry_id, model_name, model_version):

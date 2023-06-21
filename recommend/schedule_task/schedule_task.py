@@ -39,7 +39,7 @@ if __name__ == '__main__':
         current_logger.debug(f"checker init_first {init_first} {datetime.now()}")
         if init_first is False:
             diff_time = common_tool.compute_diff_time(start_time, datetime.now())
-            if diff_time > 60:
+            if diff_time > 1800:
                 current_logger.debug(f"first init time {datetime.now()}")
                 schedule_rank_task()
                 init_first = True
