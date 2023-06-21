@@ -12,4 +12,4 @@ COPY recommend/  $BASE_PATH/
 COPY resources/credentials  /root/.aws/ 
 RUN  cd $BASE_PATH && \
      pip install -e . 
-CMD ["python","-u","/opt/recommend/schedule_task/schedule_task.py"]
+CMD ["python","-u","/opt/recommend/schedule_task/schedule_task_simple.py"]

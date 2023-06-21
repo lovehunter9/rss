@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from recommend_model_sdk.tools.model_tool import ModelTool
 from db.recommend_pg_db_tool import *
 
-#path = os.environ.get('model_path', "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model")
+# path = os.environ.get('model_path', "/ssd/code/MODEL")
 
 path = os.environ.get('model_path', "/model")
 read_entries_num = int(os.environ.get('read_entries_num', 50))
