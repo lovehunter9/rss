@@ -3,18 +3,18 @@ from datetime import datetime
 import time
 import traceback
 from recommend_model_sdk.tools.common_tool import CommonTool
-from handler.rank import RankHandler
+from handler.recommend_handler import RecommendHandler
 
 current_logger = CommonTool().get_logger()
 
 
 def schedule_rank_task():
-    handler = RankHandler()
+    handler = RecommendHandler()
     current_logger.debug(f'schedule_rank_task')
     try:
         start_time = datetime.now()
         current_logger.debug(f'schedule_rank_task start  {start_time}')
-        RankHandler().rank()
+        handler.recommend()
         current_logger.debug(f'diff time {common_tool.compute_diff_time(start_time,datetime.now())}')
     except Exception as ex:
         tb = traceback.format_exc()

@@ -2,30 +2,34 @@ import os
 import numpy as np
 from datetime import datetime
 from bs4 import BeautifulSoup
+from recommend_model_sdk.tools.common_tool import CommonTool
 from recommend_model_sdk.tools.model_tool import ModelTool
 from db.recommend_pg_db_tool import *
 
-# path = os.environ.get('model_path', "/ssd/code/MODEL")
+path = os.environ.get('model_path', "/ssd/code/MODEL_CLIENT")
 
-path = os.environ.get('model_path', "/model")
+# path = os.environ.get('model_path', "/model")
 read_entries_num = int(os.environ.get('read_entries_num', 50))
 down_latest_number = int(os.environ.get('down_latest_number', 1000))
 
 
 class DataHandler:
+    def __init__(self) -> None:
+        self.current_logger = CommonTool().get_logger()
+        self.commont_tool = CommonTool()
 
-    def infer(docList):
+    def infer(self,docList):
         # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_infer
         current_model_tool = ModelTool(path)
         model_name = "word2vec_google"
         model_version = "v1"
         print(current_model_tool.infer(model_name, model_version, docList))
 
-    def init_model(user):
+    def init_model(self,user):
         current_model_tool = ModelTool(path)
         current_model_tool.init_model(user.model_name, user.model_version)
 
-    def get_readed_entries(user):
+    def get_readed_entries(self,user):
         tool = RecommendPGDBTool()
         current_model_tool = ModelTool(path)
         entries = tool.select_read_entries(read_entries_num)
@@ -58,7 +62,7 @@ class DataHandler:
             tool.batch_insert_entries_embedding_model(saveEmbeddingList)
         return result_list
 
-    def down_latest_article_embedding_package(user):
+    def down_latest_article_embedding_package(self,user):
         tool = RecommendPGDBTool()
         current_model_tool = ModelTool(path)
 
@@ -101,7 +105,7 @@ class DataHandler:
             if len(embedding_list) > 0:
                 tool.batch_insert_recommend_entries_embedding(embedding_list)
 
-    def get_tobe_recommended_entries(user):
+    def get_tobe_recommended_entries(self,user):
         tool = RecommendPGDBTool()
         entries = tool.select_tobe_recommended_entries(user.model_name, user.model_version, down_latest_number)
         result_list = dict()
@@ -112,7 +116,7 @@ class DataHandler:
             }
         return result_list
 
-    def down_valid_model_and_version():
+    def down_valid_model_and_version(self):
         tool = RecommendPGDBTool()
         current_model_tool = ModelTool(path)
         result = current_model_tool.get_valid_model_and_version()
@@ -120,14 +124,14 @@ class DataHandler:
             for v in versionList:
                 tool.check_model_and_version(model, v)
 
-    def download_feed():
+    def download_feed(self):
         tool = RecommendPGDBTool()
         tool.empty_recommend_feed_model()
         feedList = []
 
         current_model_tool = ModelTool(path)
         feed_id_to_feed = current_model_tool.download_latest_all_feed()
-
+        self.current_logger.debug(f'download feed id to feed compelete')
         for current_id, current_feed in feed_id_to_feed.items():
             feed = {
                 'id': current_feed['id'],
@@ -143,7 +147,9 @@ class DataHandler:
                 feed['icon_content'] = current_feed['icon_content']
             feedList.append(feed)
             if len(feedList) > 200:
+                self.current_logger.debug(f'start insert feed to db')
                 tool.batch_insert_recommend_feed_model(feedList)
                 feedList = []
         if len(feedList) > 0:
             tool.batch_insert_recommend_feed_model(feedList)
+        self.current_logger.debug(f'insert downloaded feed to db')

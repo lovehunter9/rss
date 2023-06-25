@@ -2,11 +2,11 @@ import unittest
 from recommend_model_sdk.tools.model_tool import ModelTool
 
 from handler.data import *
-from handler.rank import *
+from handler.recommend_handler import *
 from db.recommend_pg_db_tool import *
-from newspaper import *
+# from newspaper import *
 
-from lxml import etree
+# from lxml import etree
 from bs4 import BeautifulSoup
 
 
@@ -105,7 +105,7 @@ class ModelToolUnitTest(unittest.TestCase):
         # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_handler
         #RecommendHandler.downloadFeed()
         #DataHandler.down_latest_article_embedding_package()
-        RankHandler.rank()
+        RecommendHandler().recommend()
 
     def test_newspaper(self):
         # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_newspaper
