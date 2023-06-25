@@ -59,5 +59,10 @@ type Recommend struct {
 	Rank  int            `json:"rank"`
 }
 
+type ReadTimeStatRequest struct {
+	EntryID  int64 `json:"entry_id"`
+	ReadTime int   `json:"read_time"`
+}
+
 // Categories represents a list of categories.
 type Recommends []*Recommend

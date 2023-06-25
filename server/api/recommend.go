@@ -183,6 +183,22 @@ func (h *handler) recommendReadCompleteStat(w http.ResponseWriter, r *http.Reque
 	json.NoContent(w, r)
 }
 
+func (h *handler) recommendReadTimeStat(w http.ResponseWriter, r *http.Request) {
+	var statRequest model.ReadTimeStatRequest
+	if err := json_parser.NewDecoder(r.Body).Decode(&statRequest); err != nil {
+		json.BadRequest(w, r, err)
+		return
+	}
+	stat := h.initRecommendStat(statRequest.EntryID)
+	if stat == nil {
+		json.BadRequest(w, r, errors.New("error.stat deal error"))
+		return
+	}
+	stat.ReadTime = stat.ReadTime + statRequest.ReadTime
+	h.store.UpdateStatEntryRead(stat)
+	json.NoContent(w, r)
+}
+
 func (h *handler) initRecommendStat(entryID int64) *model.StatEntry {
 	recommendBase, _ := h.store.LastRecommendBase()
 	stat, _ := h.store.StatEntryRead(recommendBase.Batch, entryID)

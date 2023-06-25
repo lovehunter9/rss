@@ -12,6 +12,7 @@ type StatEntry struct {
 	Rank         int   `json:"rank"`
 	ClickNum     int   `json:"click_num"`
 	ReadComplete bool  `json:"read_complete"`
+	ReadTime     int   `json:"read_time"`
 	ReadLater    bool  `json:"readlater_tag"`
 	Board        bool  `json:"board_tag"`
 }

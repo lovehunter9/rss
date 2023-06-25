@@ -10,8 +10,8 @@ import (
 func (s *Storage) StatEntryRead(batch int, entryID int64) (*model.StatEntry, error) {
 	var stat model.StatEntry
 
-	query := `SELECT id, batch, entry_id,rank,read_complete,readlater_tag,board_tag,click_num FROM stat_entry_read WHERE batch=$1 and entry_id=$2 `
-	err := s.db.QueryRow(query, batch, entryID).Scan(&stat.ID, &stat.Batch, &stat.EntryID, &stat.Rank, &stat.ReadComplete, &stat.ReadLater, &stat.Board, &stat.ClickNum)
+	query := `SELECT id, batch, entry_id,rank,read_complete,readlater_tag,board_tag,click_num,read_time FROM stat_entry_read WHERE batch=$1 and entry_id=$2 `
+	err := s.db.QueryRow(query, batch, entryID).Scan(&stat.ID, &stat.Batch, &stat.EntryID, &stat.Rank, &stat.ReadComplete, &stat.ReadLater, &stat.Board, &stat.ClickNum, &stat.ReadTime)
 
 	switch {
 	case err == sql.ErrNoRows:
@@ -55,7 +55,7 @@ func (s *Storage) CreateStatEntryRead(request *model.StatEntry) (*model.StatEntr
 }
 
 func (s *Storage) UpdateStatEntryRead(stat *model.StatEntry) error {
-	query := `UPDATE stat_entry_read SET batch=$1, entry_id=$2,rank=$3,read_complete=$4,readlater_tag=$5,board_tag=$6,click_num=$7 WHERE id=$8 `
+	query := `UPDATE stat_entry_read SET batch=$1, entry_id=$2,rank=$3,read_complete=$4,readlater_tag=$5,board_tag=$6,click_num=$7,read_time=$8 WHERE id=$9 `
 	_, err := s.db.Exec(
 		query,
 		stat.Batch,
@@ -65,6 +65,7 @@ func (s *Storage) UpdateStatEntryRead(stat *model.StatEntry) error {
 		stat.ReadLater,
 		stat.Board,
 		stat.ClickNum,
+		stat.ReadTime,
 		stat.ID,
 	)
 
