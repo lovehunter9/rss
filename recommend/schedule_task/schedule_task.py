@@ -1,22 +1,24 @@
-import os
 from datetime import datetime
+import os
+import psutil
 import schedule
 import time
 import traceback
+
 from recommend_model_sdk.tools.common_tool import CommonTool
-from handler.rank import RankHandler
+from handler.recommend_handler import RecommendHandler
 
 current_logger = CommonTool().get_logger()
 common_tool = CommonTool()
 
 
 def schedule_rank_task():
-    handler = RankHandler()
+    handler = RecommendHandler()
     current_logger.debug(f'schedule_rank_task')
     try:
         start_time = datetime.now()
         current_logger.debug(f'schedule_rank_task start  {start_time}')
-        RankHandler.rank()
+        handler.recommend()
         current_logger.debug(f'diff time {common_tool.compute_diff_time(start_time,datetime.now())}')
     except Exception as ex:
         tb = traceback.format_exc()
@@ -24,14 +26,16 @@ def schedule_rank_task():
 
 
 def schedule_probe():
-    current_logger.debug(f'schedule_probe datetime {datetime.now()}')
+    current_pid = os.getpid()
+    current_memory = psutil.Process(os.getpid()).memory_info().rss / 1024 /1024
+    current_logger.debug(f'schedule_probe datetime {datetime.now()} current_pid {current_pid} memory {current_memory} MB')
 
 
 if __name__ == '__main__':
     import nltk
     nltk.download('stopwords')
     # schedule_rank_task()
-    schedule_task_interval = int(os.environ.get('schedule_task_interval', 240))
+    schedule_task_interval = int(os.environ.get('schedule_task_interval', 2))
     schedule.every(schedule_task_interval).minutes.do(schedule_rank_task)
     schedule.every(1).minutes.do(schedule_probe)
     init_first = False

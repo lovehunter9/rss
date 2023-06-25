@@ -4,28 +4,35 @@ import random
 import os
 from handler.data import *
 from recommend_model_sdk.tools.model_tool import ModelTool
-from recommend_model_sdk.rank.rank_tool import RankTool
 from recommend_model_sdk.tools.common_tool import CommonTool
+from recommend_model_sdk.recommend.recommend_tool import RecommendTool
 
 from db.recommend_pg_db_tool import *
 
 
-class RankHandler:
+class RecommendHandler:
     def __init__(self) -> None:
         self.current_logger = CommonTool().get_logger()
         self.commont_tool = CommonTool()
 
-    def rank(self):
+    def recommend(self):
         tool = RecommendPGDBTool()
         start_time = datetime.now()
         user = tool.select_users_model()
-        self.current_logger.debug(f'select_users_model time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+        self.current_logger.debug(f'model_name {user.model_name} model_version {user.model_version}')
+        user.model_name = "bert"
+        user.model_version = "v1"
         
-        DataHandler.down_valid_model_and_version()
+        self.current_logger.debug(f'select_users_model time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+        data_handler = DataHandler()
+        data_handler.down_valid_model_and_version()
+        
         
         start_time = datetime.now()
-        DataHandler.init_model(user)
+        data_handler = DataHandler()
+        data_handler.init_model(user)
         self.current_logger.debug(f'init_model time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+    
         
         baseModel = tool.select_recommend_model()
         if len(baseModel) == 0:
@@ -35,25 +42,25 @@ class RankHandler:
         tool.insert_recommend_model(batch)
         
         start_time = datetime.now()
-        DataHandler.download_feed()
+        # data_handler.download_feed()
         self.current_logger.debug(f'download_feed time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
         
         start_time = datetime.now()
-        DataHandler.down_latest_article_embedding_package(user)
+        # data_handler.down_latest_article_embedding_package(user)
         self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
         
         start_time = datetime.now()
-        query_url_to_embedding_dict = DataHandler.get_readed_entries(user)
+        query_url_to_embedding_dict = data_handler.get_readed_entries(user)
         self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
         
         start_time = datetime.now()
-        base_url_to_embedding_dict = DataHandler.get_tobe_recommended_entries(user)
+        base_url_to_embedding_dict = data_handler.get_tobe_recommended_entries(user)
         self.current_logger.debug(f'get_tobe_recommended_entries time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
         
-        rank_tool = RankTool(base_url_to_embedding_dict)
+        recommend_tool = RecommendTool(base_url_to_embedding_dict,user.model_name,user.model_version)
         start_time = datetime.now()
-        result = rank_tool.rank(query_url_to_embedding_dict, 100)
-        self.current_logger.debug(f'rank time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+        result = recommend_tool.recommend(query_url_to_embedding_dict, 100)
+        self.current_logger.debug(f'recommend time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
         saveResultList = []
         rank = 1
         for detail in result:
