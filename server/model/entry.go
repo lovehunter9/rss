@@ -41,6 +41,7 @@ type Entry struct {
 	BoardIDS    string        `json:"board_ids"`
 	DocId       string        `json:"doc_id"`
 	FullContent string        `json:"full_content"`
+	ImageUrl    string        `json:"image_url"`
 }
 
 // Entries represents a list of entries.

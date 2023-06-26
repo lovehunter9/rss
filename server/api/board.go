@@ -6,11 +6,15 @@ package api // import "miniflux.app/api"
 
 import (
 	json_parser "encoding/json"
+	"errors"
 	"net/http"
+	"time"
 
+	"miniflux.app/crypto"
 	"miniflux.app/http/request"
 	"miniflux.app/http/response/json"
 	"miniflux.app/model"
+	"miniflux.app/reader/processor"
 	"miniflux.app/validator"
 )
 
@@ -134,5 +138,45 @@ func (h *handler) removeEntryToBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	json.NoContent(w, r)
+}
+
+func (h *handler) addPageToBoard(w http.ResponseWriter, r *http.Request) {
+	userID := request.UserID(r)
+	var request model.PageToBoardRequest
+	if err := json_parser.NewDecoder(r.Body).Decode(&request); err != nil {
+		json.BadRequest(w, r, err)
+		return
+	}
+
+	content, img := processor.ScraperWebPage(request.Url)
+	if content == "" {
+		json.ServerError(w, r, errors.New("fetch_error"))
+		return
+	}
+	var feedId int64 = 0
+	existEntryID := h.store.GetEntryIDByURL(feedId, request.Url)
+	if existEntryID == 0 {
+		entry := model.Entry{
+			UserID:      userID,
+			FeedID:      feedId,
+			Title:       request.Title,
+			Author:      "",
+			Date:        time.Now(),
+			URL:         request.Url,
+			Content:     "",
+			FullContent: content,
+			ReadLater:   false,
+			Hash:        crypto.Hash(request.Url),
+			ImageUrl:    img,
+		}
+
+		h.store.CreateEntrySingle(&entry)
+		existEntryID = entry.ID
+	}
+	if err := h.store.AddEntryToBoard(existEntryID, request.BoardID); err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
 	json.NoContent(w, r)
 }

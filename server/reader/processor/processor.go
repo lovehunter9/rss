@@ -171,6 +171,13 @@ func ProcessEntryWebPage(feed *model.Feed, entry *model.Entry, user *model.User)
 	if content != "" {
 		entry.Content = content
 		entry.ReadingTime = calculateReadingTime(content, user)
+
+		doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
+		if err == nil {
+			img, _ := doc.Find("img").First().Attr("src")
+			entry.ImageUrl = img
+		}
+
 	}
 
 	return nil
@@ -295,4 +302,27 @@ func calculateReadingTime(content string, user *model.User) int {
 	}
 
 	return timeToReadInt
+}
+
+func ScraperWebPage(url string) (string, string) {
+	content, scraperErr := scraper.Fetch(
+		url,
+		"",
+		"",
+		"",
+		false,
+		false,
+	)
+	if scraperErr != nil {
+		return "", ""
+	}
+
+	content = sanitizer.Sanitize(url, content)
+
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
+	if err != nil {
+		return content, ""
+	}
+	img, _ := doc.Find("img").First().Attr("src")
+	return content, img
 }

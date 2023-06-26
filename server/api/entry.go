@@ -263,7 +263,7 @@ func (h *handler) fetchContent(w http.ResponseWriter, r *http.Request) {
 		json.ServerError(w, r, err)
 		return
 	}
-	h.store.UpdateEntryFullContent(entryID, entry.DocId, entry.Content)
+	h.store.UpdateEntryFullContent(entryID, entry)
 	json.OK(w, r, map[string]string{"content": entry.Content})
 }
 
@@ -465,5 +465,16 @@ func (h *handler) getFullContentTest(w http.ResponseWriter, r *http.Request) {
 
 	content = sanitizer.Sanitize(url, content)
 	json.OK(w, r, content)
+
+}
+
+func (h *handler) contentQuery(w http.ResponseWriter, r *http.Request) {
+	queryData := request.QueryStringParam(r, "query", "")
+	result := ""
+	if queryData != "" {
+		result = search.QueryRSS(queryData)
+	}
+
+	json.OK(w, r, result)
 
 }

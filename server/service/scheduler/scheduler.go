@@ -102,8 +102,8 @@ func fullContentScheduler(store *storage.Storage) {
 				Boarders:  boardNoList,
 				Content:   entry.Content,
 			}
-			docId := search.IntputRSS(&notificationData)
-			store.UpdateEntryFullContent(entry.ID, docId, entry.Content)
+			entry.DocId = search.IntputRSS(&notificationData)
+			store.UpdateEntryFullContent(entry.ID, entry)
 		}
 		logger.Info("fullContentScheduler ...")
 	}

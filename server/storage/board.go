@@ -173,7 +173,7 @@ func (s *Storage) AddEntryToBoard(entryID, boardID int64) error {
 	_, err := s.db.Exec(query, entryID, boardID)
 
 	if err != nil {
-		return fmt.Errorf(`store: unable to create entryboard icon: %v`, err)
+		return fmt.Errorf(`the entry is already exist: %v`, err)
 	}
 	return nil
 }

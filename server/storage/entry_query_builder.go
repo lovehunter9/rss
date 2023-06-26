@@ -279,7 +279,8 @@ func (e *EntryQueryBuilder) GetEntries() (model.Entries, error) {
 			f.cookie,
 			fi.icon_id,
 			u.timezone,
-			g.board_ids
+			g.board_ids,
+			e.image_url
 		FROM
 			entries e
 		LEFT JOIN
@@ -348,6 +349,7 @@ func (e *EntryQueryBuilder) GetEntries() (model.Entries, error) {
 			&iconID,
 			&tz,
 			&boardIDS,
+			&entry.ImageUrl,
 		)
 
 		if err != nil {
@@ -371,8 +373,8 @@ func (e *EntryQueryBuilder) GetEntries() (model.Entries, error) {
 		entry.Feed.Icon.FeedID = entry.FeedID
 		entry.Feed.Category.UserID = entry.UserID
 		entry.BoardIDS = ""
-		// entry.BoardIDS = 
-		if (boardIDS.Valid) {
+		// entry.BoardIDS =
+		if boardIDS.Valid {
 			entry.BoardIDS = boardIDS.String
 		}
 		entries = append(entries, &entry)
@@ -499,7 +501,8 @@ func (e *EntryQueryBuilder) GetBoardEntries() (model.Entries, error) {
 			f.cookie,
 			fi.icon_id,
 			u.timezone,
-			g.board_ids
+			g.board_ids,
+			e.image_url
 		FROM
 			entries e
 		JOIN
@@ -570,6 +573,7 @@ func (e *EntryQueryBuilder) GetBoardEntries() (model.Entries, error) {
 			&iconID,
 			&tz,
 			&boardIDS,
+			&entry.ImageUrl,
 		)
 
 		if err != nil {
@@ -593,7 +597,7 @@ func (e *EntryQueryBuilder) GetBoardEntries() (model.Entries, error) {
 		entry.Feed.Icon.FeedID = entry.FeedID
 		entry.Feed.Category.UserID = entry.UserID
 		entry.BoardIDS = ""
-		if (boardIDS.Valid) {
+		if boardIDS.Valid {
 			entry.BoardIDS = boardIDS.String
 		}
 

@@ -102,4 +102,7 @@ func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
 	sr.HandleFunc("/recommend/{entryID}/readComplete", handler.recommendReadCompleteStat).Methods(http.MethodPut)
 	sr.HandleFunc("/recommend/readTimeStat", handler.recommendReadTimeStat).Methods(http.MethodPut)
 
+	sr.HandleFunc("/page/addPageToBoard", handler.addPageToBoard).Methods(http.MethodPut)
+	sr.HandleFunc("/entries/contentQuery", handler.contentQuery).Methods(http.MethodGet)
+
 }

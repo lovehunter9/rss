@@ -83,6 +83,9 @@ func ExtractContent(page io.Reader) (string, error) {
 	transformMisusedDivsIntoParagraphs(document)
 	removeUnlikelyCandidates(document)
 
+	//img, _ := document.Find("img").First().Attr("src")
+	//logger.Debug("img in content: %s", img)
+
 	candidates := getCandidates(document)
 	logger.Debug("[Readability] Candidates: %v", candidates)
 

@@ -774,4 +774,12 @@ var migrations = []func(tx *sql.Tx) error{
 		_, err = tx.Exec(sql)
 		return err
 	},
+	func(tx *sql.Tx) (err error) {
+		sql := `ALTER TABLE stat_entry_read ADD COLUMN read_time int not null default 0;
+				ALTER TABLE entries ADD COLUMN image_url text default '';
+				INSERT INTO feeds (id,user_id, category_id,title,feed_url,site_url,disabled) VALUES (0, 1,1,'save pages','','',true);
+				`
+		_, err = tx.Exec(sql)
+		return err
+	},
 }

@@ -29,5 +29,11 @@ type EntryToBoardRequest struct {
 	BoardID int64 `json:"board_id"`
 }
 
+type PageToBoardRequest struct {
+	Url     string `json:"url"`
+	Title   string `json:"title"`
+	BoardID int64  `json:"board_id"`
+}
+
 // Categories represents a list of categories.
 type Boards []*Board

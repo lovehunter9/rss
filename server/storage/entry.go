@@ -120,7 +120,8 @@ func (s *Storage) CreateEntrySingle(entry *model.Entry) error {
 				reading_time,
 				changed_at,
 				full_content,
-				readlater_tag
+				readlater_tag,
+				image_url
 			)
 		VALUES
 			(
@@ -136,7 +137,8 @@ func (s *Storage) CreateEntrySingle(entry *model.Entry) error {
 				$10,
 				now(),
 				$11,
-				$12
+				$12,
+				$13
 			)
 		RETURNING
 			id
@@ -155,6 +157,7 @@ func (s *Storage) CreateEntrySingle(entry *model.Entry) error {
 		entry.ReadingTime,
 		entry.FullContent,
 		entry.ReadLater,
+		entry.ImageUrl,
 	).Scan(&entry.ID)
 	if err != nil {
 		return fmt.Errorf(`store: unable to create entry  %v`, err)
@@ -672,9 +675,9 @@ func (s *Storage) GetFullContent(entryId int64) string {
 
 }
 
-func (s *Storage) UpdateEntryFullContent(entryId int64, docId string, fullContent string) error {
-	query := `UPDATE entries SET full_content=$1,doc_id=$2 WHERE id=$3 `
-	_, err := s.db.Exec(query, fullContent, docId, entryId)
+func (s *Storage) UpdateEntryFullContent(entryId int64, entry *model.Entry) error {
+	query := `UPDATE entries SET full_content=$1,doc_id=$2,image_url=$3 WHERE id=$4 `
+	_, err := s.db.Exec(query, entry.Content, entry.DocId, entry.ImageUrl, entryId)
 	if err != nil {
 		return fmt.Errorf(`store: unable to update full content  %v: %v`, entryId, err)
 	}
