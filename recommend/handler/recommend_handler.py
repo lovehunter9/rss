@@ -19,10 +19,9 @@ class RecommendHandler:
         tool = RecommendPGDBTool()
         start_time = datetime.now()
         user = tool.select_users_model()
-        self.current_logger.debug(f'model_name {user.model_name} model_version {user.model_version}')
         user.model_name = "bert"
         user.model_version = "v1"
-        
+        self.current_logger.debug(f'model_name {user.model_name} model_version {user.model_version}')
         self.current_logger.debug(f'select_users_model time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
         data_handler = DataHandler()
         data_handler.down_valid_model_and_version()
@@ -42,11 +41,11 @@ class RecommendHandler:
         tool.insert_recommend_model(batch)
         
         start_time = datetime.now()
-        # data_handler.download_feed()
+        data_handler.download_feed()
         self.current_logger.debug(f'download_feed time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
         
         start_time = datetime.now()
-        # data_handler.down_latest_article_embedding_package(user)
+        data_handler.down_latest_article_embedding_package(user)
         self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
         
         start_time = datetime.now()
