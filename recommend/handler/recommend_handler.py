@@ -42,11 +42,11 @@ class RecommendHandler:
         tool.insert_recommend_model(batch)
         
         start_time = datetime.now()
-        # data_handler.download_feed()
+        data_handler.download_feed()
         self.current_logger.debug(f'download_feed time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
         
         start_time = datetime.now()
-        # data_handler.down_latest_article_embedding_package(user)
+        data_handler.down_latest_article_embedding_package(user)
         self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
         
         start_time = datetime.now()
