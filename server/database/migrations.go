@@ -791,9 +791,6 @@ var migrations = []func(tx *sql.Tx) error{
 	func(tx *sql.Tx) (err error) {
 		sql := `ALTER TABLE stat_entry_read ADD COLUMN read_time int not null default 0;
 				ALTER TABLE entries ADD COLUMN image_url text default '';
-				ALTER TABLE feeds DROP CONSTRAINT feeds_category_id_fkey;
-				ALTER TABLE feeds DROP CONSTRAINT feeds_user_id_fkey;
-				INSERT INTO feeds (id,user_id, category_id,title,feed_url,site_url,disabled) VALUES (0, 1,1,'save pages','','',true);
 				`
 		_, err = tx.Exec(sql)
 		return err
