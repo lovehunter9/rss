@@ -319,10 +319,13 @@ var migrations = []func(tx *sql.Tx) error{
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
-		sql := `
+		/*sql := `
 			ALTER TABLE entries ADD COLUMN changed_at timestamp with time zone;
 			UPDATE entries SET changed_at = published_at;
 			ALTER TABLE entries ALTER COLUMN changed_at SET not null;
+		`*/
+		sql := `
+			ALTER TABLE entries ADD COLUMN changed_at timestamp with time zone not null;
 		`
 		_, err = tx.Exec(sql)
 		return err
