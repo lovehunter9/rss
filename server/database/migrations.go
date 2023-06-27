@@ -675,8 +675,11 @@ var migrations = []func(tx *sql.Tx) error{
 	},
 
 	func(tx *sql.Tx) (err error) {
-		sql := `
+		/*sql := `
 			ALTER TABLE feeds ADD COLUMN update_time timestamp with time zone default to_date('2020-1-1','YYYY-MM-DD');
+		`*/
+		sql := `
+			ALTER TABLE feeds ADD COLUMN update_time timestamp with time zone ;
 		`
 		_, err = tx.Exec(sql)
 		return err

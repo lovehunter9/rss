@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"runtime"
 	"sort"
+	"time"
 
 	"miniflux.app/config"
 	"miniflux.app/logger"
@@ -227,7 +228,8 @@ func (s *Storage) FeedByID(userID, feedID int64) (*model.Feed, error) {
 
 // CreateFeed creates a new feed.
 func (s *Storage) CreateFeed(feed *model.Feed) error {
-
+	//init
+	feedUpdateTime, _ := time.Parse("2020-1-1", "2019-11-21 11:59:01")
 	sql := `
 		INSERT INTO feeds (
 			feed_url,
@@ -251,10 +253,11 @@ func (s *Storage) CreateFeed(feed *model.Feed) error {
 			allow_self_signed_certificates,
 			fetch_via_proxy,
 			hide_globally,
-			url_rewrite_rules
+			url_rewrite_rules,
+			update_time
 		)
 		VALUES
-			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
+			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22,$23)
 		RETURNING
 			id
 	`
@@ -282,6 +285,7 @@ func (s *Storage) CreateFeed(feed *model.Feed) error {
 		feed.FetchViaProxy,
 		feed.HideGlobally,
 		feed.UrlRewriteRules,
+		feedUpdateTime,
 	).Scan(&feed.ID)
 	if err != nil {
 		return fmt.Errorf(`store: unable to create feed %q: %v`, feed.FeedURL, err)

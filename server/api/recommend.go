@@ -15,14 +15,29 @@ import (
 	feedHandler "miniflux.app/reader/handler"
 )
 
+var RecommendCacheBatch int
+var RecommendCachePage int
+
 //每天活跃时间
 //每天活跃时间段
 
 func (h *handler) getRecommendList(w http.ResponseWriter, r *http.Request) {
 	recommendBase, _ := h.store.LastRecommendBase()
-	limit := 5 // request.QueryIntParam(r, "limit", 20)
-	offset := request.QueryIntParam(r, "offset", 0)
-	//count := h.store.GetRecommendCount(recommendBase.Batch)
+	count := h.store.GetRecommendCount(recommendBase.Batch)
+	//limit := request.QueryIntParam(r, "limit", 20)
+	//offset := request.QueryIntParam(r, "offset", 0)
+	limit := 5
+	if recommendBase.Batch != RecommendCacheBatch {
+		RecommendCacheBatch = recommendBase.Batch
+		RecommendCachePage = 0
+	} else {
+		RecommendCachePage = RecommendCachePage + 1
+		if RecommendCachePage*5 > count {
+			RecommendCachePage = 0
+		}
+	}
+
+	offset := RecommendCachePage * limit
 	list, err := h.store.RecommendList(recommendBase.Batch, offset, limit)
 	if err != nil {
 		json.ServerError(w, r, err)
