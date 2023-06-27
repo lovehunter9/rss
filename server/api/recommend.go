@@ -13,7 +13,6 @@ import (
 	"miniflux.app/http/response/json"
 	"miniflux.app/model"
 	feedHandler "miniflux.app/reader/handler"
-	"miniflux.app/validator"
 )
 
 //每天活跃时间
@@ -102,10 +101,10 @@ func (h *handler) recommendSaveToBoard(w http.ResponseWriter, r *http.Request) {
 		json.BadRequest(w, r, err)
 		return
 	}
-	if validationErr := validator.ValidateEntryBoardCreation(h.store, &request); validationErr != nil {
+	/*if validationErr := validator.ValidateEntryBoardCreation(h.store, &request); validationErr != nil {
 		json.BadRequest(w, r, validationErr.Error())
 		return
-	}
+	}*/
 
 	entryId := h.initEntry(userID, request.EntryID, false)
 
