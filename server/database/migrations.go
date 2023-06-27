@@ -349,13 +349,14 @@ var migrations = []func(tx *sql.Tx) error{
 	func(tx *sql.Tx) (err error) {
 		sql := `
 			ALTER TABLE entries ADD COLUMN share_code text not null default '';
-			CREATE UNIQUE INDEX entries_share_code_idx ON entries USING btree(share_code) WHERE share_code <> '';
 		`
 		_, err = tx.Exec(sql)
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
-		sql := `CREATE INDEX enclosures_user_entry_url_idx ON enclosures(user_id, entry_id, md5(url))`
+		sql := `CREATE INDEX enclosures_user_entry_url_idx ON enclosures(user_id, entry_id, md5(url));
+				CREATE UNIQUE INDEX entries_share_code_idx ON entries USING btree(share_code) WHERE share_code <> '';
+			`
 		_, err = tx.Exec(sql)
 		return err
 	},
