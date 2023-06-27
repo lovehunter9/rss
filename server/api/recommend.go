@@ -20,15 +20,16 @@ import (
 
 func (h *handler) getRecommendList(w http.ResponseWriter, r *http.Request) {
 	recommendBase, _ := h.store.LastRecommendBase()
-	limit := request.QueryIntParam(r, "limit", 20)
+	limit := 5 // request.QueryIntParam(r, "limit", 20)
 	offset := request.QueryIntParam(r, "offset", 0)
-	count := h.store.GetRecommendCount(recommendBase.Batch)
+	//count := h.store.GetRecommendCount(recommendBase.Batch)
 	list, err := h.store.RecommendList(recommendBase.Batch, offset, limit)
 	if err != nil {
 		json.ServerError(w, r, err)
 		return
 	}
-	json.OK(w, r, &recommendResponse{Total: count, Entries: list})
+	json.OK(w, r, list)
+	//json.OK(w, r, &recommendResponse{Total: count, Entries: list})
 }
 
 func (h *handler) initEntry(userID, entryID int64, readLater bool) int64 {
