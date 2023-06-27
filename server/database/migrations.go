@@ -275,12 +275,12 @@ var migrations = []func(tx *sql.Tx) error{
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
-		sql := `
+		/*sql := `
 			ALTER TABLE entries ADD COLUMN document_vectors tsvector;
 			UPDATE entries SET document_vectors = to_tsvector(substring(title || ' ' || coalesce(content, '') for 1000000));
 			CREATE INDEX document_vectors_idx ON entries USING gin(document_vectors);
 		`
-		_, err = tx.Exec(sql)
+		_, err = tx.Exec(sql)*/
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
@@ -289,13 +289,13 @@ var migrations = []func(tx *sql.Tx) error{
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
-		sql := `
+		/*sql := `
 			UPDATE
 				entries
 			SET
 				document_vectors = setweight(to_tsvector(substring(coalesce(title, '') for 1000000)), 'A') || setweight(to_tsvector(substring(coalesce(content, '') for 1000000)), 'B')
 		`
-		_, err = tx.Exec(sql)
+		_, err = tx.Exec(sql)*/
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
