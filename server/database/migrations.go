@@ -123,12 +123,12 @@ var migrations = []func(tx *sql.Tx) error{
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
-		sql := `
+		/*sql := `
 			CREATE EXTENSION IF NOT EXISTS hstore;
-			ALTER TABLE users ADD COLUMN extra hstore;
+			ALTER TABLE users ADD COLUMN   hstore;
 			CREATE INDEX users_extra_idx ON users using gin(extra);
 		`
-		_, err = tx.Exec(sql)
+		_, err = tx.Exec(sql)*/
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
@@ -442,7 +442,7 @@ var migrations = []func(tx *sql.Tx) error{
 			return err
 		}
 
-		_, err = tx.Exec(`
+		/*_, err = tx.Exec(`
 			DECLARE my_cursor CURSOR FOR
 			SELECT
 				id,
@@ -486,13 +486,17 @@ var migrations = []func(tx *sql.Tx) error{
 			if err != nil {
 				return err
 			}
-		}
+		}*/
 
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
-		_, err = tx.Exec(`
+		/*_, err = tx.Exec(`
 			ALTER TABLE users DROP COLUMN extra;
+			CREATE UNIQUE INDEX users_google_id_idx ON users(google_id) WHERE google_id <> '';
+			CREATE UNIQUE INDEX users_openid_connect_id_idx ON users(openid_connect_id) WHERE openid_connect_id <> '';
+		`)*/
+		_, err = tx.Exec(`
 			CREATE UNIQUE INDEX users_google_id_idx ON users(google_id) WHERE google_id <> '';
 			CREATE UNIQUE INDEX users_openid_connect_id_idx ON users(openid_connect_id) WHERE openid_connect_id <> '';
 		`)
