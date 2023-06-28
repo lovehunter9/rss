@@ -1,14 +1,20 @@
 <template>
-  <q-item dense clickable class="entry-total-root column" @click="itemClick">
+  <q-item dense clickable class="entry-total-root column menuItem" @click="itemClick">
     <div class="entry-header row items-center justify-between">
       <div class="enter-header-start row items-center">
+
+        <div v-if="recommend.feed.icon_content.length > 8" style="margin-right: 10px;">
+          <img :src="'data:image/png;' + recommend.feed.icon_content" width="30" height="30">
+        </div>
 
         <div class="enter-time text-minor-color ">
           {{ recommend.author }} · {{ getTime() }}
         </div>
       </div>
       <div class="row justify-end items-center">
-        <q-img style="margin-right:14px" :src="markRef" :title="markTextRef" width="20px" height="20px" />
+        <q-img style="margin-right:14px" :src="markRef" :title="markTextRef" width="20px" height="20px" @click.stop=''>
+          <change-entry-board-menu-component :item-id="`${recommend.entry_id}`" @add-to-board="addToBoard" />
+        </q-img>
         <img class="icon-end" src="../../assets/menu/share.svg">
       </div>
     </div>
@@ -16,14 +22,15 @@
       {{ recommend.title }}
     </div>
 
-    <div class="entry-content text-minor-color" v-html="recommend.content"></div>
+
+    <!-- <div class="entry-content text-minor-color" v-html="recommend.content"></div> -->
     <div>
       score: {{ recommend.score }}
     </div>
     <div>
       rank: {{ recommend.rank }}
     </div>
-    <div>
+    <div style="word-break: break-all;">
       url: {{ recommend.url }}
     </div>
     <div>
@@ -38,15 +45,20 @@
 <script setup lang='ts'>
 import { PropType, ref } from 'vue';
 import { Recommend } from 'src/types'
-import { getPastTime, utcToStamp } from 'src/utils/utils';
+// import { getPastTime, utcToStamp } from 'src/utils/utils';
+import { addRecommendToBoard } from 'src/api/api';
+import ChangeEntryBoardMenuComponent from 'components/rss/ChangeEntryBoardMenuComponent.vue'
+import { useQuasar } from 'quasar';
+
 // import ChangeEntryBoardMenuComponent from 'components/rss/ChangeEntryBoardMenuComponent.vue'
 const markRef = ref(require('../../assets/menu/unbookmark.svg'))
 const markTextRef = ref('Add to board')
+const $q = useQuasar()
 
 const props = defineProps({
   recommend: {
     type: Object as PropType<Recommend>,
-      required: true
+    required: true
   }
 })
 
@@ -63,12 +75,26 @@ const itemClick = () => {
   window.open(props.recommend.url)
 }
 
+const addToBoard = async (itemId: string, boardId: number) => {
+  try {
+    await addRecommendToBoard({
+      entry_id: Number(itemId),
+      board_id: boardId
+    })
+    $q.notify('Add Success')
+  } catch (error) {
+    console.log(error);
+    $q.notify('Add Fail')
+  }
+}
+
+
 </script>
 
 <style scoped lang='scss'>
 .entry-total-root {
   width: 100%;
-  padding: 18px 0 14px;
+  padding: 18px 0px 14px;
 
   // background-color: red;
 
@@ -115,5 +141,9 @@ const itemClick = () => {
     margin-top: 11px;
   }
 
+
+  .itemActiveStyle {
+    color: $main-style;
+  }
 }
 </style>

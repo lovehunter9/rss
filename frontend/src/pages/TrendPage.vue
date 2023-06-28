@@ -55,10 +55,10 @@ onMounted(() => {
 
 const requestRecommendList = async () => {
   rssStore.recommends = []
-  const list = await rssStore.get_recommendList(currentPage.value - 1, 20)
-  if (list) {
-    totalPage.value = Math.ceil(list.total / 20)
-  }
+  await rssStore.get_recommendList(currentPage.value - 1, 20)
+  // if (list) {
+  //   totalPage.value = Math.ceil(list.total / 20)
+  // }
 }
 
 const updateCurrentPage = (page: number) => {

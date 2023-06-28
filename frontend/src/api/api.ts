@@ -15,7 +15,8 @@ import {
   FeedModificationRequest,
   BoardRequest,
   Board,
-  BoardEntriesQueryRequest, EntryToBoardRequest, RecommendListQueryResponse,
+  Entry,
+  BoardEntriesQueryRequest, EntryToBoardRequest, PageToBoard, Recommend,
 } from 'src/types';
 import { useRssStore } from 'src/stores/rss';
 
@@ -396,15 +397,53 @@ export async function get_today(): Promise<EntriesQueryResponse> {
   return data;
 }
 
-export async function get_recommendList(offset: number,limit = 20):Promise<RecommendListQueryResponse> {
+export async function get_recommendList(offset: number,limit = 20):Promise<Recommend[]> {
   const rssStore = useRssStore();
-
-  const data: RecommendListQueryResponse = await axios.get(
+  console.log('RecommendListQueryResponse data ===>');
+  const data: Recommend[] = await axios.get(
     rssStore.url + '/api/recommendList'
   , {
     params: {
-      offset,
-      limit
+      // offset,
+      // limit
+    }
+  });
+
+  console.log('RecommendListQueryResponse data ===>');
+  console.log(data);
+
+  return data;
+}
+
+export const addRecommendToBoard = async (req: EntryToBoardRequest) => {
+  // saveToBoard /recommend/saveToBoard
+  // EntryID int64 `json:"entry_id"`
+	// BoardID int64 `json:"board_id"`
+  const rssStore = useRssStore();
+  const data = await axios.put(
+    rssStore.url + '/api/recommend/saveToBoard',
+    req
+  )
+  return data
+}
+
+export const addPageToBoard = async (req: PageToBoard) => {
+  const rssStore = useRssStore();
+  const data = await axios.put(
+    rssStore.url + '/api/page/addPageToBoard',
+    req
+  )
+  return data
+}
+
+export const entriesContentQuery = async (query: string) => {
+  const rssStore = useRssStore();
+
+  const data: Entry = await axios.get(
+    rssStore.url + '/api/entries/contentQuery'
+  , {
+    params: {
+      query
     }
   });
 
