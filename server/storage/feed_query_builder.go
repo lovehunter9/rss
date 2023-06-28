@@ -60,6 +60,12 @@ func (f *FeedQueryBuilder) WithFeedID(feedID int64) *FeedQueryBuilder {
 	return f
 }
 
+func (f *FeedQueryBuilder) WithNonDisabled() *FeedQueryBuilder {
+	f.conditions = append(f.conditions, fmt.Sprintf("f.disabled = $%t", len(f.args)+1))
+	f.args = append(f.args, false)
+	return f
+}
+
 // WithCounters let the builder return feeds with counters of statuses of entries.
 func (f *FeedQueryBuilder) WithCounters() *FeedQueryBuilder {
 	f.withCounters = true

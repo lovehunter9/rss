@@ -145,6 +145,7 @@ func (s *Storage) Feeds(userID int64) (model.Feeds, error) {
 	builder := NewFeedQueryBuilder(s, userID)
 	builder.WithOrder(model.DefaultFeedSorting)
 	builder.WithDirection(model.DefaultFeedSortingDirection)
+	builder.WithNonDisabled()
 	return builder.GetFeeds()
 }
 

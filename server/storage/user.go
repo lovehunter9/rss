@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
+	"time"
 
 	"miniflux.app/logger"
 	"miniflux.app/model"
@@ -149,7 +150,8 @@ func (s *Storage) CreateUser(userCreationRequest *model.UserCreationRequest) (*m
 		return nil, fmt.Errorf(`store: unable to create user default category: %v`, err)
 	}
 
-	_, err = tx.Exec(`INSERT INTO feeds (id,user_id, category_id,title,feed_url,site_url,disabled) VALUES (0, $1,$2,'save pages','','',true)`, user.ID, category.ID)
+	feedUpdateTime, _ := time.Parse("2020-1-1", "2019-11-21 11:59:01")
+	_, err = tx.Exec(`INSERT INTO feeds (id,user_id, category_id,title,feed_url,site_url,disabled,update_time) VALUES (0, $1,$2,'save pages','','',true,$3)`, user.ID, category.ID, feedUpdateTime)
 	if err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf(`store: unable to create  default feed3: %v`, err)
