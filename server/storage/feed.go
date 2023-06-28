@@ -164,6 +164,7 @@ func (s *Storage) FeedsWithCounters(userID int64) (model.Feeds, error) {
 	builder.WithCounters()
 	builder.WithOrder(model.DefaultFeedSorting)
 	builder.WithDirection(model.DefaultFeedSortingDirection)
+	builder.WithNonDisabled()
 	return getFeedsSorted(builder)
 }
 
@@ -182,6 +183,7 @@ func (s *Storage) FeedsByCategoryWithCounters(userID, categoryID int64) (model.F
 	builder.WithCounters()
 	builder.WithOrder(model.DefaultFeedSorting)
 	builder.WithDirection(model.DefaultFeedSortingDirection)
+	builder.WithNonDisabled()
 	return getFeedsSorted(builder)
 }
 

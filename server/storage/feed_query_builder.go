@@ -61,8 +61,7 @@ func (f *FeedQueryBuilder) WithFeedID(feedID int64) *FeedQueryBuilder {
 }
 
 func (f *FeedQueryBuilder) WithNonDisabled() *FeedQueryBuilder {
-	f.conditions = append(f.conditions, fmt.Sprintf("f.disabled = $%t", len(f.args)+1))
-	f.args = append(f.args, false)
+	f.conditions = append(f.conditions, "f.disabled = false")
 	return f
 }
 
