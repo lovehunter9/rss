@@ -1,7 +1,8 @@
 <template>
   <div class="discover-detail-root ">
-    <title-commonent backTitle="#blockchain" @back-action="backAction()"/>
-    <title-commonent backTitle="#blockchain" v-show="titleViewFixedRef" class="model2 bg-color-white" @back-action="backAction()"/>
+    <title-commonent backTitle="#blockchain" @back-action="backAction()" />
+    <title-commonent backTitle="#blockchain" v-show="titleViewFixedRef" class="model2 bg-color-white"
+      @back-action="backAction()" />
     <div class="section-title text-minor-color " style="margin-top:2px" v-if="reletedTopics.length > 0">
       Releted Topics
     </div>
@@ -18,7 +19,7 @@
     </div>
 
     <q-list class="search-result-list">
-      <SearchFeedComponent v-for="item,index in searchResults" :key="index" :feed="item"></SearchFeedComponent>
+      <SearchFeedComponent v-for="item, index in searchResults" :key="index" :feed="item"></SearchFeedComponent>
       <div class="row justify-center full-width no-more-result text-major-color">
         No More Result &nbsp;
         <a href="javascript:;" @click="jumpToSearch()" style="color:#1B87F4"> Try other Topices </a>
@@ -29,7 +30,7 @@
 
 <script setup lang='ts'>
 
-import { SDKSearchPathResponse } from 'src/types';
+import { Entry } from 'src/types';
 import { ref } from 'vue';
 import TitleCommonent from '../../components/TitleCommonent.vue'
 import { useQuasar } from 'quasar';
@@ -50,48 +51,10 @@ const jumpToSearch = () => {
   emit('backAction')
 }
 
-const reletedTopics = ref([
-  {
-    title:'# Cryptocurrency'
-  },
-  {
-    title:'# dddsssaaa'
-  },
-  {
-    title:'# Ethereum'
-  },
-  {
-    title:'# Web3'
-  },
-  {
-    title:'# Cryptocurrency'
-  }
-])
+const reletedTopics = ref<{ title: string }[]>([])
 
 
-const searchResults = ref([
-  {
-    title: 'Blockchain News',
-    url: 'www.sspai.com',
-    logo: 'examples/blocchain_example.png',
-    subsribeUrl: '',
-    isSubsribe: false,
-    details:[
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      },
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      },
-      {
-        content: 'Leading source for news, information & resources for the Connected Generation.',
-        time: '1 mins ago'
-      }
-    ]
-  }
-])
+const searchResults = ref()
 
 const titleViewFixedRef = ref(false)
 
@@ -101,54 +64,97 @@ const floatTitleView = (floatValue: boolean) => {
   titleViewFixedRef.value = floatValue
 }
 
-const reloadFeed = (feed: SDKSearchPathResponse) => {
+const reloadFeed = (entry: Entry) => {
   reletedTopics.value = []
-  const details = feed.item.length > 3 ? feed.item.slice(0,3) : feed.item
+  const details = [entry]//feed.item.length > 3 ? feed.item.slice(0,3) : feed.item
   searchResults.value = [
-   {
-    title: feed.title,
-    url: feed.link,
-    logo: feed.logo ? feed.logo : 'examples/blocchain_example.png',
-    subsribeUrl: feed.atomlink,
-    isSubsribe: rssStore.get_local_feed_by_feed_url(feed.atomlink) !== undefined,
-    details: details.map(e => {
-      return {
-        content: e.title,
-        time: e.pubDate
-      }
-    })
-   }
+    {
+      title: entry.title,
+      url: entry.url,
+      logo: 'examples/blocchain_example.png',
+      subsribeUrl: entry.feed.feed_url,
+      isSubsribe: rssStore.get_local_feed_by_feed_url(entry.feed.feed_url) !== undefined,
+      details: details.map(e => {
+        return {
+          content: e.title,
+          time: e.published_at
+        }
+      })
+    }
   ]
 }
+
+const reloadDefault = () => {
+  searchResults.value = [
+    {
+      title: 'Blockchain News',
+      url: 'www.sspai.com',
+      logo: 'examples/blocchain_example.png',
+      subsribeUrl: '',
+      isSubsribe: false,
+      details: [
+        {
+          content: 'Leading source for news, information & resources for the Connected Generation.',
+          time: '1 mins ago'
+        },
+        {
+          content: 'Leading source for news, information & resources for the Connected Generation.',
+          time: '1 mins ago'
+        },
+        {
+          content: 'Leading source for news, information & resources for the Connected Generation.',
+          time: '1 mins ago'
+        }
+      ]
+    }
+  ]
+  reletedTopics.value = [
+    {
+      title: '# Cryptocurrency'
+    },
+    {
+      title: '# dddsssaaa'
+    },
+    {
+      title: '# Ethereum'
+    },
+    {
+      title: '# Web3'
+    },
+    {
+      title: '# Cryptocurrency'
+    }
+  ]
+}
+reloadDefault()
 
 const $q = useQuasar()
 const addToFeed = (url: string) => {
   $q.dialog({
-        component: AddFeedDialog,
-        componentProps: {
-          text: url
-        }
-      })
-        .onOk(() => {
-          console.log('OK');
-          emit('backAction')
-        })
-        .onCancel(() => {
-          console.log('Cancel');
-        })
-        .onDismiss(() => {
-          console.log('Called on OK or Cancel');
-          //     });
-        })
+    component: AddFeedDialog,
+    componentProps: {
+      text: url
+    }
+  })
+    .onOk(() => {
+      console.log('OK');
+      emit('backAction')
+    })
+    .onCancel(() => {
+      console.log('Cancel');
+    })
+    .onDismiss(() => {
+      console.log('Called on OK or Cancel');
+      //     });
+    })
 }
 
 
-defineExpose({ floatTitleView, reloadFeed});
+defineExpose({ floatTitleView, reloadFeed,reloadDefault });
 
 </script>
 
 <style scoped lang='scss'>
-
 .discover-detail-root {
   width: 100%;
   // background-color: red;
@@ -163,10 +169,10 @@ defineExpose({ floatTitleView, reloadFeed});
 
   .model2 {
     top: 0;
-		position: fixed;
+    position: fixed;
     width: calc(100% - 240px);
-		z-index: 999;
-	}
+    z-index: 999;
+  }
 
   .relate-topic-item {
     background: rgba(26, 19, 15, 0.05);
@@ -196,6 +202,4 @@ defineExpose({ floatTitleView, reloadFeed});
   font-size: 12px;
   line-height: 16px;
 }
-
-
 </style>

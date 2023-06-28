@@ -686,3 +686,9 @@ export interface Recommend {
   score: number
   rank: number
 }
+
+export interface PageToBoard{
+  url : string
+  title: string
+  board_id : number
+}

@@ -30,12 +30,12 @@
 <script lang="ts" setup>
 // import { Feed } from 'src/types';
 import { useRssStore } from 'src/stores/rss';
-import { SDKSearchPathResponse } from 'src/types';
+import { Entry } from 'src/types';
 import { ref } from 'vue';
 
 const loading = ref(false);
 
-const options = ref<SDKSearchPathResponse[]>([]);
+const options = ref<Entry[]>([]);
 
 const model = ref<string>('');
 
@@ -51,7 +51,7 @@ const filterFn = async (val: string, update: (arg0: () => void) => void, abort: 
   }
   update(async () => {
     // options.value = ['111', '222', '333']
-    const result = await rssStore.sdkSearchFeed(model.value)
+    const result = await rssStore.entriesContentQuery(model.value)//sdkSearchFeed(model.value)
     if (result) {
       options.value = [result]
     }
@@ -59,7 +59,7 @@ const filterFn = async (val: string, update: (arg0: () => void) => void, abort: 
   })
 };
 
-const itemClick = (value: SDKSearchPathResponse) => {
+const itemClick = (value: Entry) => {
   console.log(model.value);
 
   model.value = '';

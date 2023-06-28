@@ -21,6 +21,7 @@ import {
 
 import {
   create_board,
+  entriesContentQuery,
   entry_readlater,
   feed_mark_all_as_read,
   fetch_feed_counter,
@@ -429,6 +430,14 @@ export const useRssStore = defineStore('rss', {
 
         return result
       } catch (error) {
+      }
+    },
+
+    async entriesContentQuery(query: string) {
+      try {
+        return await entriesContentQuery(query)
+      } catch (error) {
+        console.log(error);
       }
     },
 

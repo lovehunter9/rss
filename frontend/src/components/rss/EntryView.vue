@@ -5,14 +5,15 @@
       <div class="circle-temp" v-else />
       <div class="layout-right column justify-start">
         <div class="row justify-start" style="width: 100%;">
-          <q-img class="entry-icon" :src="store.feeds_icon[entry.feed_id].data"/>
-          <div class="column feed-layout justify-start">
+          <q-img v-if="store.feeds_icon[entry.feed_id] && store.feeds_icon[entry.feed_id].data" class="entry-icon" :src="store.feeds_icon[entry.feed_id] && store.feeds_icon[entry.feed_id].data ? store.feeds_icon[entry.feed_id].data : '' "/>
+          <div class="column feed-layout justify-start" :class="{
+            'margin-left-title' : store.feeds_icon[entry.feed_id] && store.feeds_icon[entry.feed_id].data
+          }">
             <span class="text-feed-name text-major-color">{{ entry.feed.title }}</span>
             <span class="text-feed-create text-minor-color">{{ getTime() }}</span>
           </div>
         </div>
         <span class="text-entry-title text-major-color">{{ entry.title }}</span>
-        <!--        <span>{{ entry.time }}</span>-->
       </div>
     </div>
   </q-item>
@@ -111,8 +112,6 @@ function getTime() {
     }
 
     .feed-layout {
-      margin-left: 10px;
-      // background-color: green;
       max-width: calc(100% - 42px);
 
       .text-feed-name {
@@ -164,6 +163,10 @@ function getTime() {
   margin-left: 16px;
   margin-right: 16px;
   background: #E0E0E0;
+}
+
+.margin-left-title {
+  margin-left: 10px;
 }
 
 </style>

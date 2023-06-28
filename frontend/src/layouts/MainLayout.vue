@@ -8,7 +8,7 @@
         class="drawer">
         <div class="row" style="width: 100%;margin-bottom: 8px;">
           <!-- <search-view class="search-view" @click="changeItemMenu(MenuType.Discover)"/> -->
-          <div class="search-view row items-center" @click="changeItemMenu(MenuType.Search)">
+          <div class="search-view row items-center" @click="changeItemMenu(MenuType.Discover)">
             <q-icon name="search" size="16px" style="margin-left: 8px;" class="text-minor-color"></q-icon>
             <div style="margin-left:10px;"> Search </div>
           </div>
@@ -39,8 +39,8 @@
         </div>
         <q-scroll-area style="height:calc(100% - 110px);">
           <q-list class="margin-bottom-safe-area">
-            <!-- <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false"
-              @item-on-click="changeItemMenu(MenuType.Discover)" /> -->
+            <layout-left-item-menu :menu-type="MenuType.Discover" :show-un-read-count="false"
+              @item-on-click="changeItemMenu(MenuType.Discover)" />
             <layout-left-item-menu :menu-type="MenuType.Trend" :show-un-read-count="false"
               @item-on-click="changeItemMenu(MenuType.Trend)" />
             <layout-left-item-menu :menu-type="MenuType.Today" :unread-count="`${todayCount}`"
@@ -307,6 +307,11 @@ export default defineComponent({
         type: MenuType.Discover,
         value: 0
       };
+    } else if (Route.path.includes('/trend')) {
+      store.menu_choice = {
+        type: MenuType.Trend,
+        value: 0
+      };
     }
 
     // watch(
@@ -388,7 +393,7 @@ export default defineComponent({
       } else if (type == MenuType.Board) {
         goto('/')
       } else if (type == MenuType.Trend) {
-        goto('/trend')
+        goto('/trend2')
       } else if (type == MenuType.Search) {
         goto('/search')
       }
