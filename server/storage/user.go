@@ -134,16 +134,25 @@ func (s *Storage) CreateUser(userCreationRequest *model.UserCreationRequest) (*m
 		return nil, fmt.Errorf(`store: unable to create user: %v`, err)
 	}
 
-	_, err = tx.Exec(`INSERT INTO categories (user_id, title) VALUES ($1, $2)`, user.ID, "All")
+	category_query := `INSERT INTO categories (user_id, title) VALUES ($1, $2) RETURNING id`
+	var category model.Category
+	err = tx.QueryRow(
+		category_query,
+		user.ID,
+		"All",
+	).Scan(
+		&category.ID,
+	)
+	//_, err = tx.Exec(`INSERT INTO categories (user_id, title) VALUES ($1, $2)`, user.ID, "All")
 	if err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf(`store: unable to create user default category: %v`, err)
 	}
 
-	_, err = tx.Exec(`INSERT INTO feeds (id,user_id, category_id,title,feed_url,site_url,disabled) VALUES (0, $1,1,'save pages','','',true)`, user.ID)
+	_, err = tx.Exec(`INSERT INTO feeds (id,user_id, category_id,title,feed_url,site_url,disabled) VALUES (0, $1,$2,'save pages','','',true)`, user.ID, category.ID)
 	if err != nil {
 		tx.Rollback()
-		return nil, fmt.Errorf(`store: unable to create  default feed2: %v`, err)
+		return nil, fmt.Errorf(`store: unable to create  default feed3: %v`, err)
 	}
 
 	_, err = tx.Exec(`INSERT INTO integrations (user_id) VALUES ($1)`, user.ID)
