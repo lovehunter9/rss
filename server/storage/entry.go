@@ -86,7 +86,7 @@ func (s *Storage) UpdateEntryContent(entry *model.Entry) error {
 		return fmt.Errorf(`store: unable to update content of entry #%d: %v`, entry.ID, err)
 	}
 
-	query = `
+	/*query = `
 		UPDATE
 			entries
 		SET
@@ -98,7 +98,7 @@ func (s *Storage) UpdateEntryContent(entry *model.Entry) error {
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf(`store: unable to update content of entry #%d: %v`, entry.ID, err)
-	}
+	}*/
 
 	return tx.Commit()
 }
@@ -167,7 +167,7 @@ func (s *Storage) CreateEntrySingle(entry *model.Entry) error {
 
 // createEntry add a new entry.
 func (s *Storage) createEntry(tx *sql.Tx, entry *model.Entry) error {
-	query := `
+	/*query := `
 		INSERT INTO entries
 			(
 				title,
@@ -197,6 +197,38 @@ func (s *Storage) createEntry(tx *sql.Tx, entry *model.Entry) error {
 				$10,
 				now(),
 				setweight(to_tsvector(left(coalesce($1, ''), 500000)), 'A') || setweight(to_tsvector(left(coalesce($6, ''), 500000)), 'B')
+			)
+		RETURNING
+			id, status
+	`*/
+	query := `
+		INSERT INTO entries
+			(
+				title,
+				hash,
+				url,
+				comments_url,
+				published_at,
+				content,
+				author,
+				user_id,
+				feed_id,
+				reading_time,
+				changed_at
+			)
+		VALUES
+			(
+				$1,
+				$2,
+				$3,
+				$4,
+				$5,
+				$6,
+				$7,
+				$8,
+				$9,
+				$10,
+				now()
 			)
 		RETURNING
 			id, status
@@ -235,7 +267,7 @@ func (s *Storage) createEntry(tx *sql.Tx, entry *model.Entry) error {
 // Note: we do not update the published date because some feeds do not contains any date,
 // it default to time.Now() which could change the order of items on the history page.
 func (s *Storage) updateEntry(tx *sql.Tx, entry *model.Entry) error {
-	query := `
+	/*query := `
 		UPDATE
 			entries
 		SET
@@ -246,6 +278,21 @@ func (s *Storage) updateEntry(tx *sql.Tx, entry *model.Entry) error {
 			author=$5,
 			reading_time=$6,
 			document_vectors = setweight(to_tsvector(left(coalesce($1, ''), 500000)), 'A') || setweight(to_tsvector(left(coalesce($4, ''), 500000)), 'B')
+		WHERE
+			user_id=$7 AND feed_id=$8 AND hash=$9
+		RETURNING
+			id
+	`*/
+	query := `
+		UPDATE
+			entries
+		SET
+			title=$1,
+			url=$2,
+			comments_url=$3,
+			content=$4,
+			author=$5,
+			reading_time=$6
 		WHERE
 			user_id=$7 AND feed_id=$8 AND hash=$9
 		RETURNING

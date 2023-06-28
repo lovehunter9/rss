@@ -72,8 +72,14 @@ const updateCurrentPage = (page: number) => {
 .trend-root {
   width: 100%;
   height: 100vh;
-  padding-left: 100px;
+  padding-left: 120px;
   padding-right: 100px;
   padding-top: 20px;
+
+  .tabs-bg {
+    // background-color: red;
+
+
+  }
 }
 </style>

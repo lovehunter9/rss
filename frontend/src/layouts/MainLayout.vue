@@ -62,7 +62,7 @@
           <q-item class="item" dense v-for="(category, index) in store.categories" :key="'ct' + index"
             style="padding: 0;padding-left: 5px;width: calc(100%-10px);">
             <q-expansion-item dense switchToggleSide :disable="category.feeds.length === 0" :defaultOpened="index === 0 &&
-            category.feeds.length > 0">
+            category.feeds.length > 0" class="menuItem">
               <template v-slot:header>
                 <q-item class="menuItem"
                   :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed &&

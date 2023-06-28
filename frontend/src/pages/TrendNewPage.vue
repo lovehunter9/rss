@@ -20,7 +20,8 @@
 
       <template v-slot:after>
         <div class="column items-center justify-center" style="height: 100vh;">
-          <div class="entry-content text-minor-color" v-html="selectRecommendRef.content"  v-if="selectRecommendRef"/>
+          <!-- <div class="entry-content text-minor-color" v-html="selectRecommendRef.content"  v-if="selectRecommendRef"/> -->
+          <TrendDetail v-if="selectRecommendRef" :item="selectRecommendRef" @goPageAction="goIndex"/>
           <div class="text-7A7A7A column items-center justify-center" v-else>
             <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148"/>
             {{ 'No item selected.' }}
@@ -39,6 +40,7 @@ import {onMounted, ref} from 'vue';
 import EmptyView from 'components/rss/EmptyView.vue';
 import EntryTotalComponent from './common/EntryTotal2Component.vue'
 import { Recommend } from 'src/types';
+import TrendDetail from './trend/TrendDetailComponent.vue'
 
 const rssStore = useRssStore();
 
@@ -53,9 +55,14 @@ onMounted(() => {
 
 const requestRecommendList = async () => {
   rssStore.recommends = []
+  selectRecommendRef.value = undefined
   isRequest.value = true
   await rssStore.get_recommendList()
   isRequest.value = false
+}
+
+const goIndex = (index:number) => {
+  selectRecommendRef.value = rssStore.recommends[index]
 }
 
 </script>

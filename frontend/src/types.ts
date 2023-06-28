@@ -216,6 +216,7 @@ export interface Entry {
   enclosures: Enclosure[];
   feed: Feed;
   board_ids: string;
+  image_url: string;
 }
 
 export interface EntryContent {

@@ -404,8 +404,8 @@ export async function get_recommendList(offset: number,limit = 20):Promise<Recom
     rssStore.url + '/api/recommendList'
   , {
     params: {
-      offset,
-      limit
+      // offset,
+      // limit
     }
   });
 

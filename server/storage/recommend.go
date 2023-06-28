@@ -71,7 +71,7 @@ func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, err
 	 f.title feed_title,f.feed_url,f.site_url,f.icon_type,f.icon_content icon_byte_content,f.category_id,f.category_title
 	 FROM recommend_result r,recommend_entries e,recommend_feed f 
 	 WHERE r.batch=$1 and r.url=e.url and e.feed_id=f.id
-	 ORDER BY r.rank desc OFFSET $2 limit $3`
+	 ORDER BY r.rank  OFFSET $2 limit $3`
 	rows, err := s.db.Query(query, batch, offset, limit)
 	if err != nil {
 		return nil, fmt.Errorf(`store: unable to fetch boards: %v`, err)
