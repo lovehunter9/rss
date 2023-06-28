@@ -14,7 +14,7 @@
           </div>
         </div>
         <span class="text-entry-title text-major-color">{{ entry.title }}</span>
-        <span class="text-entry-title text-major-color">{{ entry.image_url }}</span>
+        <!-- <span class="text-entry-title text-major-color">{{ entry.image_url }}</span> -->
         <q-img :src="entry!.image_url" v-if="entry?.image_url" width="100%"></q-img>
       </div>
     </div>

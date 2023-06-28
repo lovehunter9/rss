@@ -30,7 +30,7 @@
         {{ getTime() }}
       </span>
       <div class="html-content text-major-color" v-if="item.content">
-        <div v-html="item.content"></div>
+        <div v-html="formatContentHtml(item.content)"></div>
       </div>
     </div>
   </div>
@@ -44,6 +44,7 @@ import {
 import { useRssStore } from '../../stores/rss';
 import {Recommend } from '../../types';
 import {utcToStamp } from '../../utils/utils'
+import { formatContentHtml} from 'src/utils/utils'
 import { date } from 'quasar'
 
 const store = useRssStore();

@@ -661,10 +661,10 @@ export interface SDKSearchPathItem {
 
 
 
-export interface RecommendListQueryResponse {
-  total: number
-  entries: Recommend[]
-}
+// export interface RecommendListQueryResponse {
+//   total: number
+//   entries: Recommend[]
+// }
 
 export interface Recommend {
   batch: number
