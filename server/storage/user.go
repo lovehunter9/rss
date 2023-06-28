@@ -143,7 +143,7 @@ func (s *Storage) CreateUser(userCreationRequest *model.UserCreationRequest) (*m
 	_, err = tx.Exec(`INSERT INTO feeds (id,user_id, category_id,title,feed_url,site_url,disabled) VALUES (0, $1,1,'save pages','','',true)`, user.ID)
 	if err != nil {
 		tx.Rollback()
-		return nil, fmt.Errorf(`store: unable to create  default feed: %v`, err)
+		return nil, fmt.Errorf(`store: unable to create  default feed2: %v`, err)
 	}
 
 	_, err = tx.Exec(`INSERT INTO integrations (user_id) VALUES ($1)`, user.ID)
