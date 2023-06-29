@@ -1,13 +1,13 @@
 <template>
-  <div class="sss">
+  <div class="entry-search-root">
     <q-select standout outlined hide-dropdown-icon :loading="loading" :model-value="model" use-input hide-selected
       fill-input :options="options" @filter="filterFn" @input-value="setModel"
-      :placeholder="placeholder" style="width: 100%;font-size: 12px;" class="select_height">
+      :placeholder="placeholder" style="width: 100%;font-size: 12px;" :menuOffset="[0,5]">
       <template v-slot:prepend>
         <q-icon size="16px" name="search" />
       </template>
       <template v-slot:option="scope">
-        <q-item v-bind="scope.itemProps" @click="itemClick(scope.opt)">
+        <q-item v-bind="scope.itemProps" @click="itemClick(scope.opt)" :style="`width: ${itemWidth > 0 ? (itemWidth + 'px') : '100%'};`">
           <q-item-section>
             <q-item-label>
               <span class="optimized_itmes">{{ scope.opt.title }}</span>
@@ -33,13 +33,24 @@ import { useRssStore } from 'src/stores/rss';
 import { Entry } from 'src/types';
 import { ref } from 'vue';
 
+defineProps({
+  itemWidth: {
+    default: 0,
+    require: false,
+    type: Number
+  },
+  placeholder: {
+    type: String,
+    require: false,
+    default: 'Search by topic,website,Rss URL'
+  }
+})
+
 const loading = ref(false);
 
 const options = ref<Entry[]>([]);
 
 const model = ref<string>('');
-
-const placeholder = ref('Search by topic,website,Rss URL')
 
 const rssStore = useRssStore()
 
@@ -60,15 +71,11 @@ const filterFn = async (val: string, update: (arg0: () => void) => void, abort: 
 };
 
 const itemClick = (value: Entry) => {
-  console.log(model.value);
-
   model.value = '';
-  // model.value = undefined
   emit('showDetail',value)
 }
 
 const setModel = (v: any) => {
-  console.log(1111);
   model.value = v
 }
 
@@ -77,6 +84,7 @@ const emit = defineEmits(['showDetail'])
 
 </script>
 <style lang="scss">
+
 .popup_content_select {
   padding: 5px 5px;
 

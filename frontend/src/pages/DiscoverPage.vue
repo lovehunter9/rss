@@ -12,7 +12,7 @@
       <!-- <div class="search-detail"> -->
 
       <!-- <search-view placeholder="Search by topic,website,Rss URL" class="detail-width search-view" @onSearch="onSearch"/> -->
-      <discover-search-view class="detail-width search-view" @show-detail="showSearchResultDetail"></discover-search-view>
+      <entry-search-view class="detail-width search-view" @show-detail="showSearchResultDetail"/>
       <!-- <q-scroll-area v-if="!showDetail" class="confirmDialogArea"> -->
       <div class="row justify-start confirmDialogArea" v-if="!showDetail">
         <q-intersection v-for="item, index in searchDetails" :key="index" class="example-item">
@@ -42,8 +42,7 @@
 import { ref } from 'vue';
 import './discover/css/discover.scss'
 import DiscoverDetail from './discover/DiscoverDetail.vue';
-import DiscoverSearchView from './discover/DiscoverSearchView.vue'
-
+import EntrySearchView from '../components/rss/EntrySearchView.vue'
 // function onSearch(vault : string){
 //   console.log(vault)
 // }

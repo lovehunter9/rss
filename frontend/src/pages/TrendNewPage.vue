@@ -76,6 +76,7 @@ const goIndex = (index:number) => {
     border-right: 1px solid #ececec;
     height: 100%;
     overflow: auto;
+    width: 100%;
 
     .icon-read-all {
       width: 20px;

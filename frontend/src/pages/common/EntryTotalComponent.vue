@@ -104,6 +104,8 @@ const addToBoard = async (itemId: string, boardId: number) => {
     width: 100%;
 
     .enter-header-start {
+      max-width: calc(100% - 40px);
+      
       .enter-time {
         font-family: 'Roboto';
         font-style: normal;
