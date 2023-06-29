@@ -7,6 +7,8 @@ package api // import "miniflux.app/api"
 import (
 	json_parser "encoding/json"
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
 
 	"miniflux.app/http/request"
@@ -236,4 +238,28 @@ func (h *handler) removeFeed(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NoContent(w, r)
+}
+
+func (h *handler) getDiscoverFeeds(w http.ResponseWriter, r *http.Request) {
+	var name, link string
+	categoryID := request.QueryStringParam(r, "categoryID", "")
+	query := request.QueryStringParam(r, "query", "")
+	if query != "" {
+		if strings.Contains(query, ".") && strings.Contains(query, "/") {
+			urlParse, err := url.Parse(query)
+			if err == nil {
+				link = urlParse.Hostname()
+			}
+		} else {
+			name = query
+		}
+	}
+
+	feeds, err := h.store.RecommendFeedQuery(categoryID, name, link)
+	if err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
+
+	json.OK(w, r, feeds)
 }

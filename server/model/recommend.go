@@ -15,6 +15,7 @@ type RecommendBase struct {
 type RecommendFeed struct {
 	ID              int64   `json:"id"`
 	Title           string  `json:"feed_title"`
+	Desc            string  `json:"feed_desc"`
 	FeedUrl         string  `json:"feed_url"`
 	SiteUrl         string  `json:"site_url"`
 	IconType        *string `json:"icon_type"`
