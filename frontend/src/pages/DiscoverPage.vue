@@ -16,7 +16,7 @@
       <!-- <q-scroll-area v-if="!showDetail" class="confirmDialogArea"> -->
       <div class="row justify-start confirmDialogArea" v-if="!showDetail">
         <q-intersection v-for="item, index in searchDetails" :key="index" class="example-item">
-          <div class="item-detail" @click="showContentDetail()">
+          <div class="item-detail" @click="showRecommendContentDetail()">
             <img :src="item.img" style="width:100%;height: 100%; position:absolute;">
             <div class="item-title">
               {{ item.detail }}
@@ -38,7 +38,7 @@
 
 // import {ref} from 'vue';
 // import SearchView from 'components/rss/SearchView.vue';
-import { SDKSearchPathResponse } from 'src/types';
+// import { SDKSearchPathResponse } from 'src/types';
 import { ref } from 'vue';
 import './discover/css/discover.scss'
 import DiscoverDetail from './discover/DiscoverDetail.vue';
@@ -116,10 +116,13 @@ const backAction = () => {
   showDetail.value = false
 }
 
-const showSearchResultDetail = (detail: SDKSearchPathResponse) => {
-  console.log(detail);
-  console.log(discoverDetailRef);
+const showSearchResultDetail = (detail: Entry) => {
   discoverDetailRef.value.reloadFeed(detail)
+  showContentDetail()
+}
+
+const showRecommendContentDetail = () => {
+  discoverDetailRef.value.reloadDefault()
   showContentDetail()
 }
 

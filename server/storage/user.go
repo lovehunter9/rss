@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
+	"time"
 
 	"miniflux.app/logger"
 	"miniflux.app/model"
@@ -134,10 +135,26 @@ func (s *Storage) CreateUser(userCreationRequest *model.UserCreationRequest) (*m
 		return nil, fmt.Errorf(`store: unable to create user: %v`, err)
 	}
 
-	_, err = tx.Exec(`INSERT INTO categories (user_id, title) VALUES ($1, $2)`, user.ID, "All")
+	category_query := `INSERT INTO categories (user_id, title) VALUES ($1, $2) RETURNING id`
+	var category model.Category
+	err = tx.QueryRow(
+		category_query,
+		user.ID,
+		"All",
+	).Scan(
+		&category.ID,
+	)
+	//_, err = tx.Exec(`INSERT INTO categories (user_id, title) VALUES ($1, $2)`, user.ID, "All")
 	if err != nil {
 		tx.Rollback()
 		return nil, fmt.Errorf(`store: unable to create user default category: %v`, err)
+	}
+
+	feedUpdateTime, _ := time.Parse("2020-1-1", "2019-11-21 11:59:01")
+	_, err = tx.Exec(`INSERT INTO feeds (id,user_id, category_id,title,feed_url,site_url,disabled,update_time) VALUES (0, $1,$2,'save pages','','',true,$3)`, user.ID, category.ID, feedUpdateTime)
+	if err != nil {
+		tx.Rollback()
+		return nil, fmt.Errorf(`store: unable to create  default feed3: %v`, err)
 	}
 
 	_, err = tx.Exec(`INSERT INTO integrations (user_id) VALUES ($1)`, user.ID)

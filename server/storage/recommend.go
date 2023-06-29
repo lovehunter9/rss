@@ -71,7 +71,7 @@ func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, err
 	 f.title feed_title,f.feed_url,f.site_url,f.icon_type,f.icon_content icon_byte_content,f.category_id,f.category_title
 	 FROM recommend_result r,recommend_entries e,recommend_feed f 
 	 WHERE r.batch=$1 and r.url=e.url and e.feed_id=f.id
-	 ORDER BY r.rank desc OFFSET $2 limit $3`
+	 ORDER BY r.rank  OFFSET $2 limit $3`
 	rows, err := s.db.Query(query, batch, offset, limit)
 	if err != nil {
 		return nil, fmt.Errorf(`store: unable to fetch boards: %v`, err)
@@ -111,4 +111,29 @@ func (s *Storage) GetRecommendFullContent(entryId int64) string {
 	s.db.QueryRow(query, entryId).Scan(&content)
 	return content
 
+}
+
+func (s *Storage) RecommendFeedQuery(categoryID, name, link string) (*model.RecommendFeed, error) {
+	var feed model.RecommendFeed
+
+	query := `SELECT id,title as feed_title,desc as feed_desc,feed_url,site_url, icon_type,icon_content as icon_byte_content,category_id,category_title FROM recommend_feed where 1=1 `
+	if categoryID != "" {
+		query = query + " and category_id=" + categoryID
+	}
+	if name != "" {
+		query = query + " and title like '%" + name + "%‘"
+	}
+	if link != "" {
+		query = query + " and feed_url like '%" + link + "%‘"
+	}
+	err := s.db.QueryRow(query).Scan(&feed.ID, &feed.Title, &feed.Desc, &feed.FeedUrl, &feed.SiteUrl, &feed.IconType, &feed.IconByteContent, &feed.CategoryID, &feed.CategoryTitle)
+
+	switch {
+	case err == sql.ErrNoRows:
+		return nil, nil
+	case err != nil:
+		return nil, fmt.Errorf(`store: unable to fetch recommend: %v`, err)
+	default:
+		return &feed, nil
+	}
 }

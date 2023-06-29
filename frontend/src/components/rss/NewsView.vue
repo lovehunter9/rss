@@ -8,7 +8,7 @@
       <div class="row justify-end items-center">
         <img class="icon-end" :src="readRef" :title="readTextRef" @click="readChange" />
         <q-img class="icon-end" :src="markRef" :title="markTextRef">
-          <change-entry-board-menu-component :item="item"></change-entry-board-menu-component>
+          <change-entry-board-menu-component :item-id="`${item.id}`" :board_ids="item.board_ids" @add-to-board="addToBoard" />
         </q-img>
         <img class="icon-end" src="../../assets/menu/share.svg">
       </div>
@@ -20,7 +20,8 @@
         <div class="author">
           <a href="javascript:;" class="text-major-color" @click="jumpToFeed()">{{ item.feed.title }}</a>
         </div>
-        <img class="entry-icon" :src="store.feeds_icon[item.feed_id].data">
+        <img class="entry-icon" v-if="store.feeds_icon[item.feed_id] && store.feeds_icon[item.feed_id].data"
+        :src="store.feeds_icon[item.feed_id] && store.feeds_icon[item.feed_id].data ? store.feeds_icon[item.feed_id].data : ''">
       </div>
       <q-separator style="margin-top:16px;margin-bottom: 16px;" />
       <h1> {{ item.title }} </h1>
@@ -48,6 +49,7 @@ import { similarity2 } from 'src/utils/stringCompare'
 import { useRouter } from 'vue-router';
 import { date } from 'quasar'
 import ChangeEntryBoardMenuComponent from 'components/rss/ChangeEntryBoardMenuComponent.vue'
+import { addEntryToBoard, removeEntryToBoard } from 'src/api/api';
 
 const store = useRssStore();
 const router = useRouter()
@@ -193,6 +195,22 @@ function getTime() {
     return `${dateString} at ${timeString}`
   }
   return '';
+}
+
+const addToBoard = async (itemId: string, boardId: number, updateBoardIds: string, isAdd: boolean) => {
+  try {
+      if (!isAdd) {
+        await removeEntryToBoard({ board_id: boardId, entry_id: Number(itemId)})
+      } else {
+        await addEntryToBoard({ board_id: boardId, entry_id: Number(itemId) })
+      }
+      store.updateEntryBoards(
+        Number(itemId),
+        updateBoardIds
+      )
+    } catch (error) {
+      console.log(error);
+    }
 }
 
 

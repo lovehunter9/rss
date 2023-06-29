@@ -21,6 +21,7 @@ import {
 
 import {
   create_board,
+  entriesContentQuery,
   entry_readlater,
   feed_mark_all_as_read,
   fetch_feed_counter,
@@ -282,7 +283,7 @@ export const useRssStore = defineStore('rss', {
 
     async get_entries(q: EntriesQueryRequest, filter ?: (entriesQueryResponse: EntriesQueryResponse) => EntriesQueryResponse) {
       const rssStore = useRssStore();
-
+      this.entries = [];
       try {
         console.log('get_entries ' + rssStore.url + '/api/entries' + q.build());
         const data: EntriesQueryResponse = await get_entries(q);
@@ -337,6 +338,7 @@ export const useRssStore = defineStore('rss', {
 
     async get_board_entries(boardId: number, request: BoardEntriesQueryRequest) {
       try {
+        this.entries = [];
         const response: EntriesQueryResponse = await get_board_entries(boardId, request);
         this.entries = response.entries;
         this.entries_total = response.total;
@@ -432,6 +434,14 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
+    async entriesContentQuery(query: string) {
+      try {
+        return await entriesContentQuery(query)
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
     updateEntryBoards(entry_id: number, board_ids: string) {
       this.entries.filter(e => e.id === entry_id).map(e => {
         e.board_ids = board_ids
@@ -441,7 +451,7 @@ export const useRssStore = defineStore('rss', {
     async get_recommendList(page = 0, pageSize = 20) {
       try {
         const recommendList = await get_recommendList(page * pageSize, pageSize)
-        this.recommends = recommendList.entries
+        this.recommends = recommendList
         return recommendList
       } catch (error) {
         console.log(error);

@@ -123,12 +123,12 @@ var migrations = []func(tx *sql.Tx) error{
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
-		sql := `
+		/*sql := `
 			CREATE EXTENSION IF NOT EXISTS hstore;
-			ALTER TABLE users ADD COLUMN extra hstore;
+			ALTER TABLE users ADD COLUMN   hstore;
 			CREATE INDEX users_extra_idx ON users using gin(extra);
 		`
-		_, err = tx.Exec(sql)
+		_, err = tx.Exec(sql)*/
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
@@ -260,10 +260,10 @@ var migrations = []func(tx *sql.Tx) error{
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
-		sql := `
+		/*sql := `
 			ALTER TABLE user_sessions ALTER COLUMN ip SET DATA TYPE inet using ip::inet;
 		`
-		_, err = tx.Exec(sql)
+		_, err = tx.Exec(sql)*/
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
@@ -275,12 +275,12 @@ var migrations = []func(tx *sql.Tx) error{
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
-		sql := `
+		/*sql := `
 			ALTER TABLE entries ADD COLUMN document_vectors tsvector;
 			UPDATE entries SET document_vectors = to_tsvector(substring(title || ' ' || coalesce(content, '') for 1000000));
 			CREATE INDEX document_vectors_idx ON entries USING gin(document_vectors);
 		`
-		_, err = tx.Exec(sql)
+		_, err = tx.Exec(sql)*/
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
@@ -289,13 +289,13 @@ var migrations = []func(tx *sql.Tx) error{
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
-		sql := `
+		/*sql := `
 			UPDATE
 				entries
 			SET
 				document_vectors = setweight(to_tsvector(substring(coalesce(title, '') for 1000000)), 'A') || setweight(to_tsvector(substring(coalesce(content, '') for 1000000)), 'B')
 		`
-		_, err = tx.Exec(sql)
+		_, err = tx.Exec(sql)*/
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
@@ -319,10 +319,13 @@ var migrations = []func(tx *sql.Tx) error{
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
-		sql := `
+		/*sql := `
 			ALTER TABLE entries ADD COLUMN changed_at timestamp with time zone;
 			UPDATE entries SET changed_at = published_at;
 			ALTER TABLE entries ALTER COLUMN changed_at SET not null;
+		`*/
+		sql := `
+			ALTER TABLE entries ADD COLUMN changed_at timestamp with time zone not null;
 		`
 		_, err = tx.Exec(sql)
 		return err
@@ -346,13 +349,14 @@ var migrations = []func(tx *sql.Tx) error{
 	func(tx *sql.Tx) (err error) {
 		sql := `
 			ALTER TABLE entries ADD COLUMN share_code text not null default '';
-			CREATE UNIQUE INDEX entries_share_code_idx ON entries USING btree(share_code) WHERE share_code <> '';
 		`
 		_, err = tx.Exec(sql)
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
-		sql := `CREATE INDEX enclosures_user_entry_url_idx ON enclosures(user_id, entry_id, md5(url))`
+		sql := `CREATE INDEX enclosures_user_entry_url_idx ON enclosures(user_id, entry_id, md5(url));
+				CREATE UNIQUE INDEX entries_share_code_idx ON entries USING btree(share_code) WHERE share_code <> '';
+			`
 		_, err = tx.Exec(sql)
 		return err
 	},
@@ -424,9 +428,12 @@ var migrations = []func(tx *sql.Tx) error{
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
-		sql := `
+		/*sql := `
 			ALTER TABLE entries ADD COLUMN created_at timestamp with time zone not null default now();
 			UPDATE entries SET created_at = published_at;
+		`*/
+		sql := `
+			ALTER TABLE entries ADD COLUMN created_at timestamp with time zone not null default now();
 		`
 		_, err = tx.Exec(sql)
 		return err
@@ -442,7 +449,7 @@ var migrations = []func(tx *sql.Tx) error{
 			return err
 		}
 
-		_, err = tx.Exec(`
+		/*_, err = tx.Exec(`
 			DECLARE my_cursor CURSOR FOR
 			SELECT
 				id,
@@ -486,13 +493,17 @@ var migrations = []func(tx *sql.Tx) error{
 			if err != nil {
 				return err
 			}
-		}
+		}*/
 
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
-		_, err = tx.Exec(`
+		/*_, err = tx.Exec(`
 			ALTER TABLE users DROP COLUMN extra;
+			CREATE UNIQUE INDEX users_google_id_idx ON users(google_id) WHERE google_id <> '';
+			CREATE UNIQUE INDEX users_openid_connect_id_idx ON users(openid_connect_id) WHERE openid_connect_id <> '';
+		`)*/
+		_, err = tx.Exec(`
 			CREATE UNIQUE INDEX users_google_id_idx ON users(google_id) WHERE google_id <> '';
 			CREATE UNIQUE INDEX users_openid_connect_id_idx ON users(openid_connect_id) WHERE openid_connect_id <> '';
 		`)
@@ -664,8 +675,11 @@ var migrations = []func(tx *sql.Tx) error{
 	},
 
 	func(tx *sql.Tx) (err error) {
-		sql := `
+		/*sql := `
 			ALTER TABLE feeds ADD COLUMN update_time timestamp with time zone default to_date('2020-1-1','YYYY-MM-DD');
+		`*/
+		sql := `
+			ALTER TABLE feeds ADD COLUMN update_time timestamp with time zone ;
 		`
 		_, err = tx.Exec(sql)
 		return err
@@ -766,7 +780,7 @@ var migrations = []func(tx *sql.Tx) error{
 			CREATE INDEX index_recommend_entries_embedding_url on recommend_entries_embedding using btree(url);
 			CREATE INDEX index_recommend_entries_embedding_model on recommend_entries_embedding using btree(url,model_name,model_version);
 			CREATE INDEX index_entries_embedding_entryid on entries_embedding using btree(entry_id);
-			CREATE INDEX index_entries_embedding_model on entries_embedding using btree(entry_id,model_version,model_version);
+			CREATE INDEX index_entries_embedding_model on entries_embedding using btree(entry_id,model_name,model_version);
 			CREATE INDEX index_recommend_result_batch on recommend_result using btree(batch);
 			ALTER TABLE entries ADD COLUMN last_read_at timestamp with time zone;
 		`
@@ -777,7 +791,6 @@ var migrations = []func(tx *sql.Tx) error{
 	func(tx *sql.Tx) (err error) {
 		sql := `ALTER TABLE stat_entry_read ADD COLUMN read_time int not null default 0;
 				ALTER TABLE entries ADD COLUMN image_url text default '';
-				INSERT INTO feeds (id,user_id, category_id,title,feed_url,site_url,disabled) VALUES (0, 1,1,'save pages','','',true);
 				`
 		_, err = tx.Exec(sql)
 		return err

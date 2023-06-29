@@ -30,17 +30,20 @@
 </template>
 
 <script setup lang='ts'>
-import { PropType, ref } from 'vue';
-import { Entry } from 'src/types';
+import { ref } from 'vue';
 import { useRssStore } from 'src/stores/rss';
-import { addEntryToBoard, removeEntryToBoard } from 'src/api/api';
 import { useQuasar } from 'quasar';
 import AddBoardDialog from '../dialog/AddBoardDialog.vue';
 
 let props = defineProps({
-  item: {
-    type: Object as PropType<Entry>,
+  itemId: {
+    type: String,
     required: true
+  },
+  board_ids: {
+    type: String,
+    required: false,
+    default: ''
   }
 })
 
@@ -64,7 +67,7 @@ const getBoardStatusImg = (isHover: boolean, isSelected: boolean) => {
 }
 
 function isContainBoard(id: number) {
-  return props.item.board_ids.split(',').find(e => Number(e) === id) != undefined
+  return props.board_ids.split(',').find(e => Number(e) === id) != undefined
 }
 
 const initBoardsStatus = () => {
@@ -79,32 +82,20 @@ const initBoardsStatus = () => {
 
 const boardSelectStatusRef = ref(initBoardsStatus())
 
-
 async function addToBoard(board_id: number) {
-  if (props.item) {
-    try {
-      if (isContainBoard(board_id)) {
-        await removeEntryToBoard({ board_id: board_id, entry_id: props.item.id })
-        // props.item.board_ids = props.item.board_ids.split(',') //.filter(e => Number(e) !== board.id).join(',')
-        store.updateEntryBoards(
-          props.item.id,
-          props.item.board_ids.split(',').filter(e => Number(e) !== board_id).join(',')
-        )
-      } else {
-        await addEntryToBoard({ board_id: board_id, entry_id: props.item.id })
-        store.updateEntryBoards(
-          props.item.id,
-          props.item.board_ids.length > 0 ? (props.item.board_ids + ',' + board_id) : `${board_id}`
-        )
-      }
-      // eslint-disable-next-line vue/no-mutating-props
-      (props.item as any) = store.entries.find(e => e.id === props.item.id)
-
-      boardSelectStatusRef.value = initBoardsStatus()
-    } catch (error) {
-      console.log(error);
-    }
+  let boardIds = ''
+  if (isContainBoard(board_id)) {
+    boardIds = props.board_ids.split(',').filter(e => e != `${board_id}`).join(',')
+  } else {
+    boardIds = props.board_ids.length > 0 ? (props.board_ids + ',' + board_id) : `${board_id}`
   }
+
+  emit('addToBoard', props.itemId , board_id, boardIds, !isContainBoard(board_id))
+
+  setTimeout(() => {
+    (props.board_ids as any) = boardIds
+    boardSelectStatusRef.value = initBoardsStatus()
+  }, 1000);
 }
 
 async function createBoard() {
@@ -125,6 +116,8 @@ async function createBoard() {
       //     });
     });
 }
+
+const emit = defineEmits(['addToBoard'])
 
 
 </script>

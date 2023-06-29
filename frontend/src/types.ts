@@ -216,6 +216,7 @@ export interface Entry {
   enclosures: Enclosure[];
   feed: Feed;
   board_ids: string;
+  image_url: string;
 }
 
 export interface EntryContent {
@@ -660,10 +661,10 @@ export interface SDKSearchPathItem {
 
 
 
-export interface RecommendListQueryResponse {
-  total: number
-  entries: Recommend[]
-}
+// export interface RecommendListQueryResponse {
+//   total: number
+//   entries: Recommend[]
+// }
 
 export interface Recommend {
   batch: number
@@ -685,4 +686,10 @@ export interface Recommend {
   }
   score: number
   rank: number
+}
+
+export interface PageToBoard{
+  url : string
+  title: string
+  board_id : number
 }
