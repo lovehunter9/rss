@@ -112,3 +112,28 @@ func (s *Storage) GetRecommendFullContent(entryId int64) string {
 	return content
 
 }
+
+func (s *Storage) RecommendFeedQuery(categoryID, name, link string) (*model.RecommendFeed, error) {
+	var feed model.RecommendFeed
+
+	query := `SELECT id,title as feed_title,desc as feed_desc,feed_url,site_url, icon_type,icon_content as icon_byte_content,category_id,category_title FROM recommend_feed where 1=1 `
+	if categoryID != "" {
+		query = query + " and category_id=" + categoryID
+	}
+	if name != "" {
+		query = query + " and title like '%" + name + "%‘"
+	}
+	if link != "" {
+		query = query + " and feed_url like '%" + link + "%‘"
+	}
+	err := s.db.QueryRow(query).Scan(&feed.ID, &feed.Title, &feed.Desc, &feed.FeedUrl, &feed.SiteUrl, &feed.IconType, &feed.IconByteContent, &feed.CategoryID, &feed.CategoryTitle)
+
+	switch {
+	case err == sql.ErrNoRows:
+		return nil, nil
+	case err != nil:
+		return nil, fmt.Errorf(`store: unable to fetch recommend: %v`, err)
+	default:
+		return &feed, nil
+	}
+}

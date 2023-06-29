@@ -105,4 +105,6 @@ func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
 	sr.HandleFunc("/page/addPageToBoard", handler.addPageToBoard).Methods(http.MethodPut)
 	sr.HandleFunc("/entries/contentQuery", handler.contentQuery).Methods(http.MethodGet)
 
+	sr.HandleFunc("/discover/feeds", handler.getDiscoverFeeds).Methods(http.MethodGet)
+
 }
