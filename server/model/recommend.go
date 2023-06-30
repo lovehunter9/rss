@@ -46,18 +46,19 @@ type RecommendResult struct {
 
 // Category represents a feed category.
 type Recommend struct {
-	Batch   int     `json:"batch"`
-	EntryID int64   `json:"entry_id"`
-	Title   string  `json:"title"`
-	Author  *string `json:"author"`
+	Batch    int     `json:"batch"`
+	EntryID  int64   `json:"entry_id"`
+	Title    string  `json:"title"`
+	Author   *string `json:"author"`
+	ImageUrl string  `json:"image_url"`
 
-	PublishedAt time.Time `json:"published_at"`
-	URL         string    `json:"url"`
-	Content     *string   `json:"content"`
-
-	Feed  *RecommendFeed `json:"feed,omitempty"`
-	Score float32        `json:"score"`
-	Rank  int            `json:"rank"`
+	PublishedAt time.Time      `json:"published_at"`
+	URL         string         `json:"url"`
+	Content     *string        `json:"content"`
+	FullContent string         `json:"full_content"`
+	Feed        *RecommendFeed `json:"feed,omitempty"`
+	Score       float32        `json:"score"`
+	Rank        int            `json:"rank"`
 }
 
 type ReadTimeStatRequest struct {
