@@ -3,7 +3,7 @@ import numpy as np
 import random
 import unittest
 from recommend_model_sdk.tools.model_tool import ModelTool
-from recommend_model_sdk.rank.rank_tool import RankTool
+from recommend_model_sdk.recommend.recommend_tool import RecommendTool
 
 
 class RankToolUnitTest(unittest.TestCase):
@@ -27,13 +27,13 @@ class RankToolUnitTest(unittest.TestCase):
             embedding_array_list.append(embedding_array)
 
         result = np.stack(embedding_array_list, axis=0)
-        rank_tool = RankTool(base_id_to_embedding)
+        rank_tool = RecommendTool(base_id_to_embedding,"bert","v1")
 
     def test_rank(self):
         # python  -m unittest rank_tool_unit_test.RankToolUnitTest.test_rank
-        download_dir = "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model"
+        download_dir = "/ssd/code/MODEL"
         current_model_tool = ModelTool(download_dir)
-        model_name = "word2vec_google"
+        model_name = "bert"
         model_version = "v1"
         latest_number = 10000
         url_to_articles, url_to_embeddings = current_model_tool.download_latest_article_embedding_package(model_name, model_version, 10000)
@@ -58,8 +58,8 @@ class RankToolUnitTest(unittest.TestCase):
         query_url_to_embedding_dict = dict()
         for current_tuple in query_sample_tuple:
             query_url_to_embedding_dict[current_tuple[0]] = {"embedding": current_tuple[1], "last_reviewed": datetime.now() - timedelta(hours=4)}
-        rank_tool = RankTool(base_url_to_embedding_dict)
-        result = rank_tool.rank(query_url_to_embedding_dict, 100)
+        rank_tool = RecommendTool(base_url_to_embedding_dict,model_name,model_version)
+        result = rank_tool.recommend(query_url_to_embedding_dict, 100)
         print(result)
 
     def test_numpy(self):
