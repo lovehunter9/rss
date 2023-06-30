@@ -1,4 +1,4 @@
-# sudo bash deploy_recommend_client.sh /home/ubuntu/download_s3
+# sudo bash deploy_recommend_client.sh /ssd/code/MODEL_CLIENT
 PREFIX=bytetrade
 RECOMMEND_SCHEDULE_TASK=recommend_schedule_task
 CONTAINER_MODEL_PATH=/opt/model
