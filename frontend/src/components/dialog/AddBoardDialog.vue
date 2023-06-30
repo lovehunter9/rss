@@ -29,8 +29,6 @@ import { useRssStore } from 'stores/rss';
 const { dialogRef, onDialogOK } = useDialogPluginComponent();
 const store = useRssStore()
 
-const text = ref('')
-
 const props = defineProps({
   boardId: {
     type: Number,
