@@ -112,6 +112,7 @@ class RecommendFeedModel(RecommendPGBaseModel):
     id = BigIntegerField(null=False, unique=True, index=True)
     title = TextField(null=True)
     feed_url = TextField(null=True)
+    feed_description = TextField(null=True)
     site_url = TextField(null=True)
     icon_type = TextField(null=True)
     icon_content = BlobField(null=True)

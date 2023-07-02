@@ -113,27 +113,38 @@ func (s *Storage) GetRecommendFullContent(entryId int64) string {
 
 }
 
-func (s *Storage) RecommendFeedQuery(categoryID, name, link string) (*model.RecommendFeed, error) {
-	var feed model.RecommendFeed
-
-	query := `SELECT id,title as feed_title,desc as feed_desc,feed_url,site_url, icon_type,icon_content as icon_byte_content,category_id,category_title FROM recommend_feed where 1=1 `
+func (s *Storage) RecommendFeedQuery(categoryID, categoryName, name, link string) (model.RecommendFeeds, error) {
+	query := `SELECT id,title as feed_title,feed_description as feed_desc,feed_url,site_url, icon_type,icon_content as icon_byte_content,category_id,category_title FROM recommend_feed where 1=1 `
 	if categoryID != "" {
 		query = query + " and category_id=" + categoryID
 	}
+	if categoryName != "" {
+		query = query + " and category_title='" + categoryName + "'"
+	}
+
 	if name != "" {
 		query = query + " and title like '%" + name + "%‘"
 	}
 	if link != "" {
 		query = query + " and feed_url like '%" + link + "%‘"
 	}
-	err := s.db.QueryRow(query).Scan(&feed.ID, &feed.Title, &feed.Desc, &feed.FeedUrl, &feed.SiteUrl, &feed.IconType, &feed.IconByteContent, &feed.CategoryID, &feed.CategoryTitle)
 
-	switch {
-	case err == sql.ErrNoRows:
-		return nil, nil
-	case err != nil:
-		return nil, fmt.Errorf(`store: unable to fetch recommend: %v`, err)
-	default:
-		return &feed, nil
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf(`store: unable to fetch feeds: %v`, err)
 	}
+	defer rows.Close()
+	feeds := make(model.RecommendFeeds, 0)
+	for rows.Next() {
+		var feed model.RecommendFeed
+		if err := rows.Scan(&feed.ID, &feed.Title, &feed.Desc, &feed.FeedUrl, &feed.SiteUrl, &feed.IconType, &feed.IconByteContent, &feed.CategoryID, &feed.CategoryTitle); err != nil {
+			return nil, fmt.Errorf(`store: unable to fetch recommends row: %v`, err)
+		}
+		feed.IconContent = fmt.Sprintf("%s;base64,%s", feed.IconContent, base64.StdEncoding.EncodeToString(feed.IconByteContent))
+		feed.IconByteContent = nil
+		feeds = append(feeds, &feed)
+	}
+
+	return feeds, nil
+
 }

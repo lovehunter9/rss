@@ -68,3 +68,5 @@ type ReadTimeStatRequest struct {
 
 // Categories represents a list of categories.
 type Recommends []*Recommend
+
+type RecommendFeeds []*RecommendFeed
