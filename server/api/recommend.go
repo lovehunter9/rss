@@ -82,7 +82,7 @@ func (h *handler) initEntry(userID, entryID int64, readLater bool) int64 {
 	}
 
 	existEntryID := h.store.GetEntryIDByURL(feedId, recommendEntry.URL)
-	if existEntryID == 0 {
+	if existEntryID == int64(0) {
 		entry := model.Entry{
 			UserID:      userID,
 			FeedID:      feedId,

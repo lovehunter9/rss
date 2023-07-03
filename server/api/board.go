@@ -13,6 +13,7 @@ import (
 	"miniflux.app/crypto"
 	"miniflux.app/http/request"
 	"miniflux.app/http/response/json"
+	"miniflux.app/logger"
 	"miniflux.app/model"
 	"miniflux.app/reader/processor"
 	"miniflux.app/validator"
@@ -156,7 +157,10 @@ func (h *handler) addPageToBoard(w http.ResponseWriter, r *http.Request) {
 	}
 	var feedId int64 = 0
 	existEntryID := h.store.GetEntryIDByURL(feedId, request.Url)
-	if existEntryID == 0 {
+
+	logger.Info("[addPageToBoard 1...: url:%s,boardId:%d, entryID:%d]", request.Url, request.BoardID, existEntryID)
+
+	if existEntryID == int64(0) {
 		entry := model.Entry{
 			UserID:      userID,
 			FeedID:      feedId,
@@ -174,6 +178,7 @@ func (h *handler) addPageToBoard(w http.ResponseWriter, r *http.Request) {
 		h.store.CreateEntrySingle(&entry)
 		existEntryID = entry.ID
 	}
+	logger.Info("[addPageToBoard 2...:  entryID:%d]", existEntryID)
 	if err := h.store.AddEntryToBoard(existEntryID, request.BoardID); err != nil {
 		json.ServerError(w, r, err)
 		return
