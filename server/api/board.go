@@ -160,7 +160,7 @@ func (h *handler) addPageToBoard(w http.ResponseWriter, r *http.Request) {
 
 	logger.Info("[addPageToBoard 1...: url:%s,boardId:%d, entryID:%d]", request.Url, request.BoardID, existEntryID)
 
-	if existEntryID == 0 {
+	if existEntryID == int64(0) {
 		entry := model.Entry{
 			UserID:      userID,
 			FeedID:      feedId,
