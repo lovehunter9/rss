@@ -172,12 +172,15 @@ func ProcessEntryWebPage(feed *model.Feed, entry *model.Entry, user *model.User)
 		entry.Content = content
 		entry.ReadingTime = calculateReadingTime(content, user)
 
-		doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
-		if err == nil {
-			img, _ := doc.Find("img").First().Attr("src")
-			entry.ImageUrl = img
+		if entry.ImageUrl == "" {
+			doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
+			if err == nil {
+				img, _ := doc.Find("img").First().Attr("src")
+				if strings.HasPrefix(img, "http") {
+					entry.ImageUrl = img
+				}
+			}
 		}
-
 	}
 
 	return nil
@@ -318,11 +321,14 @@ func ScraperWebPage(url string) (string, string) {
 	}
 
 	content = sanitizer.Sanitize(url, content)
+	var img string
 
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
-	if err != nil {
-		return content, ""
+	if err == nil {
+		imgUrl, _ := doc.Find("img").First().Attr("src")
+		if strings.HasPrefix(imgUrl, "http") {
+			img = imgUrl
+		}
 	}
-	img, _ := doc.Find("img").First().Attr("src")
 	return content, img
 }

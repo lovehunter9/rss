@@ -214,7 +214,8 @@ func (s *Storage) createEntry(tx *sql.Tx, entry *model.Entry) error {
 				user_id,
 				feed_id,
 				reading_time,
-				changed_at
+				changed_at,
+				image_url
 			)
 		VALUES
 			(
@@ -228,7 +229,8 @@ func (s *Storage) createEntry(tx *sql.Tx, entry *model.Entry) error {
 				$8,
 				$9,
 				$10,
-				now()
+				now(),
+				$11
 			)
 		RETURNING
 			id, status
@@ -245,6 +247,7 @@ func (s *Storage) createEntry(tx *sql.Tx, entry *model.Entry) error {
 		entry.UserID,
 		entry.FeedID,
 		entry.ReadingTime,
+		entry.ImageUrl,
 	).Scan(&entry.ID, &entry.Status)
 
 	if err != nil {
@@ -701,8 +704,8 @@ func (s *Storage) EntryURLExistswZ(feedID int64, entryURL string) bool {
 func (s *Storage) EntryForFullContent(entryId int64) (*model.Entry, error) {
 	var entry model.Entry
 
-	query := `SELECT id, user_id, feed_id, url,title,published_at FROM entries WHERE id>$1 and  status <> $2 and full_content is null order by id limit 1`
-	err := s.db.QueryRow(query, entryId, model.EntryStatusRemoved).Scan(&entry.ID, &entry.UserID, &entry.FeedID, &entry.URL, &entry.Title, &entry.Date)
+	query := `SELECT id, user_id, feed_id, url,title,published_at,image_url FROM entries WHERE id>$1 and  status <> $2 and full_content is null order by id limit 1`
+	err := s.db.QueryRow(query, entryId, model.EntryStatusRemoved).Scan(&entry.ID, &entry.UserID, &entry.FeedID, &entry.URL, &entry.Title, &entry.Date, &entry.ImageUrl)
 
 	switch {
 	case err == sql.ErrNoRows:

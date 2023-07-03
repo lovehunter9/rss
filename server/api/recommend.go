@@ -8,9 +8,7 @@ import (
 	json_parser "encoding/json"
 	"errors"
 	"net/http"
-	"strings"
 
-	"github.com/PuerkitoBio/goquery"
 	"miniflux.app/http/request"
 	"miniflux.app/http/response/json"
 	"miniflux.app/model"
@@ -45,7 +43,7 @@ func (h *handler) getRecommendList(w http.ResponseWriter, r *http.Request) {
 		json.ServerError(w, r, err)
 		return
 	}
-	for _, item := range list {
+	/*for _, item := range list {
 		if item.FullContent != "" {
 			doc, err := goquery.NewDocumentFromReader(strings.NewReader(item.FullContent))
 			if err == nil {
@@ -54,7 +52,7 @@ func (h *handler) getRecommendList(w http.ResponseWriter, r *http.Request) {
 			}
 			item.FullContent = ""
 		}
-	}
+	}*/
 	json.OK(w, r, list)
 	//json.OK(w, r, &recommendResponse{Total: count, Entries: list})
 }
