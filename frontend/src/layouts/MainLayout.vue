@@ -8,10 +8,11 @@
         class="drawer">
         <div class="row" style="width: 100%;margin-bottom: 8px;">
           <!-- <search-view class="search-view" @click="changeItemMenu(MenuType.Discover)"/> -->
-          <div class="search-view row items-center" @click="changeItemMenu(MenuType.Discover)">
+          <!-- <div class="search-view row items-center" @click="changeItemMenu(MenuType.Discover)">
             <q-icon name="search" size="16px" style="margin-left: 8px;" class="text-minor-color"></q-icon>
             <div style="margin-left:10px;"> Search </div>
-          </div>
+          </div> -->
+          <entry-search-view class="detail-width search-view" placeholder="Search" :item-width="225" @show-detail="showSearchResultDetail"/>
 
           <div class="btn-add row justify-center items-center">
             <q-img style="width: 12px;height: 12px" src="../assets/menu/add.svg">
@@ -157,14 +158,15 @@ import contextMenu, {RIGHT_MENU_TYPE} from 'components/RightMenuInstance';
 import {newsBus, newsBusMessage} from 'src/utils/utils';
 import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import { formatLocalImage } from '../utils/utils'
-
+import EntrySearchView from '../components/rss/EntrySearchView.vue'
 
 export default defineComponent({
   name: 'MainLayout',
 
   components: {
     // SearchView,
-    LayoutLeftItemMenu
+    LayoutLeftItemMenu,
+    EntrySearchView
   },
 
   setup() {
@@ -395,7 +397,8 @@ export default defineComponent({
       } else if (type == MenuType.Trend) {
         goto('/trend2')
       } else if (type == MenuType.Search) {
-        goto('/search')
+        // goto('/search')
+        goto('/')
       }
     }
 
@@ -458,6 +461,12 @@ export default defineComponent({
       return result
     };
 
+    const showSearchResultDetail = (detail: Entry) => {
+      store.entries_total = 1;
+      store.entries = [detail];
+
+      changeItemMenu(MenuType.Search)
+    }
 
     return {
       MenuType,
@@ -483,7 +492,8 @@ export default defineComponent({
       addFeed,
       feedReduce,
       todayCount,
-      formatLocalImage
+      formatLocalImage,
+      showSearchResultDetail
     };
   }
 });
@@ -509,7 +519,7 @@ export default defineComponent({
     margin: 16px 8px 0px 16px;
     width: calc(100% - 72px);
     // background-color: red;
-    border: 1px solid #E0E0E0;
+    // border: 1px solid #E0E0E0;
     border-radius: 6px;
 
     font-family: 'Roboto';

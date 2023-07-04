@@ -2,7 +2,7 @@
   <q-item class="entry-total-root" clickable dense manualFocus :active="selected" activeClass="itemActiveStyle"
     @click="itemOnClick">
     <div class="layout-right column justify-start" style="width: 100%;">
-      <div class="row justify-between items-center">
+      <div class="row justify-between items-center" style="width: 100%;">
         <div class="row justify-start items-center" style="width: calc(100% - 50px);">
           <q-img v-if="recommend.feed.icon_content.length > 8" class="entry-icon" style="margin-right: 12px;"
             :src="'data:image/png;' + recommend.feed.icon_content" />
@@ -136,6 +136,10 @@ const emit = defineEmits(['onClickCallback'])
     font-weight: 400;
     font-size: 14px;
     line-height: 14px;
+    text-overflow: ellipsis; //文本溢出显示省略号
+    white-space: nowrap; //文本不会换行
+    overflow: hidden;
+    width: 260px;
   }
 
   .text-feed-create {
