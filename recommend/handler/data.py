@@ -68,6 +68,7 @@ class DataHandler:
         current_model_tool = ModelTool(path)
 
         url_to_articles, url_to_embeddings = current_model_tool.download_latest_article_embedding_package(user.model_name, user.model_version, down_latest_number)
+        self.current_logger.debug(f'down_latest_article_embedding_package downnuber:{down_latest_number}, num:{len(url_to_articles)}')
         if len(url_to_articles) > 0:
             article_list = []
             embedding_list = []
