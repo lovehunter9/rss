@@ -21,6 +21,7 @@ import {
 
 import {
   create_board,
+  discoverFeedRequest,
   entriesContentQuery,
   entry_readlater,
   feed_mark_all_as_read,
@@ -439,6 +440,16 @@ export const useRssStore = defineStore('rss', {
         return await entriesContentQuery(query)
       } catch (error) {
         console.log(error);
+      }
+    },
+
+    async discoverFeedRequest(query = '', categoryName = '') {
+
+      try {
+        return await discoverFeedRequest(query, categoryName)
+      } catch (error) {
+        console.log(error);
+        return []
       }
     },
 

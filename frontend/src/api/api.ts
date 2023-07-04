@@ -16,7 +16,7 @@ import {
   BoardRequest,
   Board,
   Entry,
-  BoardEntriesQueryRequest, EntryToBoardRequest, PageToBoard, Recommend,
+  BoardEntriesQueryRequest, EntryToBoardRequest, PageToBoard, Recommend, RecommendFeed,
 } from 'src/types';
 import { useRssStore } from 'src/stores/rss';
 
@@ -448,6 +448,25 @@ export const entriesContentQuery = async (query: string) => {
   });
 
   return data;
+}
+// categoryID := request.QueryStringParam(r, "categoryID", "")
+// categoryName := request.QueryStringParam(r, "categoryName", "")
+// query := request.QueryStringParam(r, "query", "")
+
+export const discoverFeedRequest = async (query = '', categoryName = '') => {
+  const rssStore = useRssStore();
+
+  const data: RecommendFeed[] = await axios.get(
+    rssStore.url + '/api/discover/feeds',
+    {
+      params: {
+        query,
+        categoryName
+      }
+    }
+  )
+
+  return data
 }
 
 // sdk api

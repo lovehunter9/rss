@@ -1,7 +1,7 @@
 <template>
   <div class="discover-detail-root ">
-    <title-commonent backTitle="#blockchain" @back-action="backAction()" />
-    <title-commonent backTitle="#blockchain" v-show="titleViewFixedRef" class="model2 bg-color-white"
+    <title-commonent :backTitle="`#${category}`" @back-action="backAction()" />
+    <title-commonent :backTitle="`#${category}`" v-show="titleViewFixedRef" class="model2 bg-color-white"
       @back-action="backAction()" />
     <div class="section-title text-minor-color " style="margin-top:2px" v-if="reletedTopics.length > 0">
       Releted Topics
@@ -14,119 +14,111 @@
       </q-intersection>
     </div>
 
-    <div class="section-title text-minor-color " style="margin-top:24px">
+    <div class="section-title text-minor-color " style="margin-top:24px" v-if="searchResults.length > 0">
       Search Result
     </div>
 
-    <q-list class="search-result-list">
+    <q-list class="search-result-list" v-if="searchResults.length > 0">
       <SearchFeedComponent v-for="item, index in searchResults" :key="index" :feed="item"></SearchFeedComponent>
       <div class="row justify-center full-width no-more-result text-major-color">
         No More Result &nbsp;
         <a href="javascript:;" @click="jumpToSearch()" style="color:#1B87F4"> Try other Topices </a>
       </div>
     </q-list>
+    <div class="text-7A7A7A column items-center justify-center" v-else style="height: 300px;">
+      <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148"/>
+    </div>
   </div>
 </template>
 
 <script setup lang='ts'>
 
-import { Entry } from 'src/types';
+import { RecommendFeed } from 'src/types';
 import { ref } from 'vue';
 import TitleCommonent from '../../components/TitleCommonent.vue'
 import { useQuasar } from 'quasar';
 import AddFeedDialog from 'components/dialog/AddFeedDialog.vue';
-import { useRssStore } from 'src/stores/rss';
+// import { useRssStore } from 'src/stores/rss';
 import SearchFeedComponent from '../common/SearchFeedComponent.vue'
 
-const rssStore = useRssStore()
+defineProps({
+  category: {
+    type: String,
+    require: false,
+    default: ''
+  }
+})
 
 const emit = defineEmits(['backAction'])
 
 const backAction = () => {
-  // router.back()
+  searchResults.value = []
+  titleViewFixedRef.value = false
   emit('backAction')
 }
 
 const jumpToSearch = () => {
-  emit('backAction')
+  backAction()
 }
 
 const reletedTopics = ref<{ title: string }[]>([])
 
 
-const searchResults = ref()
+const searchResults = ref<RecommendFeed[]>([])
 
 const titleViewFixedRef = ref(false)
 
 const floatTitleView = (floatValue: boolean) => {
-  console.log(floatValue);
-
   titleViewFixedRef.value = floatValue
 }
 
-const reloadFeed = (entry: Entry) => {
-  reletedTopics.value = []
-  const details = [entry]//feed.item.length > 3 ? feed.item.slice(0,3) : feed.item
-  searchResults.value = [
-    {
-      title: entry.title,
-      url: entry.url,
-      logo: 'examples/blocchain_example.png',
-      subsribeUrl: entry.feed.feed_url,
-      isSubsribe: rssStore.get_local_feed_by_feed_url(entry.feed.feed_url) !== undefined,
-      details: details.map(e => {
-        return {
-          content: e.title,
-          time: e.published_at
-        }
-      })
-    }
-  ]
+const reloadFeed = (feeds: RecommendFeed[]) => {
+  searchResults.value = feeds
 }
 
-const reloadDefault = () => {
-  searchResults.value = [
-    {
-      title: 'Blockchain News',
-      url: 'www.sspai.com',
-      logo: 'examples/blocchain_example.png',
-      subsribeUrl: '',
-      isSubsribe: false,
-      details: [
-        {
-          content: 'Leading source for news, information & resources for the Connected Generation.',
-          time: '1 mins ago'
-        },
-        {
-          content: 'Leading source for news, information & resources for the Connected Generation.',
-          time: '1 mins ago'
-        },
-        {
-          content: 'Leading source for news, information & resources for the Connected Generation.',
-          time: '1 mins ago'
-        }
-      ]
-    }
-  ]
-  reletedTopics.value = [
-    {
-      title: '# Cryptocurrency'
-    },
-    {
-      title: '# dddsssaaa'
-    },
-    {
-      title: '# Ethereum'
-    },
-    {
-      title: '# Web3'
-    },
-    {
-      title: '# Cryptocurrency'
-    }
-  ]
-}
-reloadDefault()
+// const reloadDefault = () => {
+  // searchResults.value = [
+  //   {
+  //     title: 'Blockchain News',
+  //     url: 'www.sspai.com',
+  //     logo: 'examples/blocchain_example.png',
+  //     subsribeUrl: '',
+  //     isSubsribe: false,
+  //     details: [
+  //       {
+  //         content: 'Leading source for news, information & resources for the Connected Generation.',
+  //         time: '1 mins ago'
+  //       },
+  //       {
+  //         content: 'Leading source for news, information & resources for the Connected Generation.',
+  //         time: '1 mins ago'
+  //       },
+  //       {
+  //         content: 'Leading source for news, information & resources for the Connected Generation.',
+  //         time: '1 mins ago'
+  //       }
+  //     ]
+  //   }
+  // ]
+  // reletedTopics.value = [
+  //   {
+  //     title: '# Cryptocurrency'
+  //   },
+  //   {
+  //     title: '# dddsssaaa'
+  //   },
+  //   {
+  //     title: '# Ethereum'
+  //   },
+  //   {
+  //     title: '# Web3'
+  //   },
+  //   {
+  //     title: '# Cryptocurrency'
+  //   }
+  // ]
+// }
+// reloadDefault()
 
 const $q = useQuasar()
 const addToFeed = (url: string) => {
@@ -150,7 +142,7 @@ const addToFeed = (url: string) => {
 }
 
 
-defineExpose({ floatTitleView, reloadFeed,reloadDefault });
+defineExpose({ floatTitleView, reloadFeed });
 
 </script>
 

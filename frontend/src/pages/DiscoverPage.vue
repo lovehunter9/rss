@@ -12,21 +12,22 @@
       <!-- <div class="search-detail"> -->
 
       <!-- <search-view placeholder="Search by topic,website,Rss URL" class="detail-width search-view" @onSearch="onSearch"/> -->
-      <entry-search-view class="detail-width search-view" @show-detail="showSearchResultDetail"/>
+      <entry-search-view class="detail-width search-view" :is-use-select="false"
+      @show-all-value="showDetails" :filter-data-func="rssStore.discoverFeedRequest"/>
       <!-- <q-scroll-area v-if="!showDetail" class="confirmDialogArea"> -->
       <div class="row justify-start confirmDialogArea" v-if="!showDetail">
         <q-intersection v-for="item, index in searchDetails" :key="index" class="example-item">
-          <div class="item-detail" @click="showRecommendContentDetail()">
+          <div class="item-detail" @click="showRecommendContentDetail(item.detail)">
             <img :src="item.img" style="width:100%;height: 100%; position:absolute;">
             <div class="item-title">
-              {{ item.detail }}
+              #{{ item.detail }}
             </div>
           </div>
         </q-intersection>
       </div>
       <!-- </q-scroll-area> -->
 
-      <discover-detail v-show="showDetail" class="descover-detail detail-width" ref="discoverDetailRef"
+      <discover-detail v-show="showDetail" :category="selectCategory" class="descover-detail detail-width" ref="discoverDetailRef"
         @back-action="backAction()" />
       <!-- </div> -->
     </div>
@@ -38,18 +39,20 @@
 
 // import {ref} from 'vue';
 // import SearchView from 'components/rss/SearchView.vue';
-// import { SDKSearchPathResponse } from 'src/types';
+import { RecommendFeed } from 'src/types';
 import { ref } from 'vue';
 import './discover/css/discover.scss'
 import DiscoverDetail from './discover/DiscoverDetail.vue';
 import EntrySearchView from '../components/rss/EntrySearchView.vue'
-// function onSearch(vault : string){
-//   console.log(vault)
-// }
+import { useRssStore } from 'src/stores/rss';
+
+const rssStore = useRssStore()
 
 const showDetail = ref(false)
 
 const discoverDetailRef = ref()
+
+const selectCategory = ref('')
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const onScroll = (info: any) => {
@@ -71,39 +74,19 @@ const onScroll = (info: any) => {
 const searchDetails = ref([
   {
     img: require('../assets/examples/discover_example_img.png'),
-    detail: '#blockchain'
+    detail: 'Technology',
   },
   {
     img: require('../assets/examples/discover_example_img.png'),
-    detail: '#blockchain'
+    detail: 'Science'
   },
   {
     img: require('../assets/examples/discover_example_img.png'),
-    detail: '#blockchain'
+    detail: 'Industries'
   },
   {
     img: require('../assets/examples/discover_example_img.png'),
-    detail: '#blockchain'
-  },
-  {
-    img: require('../assets/examples/discover_example_img.png'),
-    detail: '#blockchain'
-  },
-  {
-    img: require('../assets/examples/discover_example_img.png'),
-    detail: '#blockchain'
-  },
-  {
-    img: require('../assets/examples/discover_example_img.png'),
-    detail: '#blockchain'
-  },
-  {
-    img: require('../assets/examples/discover_example_img.png'),
-    detail: '#blockchain'
-  },
-  {
-    img: require('../assets/examples/discover_example_img.png'),
-    detail: '#blockchain'
+    detail: 'Comics'
   }
 ])
 
@@ -115,15 +98,23 @@ const backAction = () => {
   showDetail.value = false
 }
 
-const showSearchResultDetail = (detail: Entry) => {
-  discoverDetailRef.value.reloadFeed(detail)
+const showRecommendContentDetail = async (categoryName: string) => {
+  const feeds = await rssStore.discoverFeedRequest('',categoryName)
+  selectCategory.value = categoryName
+  showDetails(feeds,false)
+}
+
+const showDetails = (feeds: RecommendFeed[],resetCategory = true) => {
+  // if (!feeds || feeds.length === 0) {
+  //   return
+  // }
+  if (resetCategory) {
+    selectCategory.value = ''
+  }
+  discoverDetailRef.value.reloadFeed(feeds)
   showContentDetail()
 }
 
-const showRecommendContentDetail = () => {
-  discoverDetailRef.value.reloadDefault()
-  showContentDetail()
-}
 
 </script>
 
