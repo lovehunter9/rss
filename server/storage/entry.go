@@ -201,6 +201,9 @@ func (s *Storage) createEntry(tx *sql.Tx, entry *model.Entry) error {
 		RETURNING
 			id, status
 	`*/
+	if entry.Date.After(time.Now()) {
+		entry.Date = time.Now()
+	}
 	query := `
 		INSERT INTO entries
 			(
