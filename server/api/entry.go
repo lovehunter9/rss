@@ -263,6 +263,7 @@ func (h *handler) fetchContent(w http.ResponseWriter, r *http.Request) {
 		json.ServerError(w, r, err)
 		return
 	}
+
 	h.store.UpdateEntryFullContent(entryID, entry)
 	json.OK(w, r, map[string]string{"content": entry.Content})
 }

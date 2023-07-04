@@ -10,8 +10,10 @@ import (
 	"fmt"
 	"runtime"
 	"sort"
+	"strings"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"miniflux.app/config"
 	"miniflux.app/logger"
 	"miniflux.app/model"
@@ -309,6 +311,13 @@ func (s *Storage) CreateFeed(feed *model.Feed) error {
 			if !s.entryExists(tx, feed.Entries[i]) {
 				if last.Before(feed.Entries[i].Date) {
 					last = feed.Entries[i].Date
+				}
+				if feed.Entries[i].Content != "" {
+					doc, err := goquery.NewDocumentFromReader(strings.NewReader(feed.Entries[i].Content))
+					if err == nil {
+						img, _ := doc.Find("img").First().Attr("src")
+						feed.Entries[i].ImageUrl = img
+					}
 				}
 				if err := s.createEntry(tx, feed.Entries[i]); err != nil {
 					tx.Rollback()

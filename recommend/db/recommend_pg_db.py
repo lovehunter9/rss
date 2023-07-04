@@ -90,6 +90,7 @@ class RecommendEntriesModel(RecommendPGBaseModel):
     url = TextField(null=True)
     content = TextField(null=True)
     full_content = TextField(null=True)
+    image_url = TextField(null=True)
 
     class Meta:
         db_table = 'recommend_entries'
@@ -112,6 +113,7 @@ class RecommendFeedModel(RecommendPGBaseModel):
     id = BigIntegerField(null=False, unique=True, index=True)
     title = TextField(null=True)
     feed_url = TextField(null=True)
+    feed_description = TextField(null=True)
     site_url = TextField(null=True)
     icon_type = TextField(null=True)
     icon_content = BlobField(null=True)

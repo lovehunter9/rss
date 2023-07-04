@@ -243,6 +243,7 @@ func (h *handler) removeFeed(w http.ResponseWriter, r *http.Request) {
 func (h *handler) getDiscoverFeeds(w http.ResponseWriter, r *http.Request) {
 	var name, link string
 	categoryID := request.QueryStringParam(r, "categoryID", "")
+	categoryName := request.QueryStringParam(r, "categoryName", "")
 	query := request.QueryStringParam(r, "query", "")
 	if query != "" {
 		if strings.Contains(query, ".") && strings.Contains(query, "/") {
@@ -255,7 +256,7 @@ func (h *handler) getDiscoverFeeds(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	feeds, err := h.store.RecommendFeedQuery(categoryID, name, link)
+	feeds, err := h.store.RecommendFeedQuery(categoryID, categoryName, name, link)
 	if err != nil {
 		json.ServerError(w, r, err)
 		return

@@ -795,4 +795,10 @@ var migrations = []func(tx *sql.Tx) error{
 		_, err = tx.Exec(sql)
 		return err
 	},
+	func(tx *sql.Tx) (err error) {
+		sql := `ALTER TABLE recommend_feed ADD COLUMN feed_description text default '';
+				`
+		_, err = tx.Exec(sql)
+		return err
+	},
 }

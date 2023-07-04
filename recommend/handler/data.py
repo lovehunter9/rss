@@ -14,22 +14,23 @@ down_latest_number = int(os.environ.get('down_latest_number', 1000))
 
 
 class DataHandler:
+
     def __init__(self) -> None:
         self.current_logger = CommonTool().get_logger()
         self.commont_tool = CommonTool()
 
-    def infer(self,docList):
+    def infer(self, docList):
         # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_infer
         current_model_tool = ModelTool(path)
         model_name = "word2vec_google"
         model_version = "v1"
         print(current_model_tool.infer(model_name, model_version, docList))
 
-    def init_model(self,user):
+    def init_model(self, user):
         current_model_tool = ModelTool(path)
         current_model_tool.init_model(user.model_name, user.model_version)
 
-    def get_readed_entries(self,user):
+    def get_readed_entries(self, user):
         tool = RecommendPGDBTool()
         current_model_tool = ModelTool(path)
         entries = tool.select_read_entries(read_entries_num)
@@ -62,7 +63,7 @@ class DataHandler:
             tool.batch_insert_entries_embedding_model(saveEmbeddingList)
         return result_list
 
-    def down_latest_article_embedding_package(self,user):
+    def down_latest_article_embedding_package(self, user):
         tool = RecommendPGDBTool()
         current_model_tool = ModelTool(path)
 
@@ -99,13 +100,15 @@ class DataHandler:
                         'full_content': current_articles['full_text'],
                         'title': current_articles['title']
                     }
+                    if 'image_url' in current_articles:
+                        article['image_url'] = current_articles['image_url']
                     article_list.append(article)
             if len(article_list) > 0:
                 tool.batch_insert_recommend_entries(article_list)
             if len(embedding_list) > 0:
                 tool.batch_insert_recommend_entries_embedding(embedding_list)
 
-    def get_tobe_recommended_entries(self,user):
+    def get_tobe_recommended_entries(self, user):
         tool = RecommendPGDBTool()
         entries = tool.select_tobe_recommended_entries(user.model_name, user.model_version, down_latest_number)
         result_list = dict()
@@ -145,6 +148,8 @@ class DataHandler:
                 feed['icon_type'] = current_feed['icon_type']
             if 'icon_content' in current_feed:
                 feed['icon_content'] = current_feed['icon_content']
+            if 'description' in current_feed:
+                feed['feed_description'] = current_feed['description']
             feedList.append(feed)
             if len(feedList) > 200:
                 self.current_logger.debug(f'start insert feed to db')
