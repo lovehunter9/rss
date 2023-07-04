@@ -265,14 +265,13 @@ const requestEntries = async (hasMore = false) => {
       return
     }
     if (store.menu_choice.type === MenuType.Board) {
-      await store.get_board_entries(store.menu_choice.value || 0,new BoardEntriesQueryRequest({limit: 50, offset: 0}))
+      await store.get_board_entries(store.menu_choice.value || 0,new BoardEntriesQueryRequest({offset: 0}))
     }
     return 0
   }
 
   const entriesQurey = new EntriesQueryRequest({
     offset: hasMore ? store.entries.length : 0,
-    limit: 50
   })
   if (store.menu_choice.type === MenuType.Feed) {
     entriesQurey.feed_id = store.menu_choice.value

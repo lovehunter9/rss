@@ -693,3 +693,26 @@ export interface PageToBoard{
   title: string
   board_id : number
 }
+
+// ID              int64   `json:"id"`
+// Title           string  `json:"feed_title"`
+// Desc            string  `json:"feed_desc"`
+// FeedUrl         string  `json:"feed_url"`
+// SiteUrl         string  `json:"site_url"`
+// IconType        *string `json:"icon_type"`
+// IconByteContent []byte  `json:"icon_byte_content"`
+// IconContent     string  `json:"icon_content"`
+// CategoryID      int64   `json:"category_id"`
+// CategoryTitle   string  `json:"category_title"`
+export interface RecommendFeed {
+  id: number
+  feed_title: string
+  feed_desc: string
+  feed_url: string
+  site_url: string
+  icon_type: string
+  icon_byte_content: string
+  icon_content: string
+  category_id: number
+  category_title: string
+}
