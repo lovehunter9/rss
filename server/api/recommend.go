@@ -8,6 +8,7 @@ import (
 	json_parser "encoding/json"
 	"errors"
 	"net/http"
+	"time"
 
 	"miniflux.app/http/request"
 	"miniflux.app/http/response/json"
@@ -32,7 +33,7 @@ func (h *handler) getRecommendList(w http.ResponseWriter, r *http.Request) {
 		RecommendCachePage = 0
 	} else {
 		RecommendCachePage = RecommendCachePage + 1
-		if RecommendCachePage*5 > count {
+		if (RecommendCachePage+1)*5 > count {
 			RecommendCachePage = 0
 		}
 	}
@@ -92,6 +93,9 @@ func (h *handler) initEntry(userID, entryID int64, readLater bool) int64 {
 			FullContent: recommendEntry.FullContent,
 			ReadLater:   readLater,
 			Hash:        recommendEntry.Hash,
+		}
+		if entry.Date.After(time.Now()) {
+			entry.Date = time.Now()
 		}
 
 		h.store.CreateEntrySingle(&entry)
