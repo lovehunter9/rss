@@ -100,6 +100,8 @@ class DataHandler:
                         'full_content': current_articles['full_text'],
                         'title': current_articles['title']
                     }
+                    if 'image_url' in current_articles:
+                        article['image_url'] = current_articles['image_url']
                     article_list.append(article)
             if len(article_list) > 0:
                 tool.batch_insert_recommend_entries(article_list)

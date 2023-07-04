@@ -90,6 +90,7 @@ class RecommendEntriesModel(RecommendPGBaseModel):
     url = TextField(null=True)
     content = TextField(null=True)
     full_content = TextField(null=True)
+    image_url = TextField(null=True)
 
     class Meta:
         db_table = 'recommend_entries'
