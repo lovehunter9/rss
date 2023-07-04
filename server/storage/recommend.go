@@ -123,10 +123,10 @@ func (s *Storage) RecommendFeedQuery(categoryID, categoryName, name, link string
 	}
 
 	if name != "" {
-		query = query + " and title like '%" + name + "%‘"
+		query = query + " and title like '%" + name + "%'"
 	}
 	if link != "" {
-		query = query + " and feed_url like '%" + link + "%‘"
+		query = query + " and feed_url like '%" + link + "%'"
 	}
 
 	rows, err := s.db.Query(query)
