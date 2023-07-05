@@ -89,7 +89,12 @@ class ModelToolUnitTest(unittest.TestCase):
         feed_id_to_feed = current_model_tool.download_latest_all_feed()
 
         for current_id, current_feed in feed_id_to_feed.items():
-            print(current_feed.keys())
+            print(current_feed["description"])
+            if 'description' in current_feed:
+                if bool(current_feed['description']):
+                    print("save")
+                else:
+                    print("f")
 
     def test_db_handler(self):
         # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_db_handler
