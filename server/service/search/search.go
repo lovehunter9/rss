@@ -283,6 +283,7 @@ type QueryRssReqStru struct {
 }
 
 func QueryRSS(query string) string {
+	logger.Info("queryRSS:%s", query)
 	accessToken, err := getAccessToken("search", "service.search", []string{"QueryRSS"})
 	if err != nil {
 		logger.Error("get access token failed: %+v", err)
