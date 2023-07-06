@@ -15,8 +15,7 @@ import {
   FeedModificationRequest,
   BoardRequest,
   Board,
-  Entry,
-  BoardEntriesQueryRequest, EntryToBoardRequest, PageToBoard, Recommend, RecommendFeed,
+  BoardEntriesQueryRequest, EntryToBoardRequest, PageToBoard, Recommend, RecommendFeed, RssContentQuery, Entry,
 } from 'src/types';
 import { useRssStore } from 'src/stores/rss';
 
@@ -436,18 +435,32 @@ export const addPageToBoard = async (req: PageToBoard) => {
   return data
 }
 
-export const entriesContentQuery = async (query: string) => {
+export const rssContentQuery = async (query: string) => {
   const rssStore = useRssStore();
+  console.log(query);
 
-  const data: Entry = await axios.get(
-    rssStore.url + '/api/entries/contentQuery'
+  let data: string = await axios.get(
+    rssStore.url + '/api/rss/contentQuery'
   , {
     params: {
       query
     }
   });
+  data = data.replace(/[\n]/g, '');
+  console.log(data);
+  if (data.length === 0) {
+    return []
+  }
 
-  return data;
+  const mode = JSON.parse(data) as RssContentQuery
+  console.log(mode);
+  if (mode.code === 0 && mode.data && mode.data.data) {
+    const dataString = mode.data.data as unknown as string
+    mode.data.data = JSON.parse(dataString)
+    console.log(mode);
+    return mode.data.data.items
+  }
+  return [];
 }
 // categoryID := request.QueryStringParam(r, "categoryID", "")
 // categoryName := request.QueryStringParam(r, "categoryName", "")
@@ -464,6 +477,16 @@ export const discoverFeedRequest = async (query = '', categoryName = '') => {
         categoryName
       }
     }
+  )
+
+  return data
+}
+
+export const getEntryById = async (entry_id: number) => {
+  const rssStore = useRssStore();
+
+  const data: Entry = await axios.get(
+    rssStore.url + '/api/entries/' + entry_id
   )
 
   return data

@@ -12,7 +12,7 @@
             <q-icon name="search" size="16px" style="margin-left: 8px;" class="text-minor-color"></q-icon>
             <div style="margin-left:10px;"> Search </div>
           </div> -->
-          <entry-search-view class="detail-width search-view" placeholder="Search" :item-width="225" @show-detail="showSearchResultDetail"/>
+          <entry-search-view class="detail-width search-view" placeholder="Search" :item-width="225" :filter-data-func="store.rssContentQuery" @show-detail="showSearchResultDetail"/>
 
           <div class="btn-add row justify-center items-center">
             <q-img style="width: 12px;height: 12px" src="../assets/menu/add.svg">
@@ -148,7 +148,7 @@ import {useRoute, useRouter} from 'vue-router';
 // import {useIsMobile} from '../utils/utils';
 import {useRssStore} from 'stores/rss';
 
-import {DeleteType, Entry, EntryStatus, Feed, MenuType} from '../types';
+import {DeleteType, Entry, EntryStatus, Feed, MenuType, RssContentQueryItem} from '../types';
 // import SearchView from 'components/rss/SearchView.vue';
 import LayoutLeftItemMenu from 'components/LayoutLeftItemMenu.vue'
 import AddFolderDialog from 'components/dialog/AddFolderDialog.vue';
@@ -159,6 +159,7 @@ import {newsBus, newsBusMessage} from 'src/utils/utils';
 import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import { formatLocalImage } from '../utils/utils'
 import EntrySearchView from '../components/rss/EntrySearchView.vue'
+import { getEntryById } from 'src/api/api'
 
 export default defineComponent({
   name: 'MainLayout',
@@ -461,11 +462,25 @@ export default defineComponent({
       return result
     };
 
-    const showSearchResultDetail = (detail: Entry) => {
-      store.entries_total = 1;
-      store.entries = [detail];
+    const showSearchResultDetail = async (selectItem: RssContentQueryItem, list: RssContentQueryItem[]) => {
+      // store.entries_total = 1;
+      // store.entries = [detail];
 
-      changeItemMenu(MenuType.Search)
+      // store.searchResult = list;
+      if (list.length === 0) {
+        return
+      }
+
+      try {
+        const entry = await getEntryById(selectItem.entry_id)
+        store.entries = [entry];
+        store.entries_total = 1;
+        changeItemMenu(MenuType.Search)
+      } catch (error) {
+
+      }
+      // Router.push(`/searchresult/${selectItem.entry_id}`)
+      // changeItemMenu(MenuType.Search)
     }
 
     return {
