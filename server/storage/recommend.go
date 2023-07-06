@@ -68,7 +68,7 @@ func (s *Storage) GetRecommendCount(batch int) int {
 }
 func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, error) {
 	query := `SELECT r.batch, e.id entry_id, e.title, e.author,e.url,e.content,e.published_at,r.score,r.rank,
-	 f.title feed_title,f.feed_url,f.site_url,f.icon_type,f.icon_content icon_byte_content,f.category_id,f.category_title,e.full_content ,e.image_url
+	 f.title feed_title,f.feed_url,f.site_url,f.icon_type,f.icon_content icon_byte_content,f.category_id,f.category_title,e.full_content 
 	 FROM recommend_result r,recommend_entries e,recommend_feed f 
 	 WHERE r.batch=$1 and r.url=e.url and e.feed_id=f.id
 	 ORDER BY r.rank  OFFSET $2 limit $3`
@@ -85,7 +85,7 @@ func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, err
 		if err := rows.Scan(&recommend.Batch, &recommend.EntryID, &recommend.Title,
 			&recommend.Author, &recommend.URL, &recommend.Content, &recommend.PublishedAt, &recommend.Score, &recommend.Rank,
 			&recommend.Feed.Title, &recommend.Feed.FeedUrl, &recommend.Feed.SiteUrl,
-			&recommend.Feed.IconType, &recommend.Feed.IconByteContent, &recommend.Feed.CategoryID, &recommend.Feed.CategoryTitle, &recommend.FullContent, &recommend.ImageUrl); err != nil {
+			&recommend.Feed.IconType, &recommend.Feed.IconByteContent, &recommend.Feed.CategoryID, &recommend.Feed.CategoryTitle, &recommend.FullContent); err != nil {
 			return nil, fmt.Errorf(`store: unable to fetch recommends row: %v`, err)
 		}
 		recommend.Feed.IconContent = fmt.Sprintf("%s;base64,%s", recommend.Feed.IconContent, base64.StdEncoding.EncodeToString(recommend.Feed.IconByteContent))
