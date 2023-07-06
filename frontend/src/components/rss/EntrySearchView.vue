@@ -11,7 +11,7 @@
           :style="`width: ${itemWidth > 0 ? (itemWidth + 'px') : '100%'};`">
           <q-item-section>
             <q-item-label>
-              <span class="optimized_itmes">{{ scope.opt.title }}</span>
+              <span class="optimized_itmes">{{ scope.opt.name }}</span>
             </q-item-label>
           </q-item-section>
         </q-item>
@@ -34,11 +34,7 @@
 </template>
 
 <script lang="ts" setup>
-// import { Feed } from 'src/types';
-import { useRssStore } from 'src/stores/rss';
-import { Entry } from 'src/types';
 import { onMounted, ref, watch } from 'vue';
-
 
 const props = defineProps({
   itemWidth: {
@@ -62,11 +58,9 @@ const props = defineProps({
   }
 })
 
-const rssStore = useRssStore()
-
 const loading = ref(false);
 
-const options = ref<Entry[]>([]);
+const options = ref<any[]>([]);
 
 const model = ref<string>('');
 
@@ -94,19 +88,17 @@ const filterFn = async (val: string, update: (arg0: () => void) => void, abort: 
     let result: any
     if (props.filterDataFunc) {
       result = await props.filterDataFunc(model.value)
-    } else {
-      result = await rssStore.entriesContentQuery(model.value)
     }
     if (result) {
-      options.value = [result]
+      options.value = result
     }
     console.log(result);
   })
 };
 
-const itemClick = (value: Entry) => {
+const itemClick = (value: any) => {
   model.value = '';
-  emit('showDetail', value)
+  emit('showDetail', value, options.value)
 }
 
 const setModel = (v: any) => {

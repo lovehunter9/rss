@@ -16,13 +16,14 @@ import {
   MenuChoice,
   MenuType,
   SDKQueryRequest,
-  Recommend
+  Recommend,
+  RssContentQueryItem
 } from 'src/types';
 
 import {
   create_board,
   discoverFeedRequest,
-  entriesContentQuery,
+  rssContentQuery,
   entry_readlater,
   feed_mark_all_as_read,
   fetch_feed_counter,
@@ -63,6 +64,8 @@ export type DataState = {
   leftDrawerOpen: boolean;
   dialogShow: boolean;
   recommends: Recommend[]
+
+  searchResult: RssContentQueryItem[]
 };
 
 export const useRssStore = defineStore('rss', {
@@ -435,9 +438,9 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async entriesContentQuery(query: string) {
+    async rssContentQuery(query: string) {
       try {
-        return await entriesContentQuery(query)
+        return await rssContentQuery(query)
       } catch (error) {
         console.log(error);
       }

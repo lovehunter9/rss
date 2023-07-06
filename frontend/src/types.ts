@@ -716,3 +716,36 @@ export interface RecommendFeed {
   category_id: number
   category_title: string
 }
+
+export interface RssContentQueryItem {
+  name: string
+  entry_id: number
+  created: string
+  feed_infos: {
+    feed_id: number,
+    feed_name: string,
+    feed_icon: string
+  }[]
+  brders: {
+    name: string
+    id: number
+  }[]
+  docId: string
+  snippet: string
+}
+
+export interface RssContentQuery {
+
+  code: number
+  message: string
+  data: {
+    code: number
+    data: {
+      count: number,
+      offset: number,
+      limit: number,
+      items: RssContentQueryItem[]
+    }
+  }
+
+}
