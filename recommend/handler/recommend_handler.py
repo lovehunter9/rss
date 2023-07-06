@@ -51,7 +51,7 @@ class RecommendHandler:
         start_time = datetime.now()
         query_url_to_embedding_dict = data_handler.get_readed_entries(user)
         self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
-        self.current_logger.debug(f'query_url_to_embedding_dict length {query_url_to_embedding_dict}')
+        self.current_logger.debug(f'query_url_to_embedding_dict length {len(query_url_to_embedding_dict)}')
         
         start_time = datetime.now()
         base_url_to_embedding_dict = data_handler.get_tobe_recommended_entries(user)
@@ -67,5 +67,5 @@ class RecommendHandler:
             result = {'batch': batch, 'url': detail[0], 'score': detail[1], 'rank': rank}
             saveResultList.append(result)
             rank = rank + 1
-
+        self.current_logger.debug(f'saveResultList {len(saveResultList)}')
         tool.batch_insert_recommend_result(saveResultList)
