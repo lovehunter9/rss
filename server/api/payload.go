@@ -27,3 +27,8 @@ type recommendResponse struct {
 	Total   int              `json:"total"`
 	Entries model.Recommends `json:"entries"`
 }
+
+type fullContentResponse struct {
+	Content    string              `json:"content"`
+	Enclosures model.EnclosureList `json:"enclosures"`
+}
