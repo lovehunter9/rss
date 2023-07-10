@@ -99,7 +99,8 @@ class DataHandler:
                         'author': current_articles['author'],
                         'content': current_articles['content'],
                         'full_content': current_articles['full_text'],
-                        'title': current_articles['title']
+                        'title': current_articles['title'],
+                        'image_url': ''
                     }
                     if 'image_url' in current_articles and bool(current_articles['image_url']):
                         article['image_url'] = current_articles['image_url']
@@ -143,7 +144,8 @@ class DataHandler:
                 'feed_url': current_feed['feed_url'],
                 'site_url': current_feed['site_url'],
                 'category_id': current_feed['category_id'],
-                'category_title': current_feed['category_title']
+                'category_title': current_feed['category_title'],
+                'feed_description': ''
             }
             if 'icon_type' in current_feed:
                 feed['icon_type'] = current_feed['icon_type']

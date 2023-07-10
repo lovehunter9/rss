@@ -166,9 +166,9 @@ func (h *handler) findEntries(w http.ResponseWriter, r *http.Request, feedID int
 		return
 	}
 
-	for i := range entries {
+	/*for i := range entries {
 		entries[i].Content = proxy.AbsoluteImageProxyRewriter(h.router, r.Host, entries[i].Content)
-	}
+	}*/
 
 	json.OK(w, r, &entriesResponse{Total: count, Entries: entries})
 }
@@ -213,10 +213,16 @@ func (h *handler) fetchContent(w http.ResponseWriter, r *http.Request) {
 	loggedUserID := request.UserID(r)
 	entryID := request.RouteInt64Param(r, "entryID")
 
+	enclosures, enclosureErr := h.store.GetEnclosures(entryID)
+	if enclosureErr != nil {
+		json.ServerError(w, r, enclosureErr)
+		return
+	}
+
 	h.store.UpdateEntryLastReadTime(entryID)
 	content := h.store.GetFullContent(entryID)
 	if content != "" {
-		json.OK(w, r, map[string]string{"content": content})
+		json.OK(w, r, &fullContentResponse{Enclosures: enclosures, Content: content})
 		return
 	}
 
@@ -265,7 +271,7 @@ func (h *handler) fetchContent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.store.UpdateEntryFullContent(entryID, entry)
-	json.OK(w, r, map[string]string{"content": entry.Content})
+	json.OK(w, r, &fullContentResponse{Enclosures: enclosures, Content: content})
 }
 
 func configureFilters(builder *storage.EntryQueryBuilder, r *http.Request) {
