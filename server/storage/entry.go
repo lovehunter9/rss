@@ -13,6 +13,7 @@ import (
 	"miniflux.app/crypto"
 	"miniflux.app/logger"
 	"miniflux.app/model"
+	"miniflux.app/timezone"
 
 	"github.com/lib/pq"
 )
@@ -814,5 +815,149 @@ func (s *Storage) GetEntryBaseInfoByIds(entryIDs []int64) (model.Entries, error)
 		}
 		entries = append(entries, &entry)
 	}
+	return entries, nil
+}
+
+func (s *Storage) GetEntriesByIds(ids []int64) (model.Entries, error) {
+	query := `
+		SELECT
+			e.id,
+			e.user_id,
+			e.feed_id,
+			e.hash,
+			e.published_at at time zone u.timezone,
+			e.title,
+			e.url,
+			e.comments_url,
+			e.author,
+			e.share_code,
+			e.status,
+			e.starred,
+			e.reading_time,
+			e.created_at,
+			e.changed_at,
+			e.readlater_tag,
+			f.title as feed_title,
+			f.feed_url,
+			f.site_url,
+			f.checked_at,
+			f.category_id, c.title as category_title,
+			f.scraper_rules,
+			f.rewrite_rules,
+			f.crawler,
+			f.user_agent,
+			f.cookie,
+			fi.icon_id,
+			u.timezone,
+			g.board_ids,
+			e.image_url
+		FROM
+			entries e
+		LEFT JOIN
+			feeds f ON f.id=e.feed_id
+		LEFT JOIN
+			categories c ON c.id=f.category_id
+		LEFT JOIN
+			feed_icons fi ON fi.feed_id=f.id
+		LEFT JOIN
+			users u ON u.id=e.user_id
+		LEFT JOIN
+			(SELECT s.entry_id, ARRAY_TO_STRING(ARRAY_AGG(s.board_id),',') as board_ids from entry_board s GROUP BY s.entry_id) g ON e.id=g.entry_id
+		WHERE e.id =ANY($1)
+	`
+	/* WHERE e.id in (%s)"
+	inStatus := ""
+	params := make([]interface{}, 0)
+	for i := 0; i < len(ids); i++ {
+		if i == 0 {
+			inStatus += "?"
+		} else {
+			inStatus += ",?"
+		}
+		params = append(params, ids[i])
+	}
+
+	query = fmt.Sprintf(query, inStatus)
+
+	rows, err := e.store.db.Query(query, params...)*/
+	rows, err := s.db.Query(query, pq.Array(ids))
+	if err != nil {
+		return nil, fmt.Errorf("unable to get entries: %v", err)
+	}
+	defer rows.Close()
+
+	entries := make(model.Entries, 0)
+	for rows.Next() {
+		var entry model.Entry
+		var iconID sql.NullInt64
+		var tz string
+		var boardIDS sql.NullString
+
+		entry.Feed = &model.Feed{}
+		entry.Feed.Category = &model.Category{}
+		entry.Feed.Icon = &model.FeedIcon{}
+
+		err := rows.Scan(
+			&entry.ID,
+			&entry.UserID,
+			&entry.FeedID,
+			&entry.Hash,
+			&entry.Date,
+			&entry.Title,
+			&entry.URL,
+			&entry.CommentsURL,
+			&entry.Author,
+			&entry.ShareCode,
+			&entry.Status,
+			&entry.Starred,
+			&entry.ReadingTime,
+			&entry.CreatedAt,
+			&entry.ChangedAt,
+			&entry.ReadLater,
+			&entry.Feed.Title,
+			&entry.Feed.FeedURL,
+			&entry.Feed.SiteURL,
+			&entry.Feed.CheckedAt,
+			&entry.Feed.Category.ID,
+			&entry.Feed.Category.Title,
+			&entry.Feed.ScraperRules,
+			&entry.Feed.RewriteRules,
+			&entry.Feed.Crawler,
+			&entry.Feed.UserAgent,
+			&entry.Feed.Cookie,
+			&iconID,
+			&tz,
+			&boardIDS,
+			&entry.ImageUrl,
+		)
+
+		if err != nil {
+			return nil, fmt.Errorf("unable to fetch entry row: %v", err)
+		}
+
+		if iconID.Valid {
+			entry.Feed.Icon.IconID = iconID.Int64
+		} else {
+			entry.Feed.Icon.IconID = 0
+		}
+
+		// Make sure that timestamp fields contains timezone information (API)
+		entry.Date = timezone.Convert(tz, entry.Date)
+		entry.CreatedAt = timezone.Convert(tz, entry.CreatedAt)
+		entry.ChangedAt = timezone.Convert(tz, entry.ChangedAt)
+		entry.Feed.CheckedAt = timezone.Convert(tz, entry.Feed.CheckedAt)
+
+		entry.Feed.ID = entry.FeedID
+		entry.Feed.UserID = entry.UserID
+		entry.Feed.Icon.FeedID = entry.FeedID
+		entry.Feed.Category.UserID = entry.UserID
+		entry.BoardIDS = ""
+		if boardIDS.Valid {
+			entry.BoardIDS = boardIDS.String
+		}
+
+		entries = append(entries, &entry)
+	}
+
 	return entries, nil
 }

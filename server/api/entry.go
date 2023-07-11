@@ -485,3 +485,23 @@ func (h *handler) contentQuery(w http.ResponseWriter, r *http.Request) {
 	json.OK(w, r, result)
 
 }
+
+func (h *handler) getEntriesByIds(w http.ResponseWriter, r *http.Request) {
+	ids := request.QueryStringParam(r, "ids", "")
+	//var idInts []int64
+	idInts := make([]int64, 0)
+	strlist := strings.Split(ids, ",")
+	for _, item := range strlist {
+		if item == "" {
+			continue
+		}
+		val, err := strconv.ParseInt(item, 10, 64)
+		if err != nil {
+			continue
+		}
+		idInts = append(idInts, int64(val))
+	}
+
+	entries, _ := h.store.GetEntriesByIds(idInts)
+	json.OK(w, r, entries)
+}

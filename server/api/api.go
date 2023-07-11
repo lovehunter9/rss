@@ -73,6 +73,7 @@ func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
 	sr.HandleFunc("/unread/mark-all-as-read", handler.markAllAsRead).Methods(http.MethodPut) //unreadentry 设置当前页已读  所有已读
 
 	sr.HandleFunc("/entries", handler.getEntries).Methods(http.MethodGet)
+	sr.HandleFunc("/getEntriesByIds", handler.getEntriesByIds).Methods(http.MethodGet)
 	sr.HandleFunc("/entries", handler.setEntryStatus).Methods(http.MethodPut)
 	sr.HandleFunc("/entries/{entryID}", handler.getEntry).Methods(http.MethodGet)
 	sr.HandleFunc("/entries/{entryID}/bookmark", handler.toggleBookmark).Methods(http.MethodPut) //star
