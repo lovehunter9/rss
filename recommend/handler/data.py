@@ -6,9 +6,9 @@ from recommend_model_sdk.tools.common_tool import CommonTool
 from recommend_model_sdk.tools.model_tool import ModelTool
 from db.recommend_pg_db_tool import *
 
-# path = os.environ.get('model_path', "/ssd/code/MODEL_CLIENT")
+path = os.environ.get('model_path', "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model")
 
-path = os.environ.get('model_path', "/model")
+# path = os.environ.get('model_path', "/model")
 read_entries_num = int(os.environ.get('read_entries_num', 50))
 down_latest_number = int(os.environ.get('down_latest_number', 1000))
 
@@ -77,6 +77,53 @@ class DataHandler:
                 url_list.append(current_url)
             entries_exist_list = tool.select_exist_recommend_entries(url_list)
             entries_embedding_exist_list = tool.select_exist_recommend_entries_embedding(url_list, user.model_name, user.model_version)
+
+            for current_url, current_articles in url_to_embeddings.items():
+                if current_url not in entries_embedding_exist_list:
+                    embedding = {
+                        'url': current_url,
+                        'model_name': current_articles['model_name'],
+                        'model_version': current_articles['model_version'],
+                        'embedding': current_articles['embeddings']
+                    }
+                    embedding_list.append(embedding)
+
+            for current_url, current_articles in url_to_articles.items():
+                if current_url not in entries_exist_list:
+                    article = {
+                        'url': current_url,
+                        'feed_id': current_articles['feed_id'],
+                        'created_at': datetime.fromtimestamp(current_articles['created_at'] / 1000.0),
+                        'published_at': datetime.fromtimestamp(current_articles['published_at'] / 1000.0),
+                        'hash': current_articles['hash'],
+                        'author': current_articles['author'],
+                        'content': current_articles['content'],
+                        'full_content': current_articles['full_text'],
+                        'title': current_articles['title'],
+                        'image_url': ''
+                    }
+                    if 'image_url' in current_articles and bool(current_articles['image_url']):
+                        article['image_url'] = current_articles['image_url']
+                    article_list.append(article)
+            if len(article_list) > 0:
+                tool.batch_insert_recommend_entries(article_list)
+            if len(embedding_list) > 0:
+                tool.batch_insert_recommend_entries_embedding(embedding_list)
+
+    def download_increment_package(self, model_name, model_version, package_id):
+        tool = RecommendPGDBTool()
+        current_model_tool = ModelTool(path)
+        #current_model_tool.download_increment_package("bert","v1","article_embeddding_package_bert_v1_97b08d6ac2ab51c7cca581eaf352d1b5")
+        url_to_articles, url_to_embeddings = current_model_tool.download_increment_package(model_name, model_version, package_id)
+        self.current_logger.debug(f'download_increment_package downnuber, num:{len(url_to_articles)}')
+        if len(url_to_articles) > 0:
+            article_list = []
+            embedding_list = []
+            url_list = []
+            for current_url, current_articles in url_to_articles.items():
+                url_list.append(current_url)
+            entries_exist_list = tool.select_exist_recommend_entries(url_list)
+            entries_embedding_exist_list = tool.select_exist_recommend_entries_embedding(url_list, model_name, model_version)
 
             for current_url, current_articles in url_to_embeddings.items():
                 if current_url not in entries_embedding_exist_list:
