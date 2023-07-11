@@ -141,6 +141,8 @@ export const useRssStore = defineStore('rss', {
         for (const feed of category.feeds) {
           if (feed.id in feedCounter.unreads) {
             feed.unread = feedCounter.unreads[feed.id];
+          } else {
+            feed.unread = 0
           }
         }
       }
@@ -208,7 +210,7 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
-    async fetch_entry_content(entry_id: number): Promise<string | undefined> {
+    async fetch_entry_content(entry_id: number): Promise<EntryContent | undefined> {
       // if (entry_id in this.contents) {
       //   return this.contents[entry_id];
       // }
@@ -218,7 +220,7 @@ export const useRssStore = defineStore('rss', {
 
         this.update_entry_content(entry_id, data.content);
         //this.contents[entry_id] = data;
-        return this.contents[entry_id];
+        return data;
       } catch (e) {
         console.log(e);
         return undefined;
@@ -287,7 +289,9 @@ export const useRssStore = defineStore('rss', {
 
     async get_entries(q: EntriesQueryRequest, filter ?: (entriesQueryResponse: EntriesQueryResponse) => EntriesQueryResponse) {
       const rssStore = useRssStore();
-      this.entries = [];
+      if (q.offset <= 0) {
+        this.entries = [];
+      }
       try {
         console.log('get_entries ' + rssStore.url + '/api/entries' + q.build());
         const data: EntriesQueryResponse = await get_entries(q);

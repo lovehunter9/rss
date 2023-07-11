@@ -14,6 +14,8 @@
       </div>
     </div>
 
+
+
     <div class="content-bg">
 
       <div class="row justify-between items-center">
@@ -25,7 +27,9 @@
           :src="'data:image/png;' + item.feed.icon_content" />
       </div>
       <q-separator style="margin-top:16px;margin-bottom: 16px;" />
-      <h1> {{ item.title }} </h1>
+      <h1 class="new-title">
+        <a href="javascript:;" class="text-major-color" @click="jumpToPageHome()">{{ item.title }}</a>
+      </h1>
       <span class="time text-minor-color">
         {{ getTime() }}
       </span>
@@ -112,7 +116,6 @@ function getTime() {
 
 const emit = defineEmits(['goPageAction']);
 
-
 </script>
 
 <style lang="scss" scoped>
@@ -185,5 +188,15 @@ const emit = defineEmits(['goPageAction']);
     }
   }
 
+
+  .new-title {
+    a:link {
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: blue
+      }
+  }
 }
 </style>

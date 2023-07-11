@@ -8,7 +8,8 @@
       <div class="row justify-end items-center">
         <img class="icon-end" :src="readRef" :title="readTextRef" @click="readChange" />
         <q-img class="icon-end" :src="markRef" :title="markTextRef">
-          <change-entry-board-menu-component :item-id="`${item.id}`" :board_ids="item.board_ids" @add-to-board="addToBoard" />
+          <change-entry-board-menu-component :item-id="`${item.id}`" :board_ids="item.board_ids"
+            @add-to-board="addToBoard" />
         </q-img>
         <img class="icon-end" src="../../assets/menu/share.svg">
       </div>
@@ -21,7 +22,7 @@
           <a href="javascript:;" class="text-major-color" @click="jumpToFeed()">{{ item.feed.title }}</a>
         </div>
         <img class="entry-icon" v-if="store.feeds_icon[item.feed_id] && store.feeds_icon[item.feed_id].data"
-        :src="store.feeds_icon[item.feed_id] && store.feeds_icon[item.feed_id].data ? store.feeds_icon[item.feed_id].data : ''">
+          :src="store.feeds_icon[item.feed_id] && store.feeds_icon[item.feed_id].data ? store.feeds_icon[item.feed_id].data : ''">
       </div>
       <q-separator style="margin-top:16px;margin-bottom: 16px;" />
       <h1> {{ item.title }} </h1>
@@ -31,6 +32,30 @@
       <div class="html-content text-major-color" v-if="item">
         <div v-html="entry"></div>
       </div>
+
+
+      <!-- <div style="width: 100%">
+    <q-expansion-item
+      :default-opened="true"
+      switchToggleSide
+      denseToggle
+      :label="'Attachments(' + (itemContent?.enclosures.length) + ')'"
+      v-if="itemContent!.enclosures.length > 0"
+    >
+      <q-card style=" margin-top: 20px;"> -->
+        <div class="" v-for="item,index in itemContent?.enclosures" :key="item.url + index">
+        <audio controls v-if="item.url.length > 0 && supportAudio(item.mime_type)">
+          <source :src="item.url" :type="item.mime_type">
+        </audio>
+        <div>
+          <a :href="item.url">
+          {{ item.url }}
+        </a>
+        </div>
+      </div>
+      <!-- </q-card>
+    </q-expansion-item>
+  </div> -->
     </div>
   </div>
 </template>
@@ -43,9 +68,8 @@ import {
   PropType
 } from 'vue';
 import { useRssStore } from 'stores/rss';
-import { Entry, EntryStatus, MenuType } from 'src/types';
+import { Entry, EntryContent, EntryStatus, MenuType } from 'src/types';
 import { formatContentHtml, newsBus, newsBusMessage, utcToStamp } from 'src/utils/utils'
-import { similarity2 } from 'src/utils/stringCompare'
 import { useRouter } from 'vue-router';
 import { date } from 'quasar'
 import ChangeEntryBoardMenuComponent from 'components/rss/ChangeEntryBoardMenuComponent.vue'
@@ -59,6 +83,8 @@ const readTextRef = ref('Click to convert the current article as unread');
 const markTextRef = ref('Read later');
 const readStatus = ref(true);
 const markStatus = ref(false);
+
+const itemContent = ref<EntryContent | undefined>()
 
 let entry = ref<string>('');
 
@@ -89,13 +115,14 @@ async function updateEntry(newVal: Entry) {
   let k = await store.fetch_entry_content(id);
   console.log(k);
   if (k != undefined) {
-    const result = similarity2(newVal.content,k)
-    console.log('匹配度:' + result);
-    if (result > 0.5) {
-      entry.value = formatContentHtml(k);
-    }
+    // const result = similarity2(newVal.content,k)
+    // console.log('匹配度:' + result);
+    // if (result > 0.5) {
+    entry.value = formatContentHtml(k.content);
+    // }
   }
-
+  itemContent.value = k
+  console.log(itemContent.value);
   updateUI();
 }
 
@@ -147,7 +174,7 @@ watch(
   });
 
 onMounted(async () => {
-  updateEntry(props.item);
+  // updateEntry(props.item);
   //store.get_local_entry(1);
 });
 
@@ -199,18 +226,22 @@ function getTime() {
 
 const addToBoard = async (itemId: string, boardId: number, updateBoardIds: string, isAdd: boolean) => {
   try {
-      if (!isAdd) {
-        await removeEntryToBoard({ board_id: boardId, entry_id: Number(itemId)})
-      } else {
-        await addEntryToBoard({ board_id: boardId, entry_id: Number(itemId) })
-      }
-      store.updateEntryBoards(
-        Number(itemId),
-        updateBoardIds
-      )
-    } catch (error) {
-      console.log(error);
+    if (!isAdd) {
+      await removeEntryToBoard({ board_id: boardId, entry_id: Number(itemId) })
+    } else {
+      await addEntryToBoard({ board_id: boardId, entry_id: Number(itemId) })
     }
+    store.updateEntryBoards(
+      Number(itemId),
+      updateBoardIds
+    )
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const supportAudio = (mime_type: string) => {
+  return mime_type.toLowerCase().startsWith('audio')
 }
 
 
@@ -292,6 +323,4 @@ const addToBoard = async (itemId: string, boardId: number, updateBoardIds: strin
 
 
 }
-
-
 </style>

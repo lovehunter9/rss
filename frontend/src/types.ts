@@ -221,6 +221,12 @@ export interface Entry {
 
 export interface EntryContent {
   content: string;
+
+  enclosures: {
+    url: string,
+    mime_type: string,
+    
+  }[]
 }
 
 export enum EntryStatus {
@@ -686,6 +692,7 @@ export interface Recommend {
   }
   score: number
   rank: number
+  image_url: string
 }
 
 export interface PageToBoard{
