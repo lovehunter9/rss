@@ -19,6 +19,7 @@
         </div>
       </div>
       <span class="text-entry-title text-major-color">{{ recommend.title }}</span>
+      <q-img :src="recommend.image_url" v-if="recommend.image_url" ></q-img>
     </div>
   </q-item>
   <!-- <div class="line" /> -->

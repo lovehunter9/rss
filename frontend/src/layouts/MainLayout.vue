@@ -63,12 +63,12 @@
           <q-item class="item" dense v-for="(category, index) in store.categories" :key="'ct' + index"
             style="padding: 0;padding-left: 5px;width: calc(100%-10px);">
             <q-expansion-item dense switchToggleSide :disable="category.feeds.length === 0" :defaultOpened="index === 0 &&
-            category.feeds.length > 0" class="menuItem">
+            category.feeds.length > 0" headerClass="menuItem">
               <template v-slot:header>
-                <q-item class="menuItem"
+                <q-item
                   :active="store.menu_choice.type !== undefined && store.menu_choice.type === MenuType.Feed &&
                   category.feeds.find(e => e.id === store.menu_choice.value) !== undefined"
-                  active-class="item-active-color" dense
+                   dense
                   :class="category.feeds.length > 0 ? 'folder-extension-margin-left' : 'folder-extension-margin-none'"
                   @click="changeItemMenu(MenuType.Category, category.id)">
                   <q-item-section class="folderTitle">
@@ -148,7 +148,7 @@ import {useRoute, useRouter} from 'vue-router';
 // import {useIsMobile} from '../utils/utils';
 import {useRssStore} from 'stores/rss';
 
-import {DeleteType, Entry, EntryStatus, Feed, MenuType, RssContentQueryItem} from '../types';
+import {DeleteType, Feed, MenuType, RssContentQueryItem} from '../types';
 // import SearchView from 'components/rss/SearchView.vue';
 import LayoutLeftItemMenu from 'components/LayoutLeftItemMenu.vue'
 import AddFolderDialog from 'components/dialog/AddFolderDialog.vue';
@@ -175,7 +175,7 @@ export default defineComponent({
     const $q = useQuasar();
     const Router = useRouter();
     const Route = useRoute();
-    const item = ref<Entry | undefined>(undefined);
+    // const item = ref<Entry | undefined>(undefined);
     const settingMode = ref();
     const dialogShow = ref(false);
     const isFolderManager = ref(false);
@@ -269,25 +269,25 @@ export default defineComponent({
       store.leftDrawerOpen = show;
     };
 
-    watch(
-      () => Route.params.entry_id,
-      (newValue, oldValue) => {
-        if (newValue == oldValue) {
-          return;
-        }
+    // watch(
+    //   () => Route.params.entry_id,
+    //   (newValue, oldValue) => {
+    //     if (newValue == oldValue) {
+    //       return;
+    //     }
 
-        let entry_id = Number(newValue);
-        let entry = store.get_local_entry(entry_id);
-        if (entry) {
-          if (entry.status != EntryStatus.Read) {
-            store.mark_entry_read(entry_id, EntryStatus.Read);
-          }
-          item.value = entry;
-        } else {
-          item.value = undefined
-        }
-      }
-    );
+    //     let entry_id = Number(newValue);
+    //     let entry = store.get_local_entry(entry_id);
+    //     if (entry) {
+    //       if (entry.status != EntryStatus.Read) {
+    //         store.mark_entry_read(entry_id, EntryStatus.Read);
+    //       }
+    //       item.value = entry;
+    //     } else {
+    //       item.value = undefined
+    //     }
+    //   }
+    // );
 
     watch(() => Route.path, (value) => {
       isFolderManager.value = value.includes('/folderSetting');
@@ -485,7 +485,7 @@ export default defineComponent({
 
     return {
       MenuType,
-      item,
+      // item,
       leftDrawerOpen,
       goto,
       showContextMenu,
