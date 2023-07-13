@@ -22,7 +22,7 @@ class RecommendHandler:
     def downLastPackage(self, baseModel):
         start_time = datetime.now()
         data_handler = DataHandler()
-        apiUrl = os.environ.get('schedule_task_interval', 'http://127.0.0.1:8081/api/share/s3packages')
+        apiUrl = os.environ.get('package_share_api', 'http://127.0.0.1:8081/api/share/s3packages')
         if len(baseModel) > 0:
             lasttime = int(time.mktime(baseModel[0].fetch_at.timetuple()))
             apiUrl = apiUrl + '?lasttime=' + str(lasttime)
