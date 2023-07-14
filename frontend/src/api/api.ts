@@ -15,7 +15,14 @@ import {
   FeedModificationRequest,
   BoardRequest,
   Board,
-  BoardEntriesQueryRequest, EntryToBoardRequest, PageToBoard, Recommend, RecommendFeed, RssContentQuery, Entry,
+  BoardEntriesQueryRequest,
+  EntryToBoardRequest,
+  PageToBoard,
+  Recommend,
+  RecommendFeed,
+  RssContentQuery,
+  Entry,
+  RssContentQueryItem,
 } from 'src/types';
 import { useRssStore } from 'src/stores/rss';
 
@@ -485,6 +492,18 @@ export const getEntryById = async (entry_id: number) => {
     rssStore.url + '/api/entries/' + entry_id
   )
 
+  return data
+}
+
+export const getEntryListByIds = async (list: RssContentQueryItem[]) => {
+  const rssStore = useRssStore();
+
+  const entry_id = list.map(v => v.entry_id)
+  console.log(entry_id + '')
+
+  const data: Entry[] = await axios.get(
+    rssStore.url + '/api/getEntriesByIds?ids=' + (entry_id + '')
+  )
   return data
 }
 

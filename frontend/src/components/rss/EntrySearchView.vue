@@ -25,7 +25,7 @@
         </q-item>
       </template>
     </q-select>
-    <q-input v-else v-model="model" standout outlined dense :debounce="500">
+    <q-input v-else v-model="model" standout outlined dense :debounce="1000">
       <template v-slot:prepend>
         <q-icon size="16px" name="search" />
       </template>

@@ -33,8 +33,8 @@
       <span class="time text-minor-color">
         {{ getTime() }}
       </span>
-      <div class="html-content text-major-color" v-if="item.content">
-        <div v-html="formatContentHtml(item.content)"></div>
+      <div class="html-content text-major-color" v-if="item.full_content">
+        <div v-html="formatContentHtml(item.full_content)"></div>
       </div>
     </div>
   </div>
