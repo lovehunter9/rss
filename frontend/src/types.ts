@@ -225,7 +225,7 @@ export interface EntryContent {
   enclosures: {
     url: string,
     mime_type: string,
-    
+
   }[]
 }
 
@@ -679,7 +679,7 @@ export interface Recommend {
   author: string
   published_at: string
   url: string
-  content: string
+  full_content: string
   feed: {
     id: number
     feed_title: string

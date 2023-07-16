@@ -12,7 +12,7 @@
             <q-icon name="search" size="16px" style="margin-left: 8px;" class="text-minor-color"></q-icon>
             <div style="margin-left:10px;"> Search </div>
           </div> -->
-          <entry-search-view class="detail-width search-view" placeholder="Search" :item-width="225" :filter-data-func="store.rssContentQuery" @show-detail="showSearchResultDetail"/>
+          <entry-search-view class="detail-width search-view" :isUseSelect="false" placeholder="Search" :item-width="225" :filter-data-func="store.rssContentQuery" @show-all-value="showSearchResultAllValue"/>
 
           <div class="btn-add row justify-center items-center">
             <q-img style="width: 12px;height: 12px" src="../assets/menu/add.svg">
@@ -159,7 +159,7 @@ import {newsBus, newsBusMessage} from 'src/utils/utils';
 import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import { formatLocalImage } from '../utils/utils'
 import EntrySearchView from '../components/rss/EntrySearchView.vue'
-import { getEntryById } from 'src/api/api'
+import { getEntryById,getEntryListByIds } from 'src/api/api'
 
 export default defineComponent({
   name: 'MainLayout',
@@ -483,6 +483,23 @@ export default defineComponent({
       // changeItemMenu(MenuType.Search)
     }
 
+    const showSearchResultAllValue = async (list: RssContentQueryItem[]) => {
+      if (list.length === 0) {
+        return
+      }
+
+      try {
+        console.log(list)
+        const entries = await getEntryListByIds(list)
+        console.log(entries)
+        store.entries = entries
+        store.entries_total = entries.length;
+        changeItemMenu(MenuType.Search)
+      } catch (error) {
+
+      }
+    }
+
     return {
       MenuType,
       // item,
@@ -508,7 +525,8 @@ export default defineComponent({
       feedReduce,
       todayCount,
       formatLocalImage,
-      showSearchResultDetail
+      showSearchResultDetail,
+      showSearchResultAllValue
     };
   }
 });
