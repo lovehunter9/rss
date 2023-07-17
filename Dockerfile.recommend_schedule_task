@@ -6,7 +6,7 @@ ENV MODEL_PATH /opt/model
 VOLUME [$MODEL_PATH]
 RUN pip install gensim==4.3.1 pandas==2.0.0 protobuf==3.20.1 nltk==3.8.1 \
 boto3==1.26.119 psycopg2-binary==2.9.6   peewee==3.16.2    \
-numpy==1.24.3 beautifulsoup4==4.12.2 bytetrade-recommend-model-sdk==0.0.25 \
+numpy==1.24.3 beautifulsoup4==4.12.2 bytetrade-recommend-model-sdk==0.0.26 \
 rake-nltk==1.0.6 sentence-transformers==2.2.2 psutil==5.9.5
 COPY recommend/  $BASE_PATH/
 # following save credentials in docker is not safe, in future we will remove it
