@@ -19,13 +19,13 @@ class RecommendHandler:
         self.current_logger = CommonTool().get_logger()
         self.commont_tool = CommonTool()
 
-    def downLastPackage(self, baseModel):
+    def downLastPackage(self, user, baseModel):
         start_time = datetime.now()
         data_handler = DataHandler()
-        apiUrl = os.environ.get('package_share_api', 'http://127.0.0.1:8081/api/share/s3packages')
+        apiUrl = os.environ.get('package_share_api', 'http://127.0.0.1:8081/api/share/s3packages?model_name=' + user.model_name + '&model_version' + user.model_version)
         if len(baseModel) > 0:
             lasttime = int(time.mktime(baseModel[0].fetch_at.timetuple()))
-            apiUrl = apiUrl + '?lasttime=' + str(lasttime)
+            apiUrl = apiUrl + '&lasttime=' + str(lasttime)
         self.current_logger.debug(f'downLastPackage url {apiUrl}')
         htmlResponse = requests.get(apiUrl)
         self.current_logger.debug(f'downLastPackage result {htmlResponse.text}')
@@ -61,7 +61,7 @@ class RecommendHandler:
         data_handler.download_feed()
         self.current_logger.debug(f'download_feed time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
 
-        self.downLastPackage(baseModel)
+        self.downLastPackage(user, baseModel)
         #start_time = datetime.now()
         #data_handler.down_latest_article_embedding_package(user)
         #self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
