@@ -12,6 +12,7 @@ import (
 
 	"miniflux.app/http/request"
 	"miniflux.app/http/response/json"
+	"miniflux.app/logger"
 	"miniflux.app/model"
 	feedHandler "miniflux.app/reader/handler"
 )
@@ -39,6 +40,7 @@ func (h *handler) getRecommendList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	offset := RecommendCachePage * limit
+	logger.Info("getRecommendList %d,%d,%d", recommendBase.Batch, RecommendCachePage, offset)
 	list, err := h.store.RecommendList(recommendBase.Batch, offset, limit)
 	if err != nil {
 		json.ServerError(w, r, err)

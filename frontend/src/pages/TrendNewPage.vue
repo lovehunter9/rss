@@ -11,7 +11,8 @@
           <div class="text-sub-label text-minor-color"></div>
           <q-scroll-area class="list-view">
             <div v-for="item in rssStore.recommends" :key="item.entry_id">
-              <EntryTotalComponent :recommend="item" :selected="item.entry_id === selectRecommendRef?.entry_id"  @onClickCallback="selectRecommendRef = item"></EntryTotalComponent>
+              <EntryTotalComponent :recommend="item" :selected="item.entry_id === selectRecommendRef?.entry_id"
+              @onClickCallback="selectRecommendRef = item"></EntryTotalComponent>
               <q-separator />
             </div>
           </q-scroll-area>

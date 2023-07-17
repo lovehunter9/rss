@@ -5,7 +5,7 @@ from handler.data import *
 from handler.recommend_handler import *
 from db.recommend_pg_db_tool import *
 # from newspaper import *
-
+import requests
 # from lxml import etree
 from bs4 import BeautifulSoup
 
@@ -151,3 +151,12 @@ class ModelToolUnitTest(unittest.TestCase):
             file_object.write(article.html)
 
         #html = requests.get(url).text
+    def package_share(self):
+        #python  -m unittest model_tool_unit_test.ModelToolUnitTest.package_share
+
+        response = requests.get('http://127.0.0.1:8081/api/share/s3packages')
+        print(response.text)
+
+        packageData = json.loads(response.text)
+        for data in packageData:
+            print(data['model_version'])
