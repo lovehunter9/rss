@@ -27,8 +27,8 @@ func (s *Storage) LastRecommendBase() (*model.RecommendBase, error) {
 func (s *Storage) RecommendEntry(entryID int64) (*model.RecommendEntry, error) {
 	var entry model.RecommendEntry
 
-	query := `SELECT id,feed_id,title, author,url,content,published_at,full_content,hash FROM recommend_entries where id=$1`
-	err := s.db.QueryRow(query, entryID).Scan(&entry.ID, &entry.FeedId, &entry.Title, &entry.Author, &entry.URL, &entry.Content, &entry.PublishedAt, &entry.FullContent, &entry.Hash)
+	query := `SELECT id,feed_id,title, author,url,content,published_at,full_content,hash,cloud_id FROM recommend_entries where id=$1`
+	err := s.db.QueryRow(query, entryID).Scan(&entry.ID, &entry.FeedId, &entry.Title, &entry.Author, &entry.URL, &entry.Content, &entry.PublishedAt, &entry.FullContent, &entry.Hash, &entry.CloudID)
 
 	switch {
 	case err == sql.ErrNoRows:
@@ -110,7 +110,16 @@ func (s *Storage) GetRecommendFullContent(entryId int64) string {
 	query := `SELECT full_content FROM recommend_entries WHERE id=$1`
 	s.db.QueryRow(query, entryId).Scan(&content)
 	return content
+}
 
+func (s *Storage) UpdateRecommendFullContent(entryId int64, entry *model.RecommendEntry) error {
+	query := `UPDATE entries SET full_content=$1 WHERE id=$2 `
+	_, err := s.db.Exec(query, entry.FullContent, entryId)
+	if err != nil {
+		return fmt.Errorf(`store: unable to update full content  %v: %v`, entryId, err)
+	}
+
+	return nil
 }
 
 func (s *Storage) RecommendFeedQuery(categoryID, categoryName, name, link string) (model.RecommendFeeds, error) {

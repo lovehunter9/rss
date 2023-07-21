@@ -7,6 +7,7 @@ package api // import "miniflux.app/api"
 import (
 	"net/http"
 
+	"miniflux.app/s3action"
 	"miniflux.app/storage"
 	"miniflux.app/worker"
 
@@ -14,14 +15,15 @@ import (
 )
 
 type handler struct {
-	store  *storage.Storage
-	pool   *worker.Pool
-	router *mux.Router
+	store    *storage.Storage
+	s3action *s3action.S3action
+	pool     *worker.Pool
+	router   *mux.Router
 }
 
 // Serve declares API routes for the application.
-func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
-	handler := &handler{store, pool, router}
+func Serve(router *mux.Router, store *storage.Storage, s3action *s3action.S3action, pool *worker.Pool) {
+	handler := &handler{store, s3action, pool, router}
 
 	sr := router.PathPrefix("/api").Subrouter()
 	middleware := newMiddleware(store)

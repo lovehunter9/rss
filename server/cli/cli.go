@@ -5,13 +5,17 @@
 package cli // import "miniflux.app/cli"
 
 import (
+	"context"
 	"flag"
 	"fmt"
 
+	s3config "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"miniflux.app/config"
 	"miniflux.app/database"
 	"miniflux.app/locale"
 	"miniflux.app/logger"
+	"miniflux.app/s3action"
 	"miniflux.app/storage"
 	"miniflux.app/ui/static"
 	"miniflux.app/version"
@@ -145,6 +149,13 @@ func Parse() {
 		logger.Fatal("Unable to connect to the database: %v", err)
 	}
 
+	s3cfg, s3Err := s3config.LoadDefaultConfig(context.TODO())
+	if s3Err != nil {
+		logger.Fatal("Unable to connect to the s3: %v", s3Err)
+	}
+	s3client := s3.NewFromConfig(s3cfg)
+	s3action := s3action.NewS3action(s3client)
+
 	if flagMigrate {
 		if err := database.Migrate(db); err != nil {
 			logger.Fatal(`%v`, err)
@@ -188,5 +199,5 @@ func Parse() {
 		createAdmin(store)
 	}
 
-	startDaemon(store)
+	startDaemon(store, s3action)
 }

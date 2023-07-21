@@ -39,8 +39,8 @@ class RecommendHandler:
         tool = RecommendPGDBTool()
         start_time = datetime.now()
         user = tool.select_users_model()
-        user.model_name = "bert"
-        user.model_version = "v1"
+        user.model_name = os.environ.get('model_name', 'bert')
+        user.model_version = os.environ.get('model_version', 'v1')
         self.current_logger.debug(f'model_name {user.model_name} model_version {user.model_version}')
         self.current_logger.debug(f'select_users_model time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
         data_handler = DataHandler()
