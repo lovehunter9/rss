@@ -7,9 +7,10 @@ peewee
 peewee-db-evolve
 psycopg2-binary
 faiss-cpu==1.7.4
-bytetrade-recommend-model-sdk==0.0.25
+bytetrade-recommend-model-sdk==0.0.26
 schedule==1.2.0
 beautifulsoup4
 rake-nltk==1.0.6
 sentence-transformers==2.2.2
 psutil==5.9.5
+langchain==0.0.235
