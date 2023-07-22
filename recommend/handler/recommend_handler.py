@@ -78,7 +78,7 @@ class RecommendHandler:
 
         recommend_tool = RecommendTool(base_url_to_embedding_dict, user.model_name, user.model_version)
         start_time = datetime.now()
-        result = recommend_tool.recommend(query_url_to_embedding_dict, 100)
+        result = recommend_tool.recommend(query_url_to_embedding_dict, 1000)
         self.current_logger.debug(f'recommend time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
         saveResultList = []
         rank = 1
