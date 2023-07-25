@@ -61,6 +61,7 @@ watch(() => props.entry, () => {
   deep : true,
   immediate : true
 })
+
 function onEntryClick() {
   if (!props.entry) {
     return

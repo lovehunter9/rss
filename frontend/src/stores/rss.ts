@@ -302,7 +302,6 @@ export const useRssStore = defineStore('rss', {
           this.entries_total = response.total;
         } else {
           this.entries = q.offset > 0 ? [...this.entries, ...data.entries] : data.entries;
-          ;
           this.entries_total = data.total;
         }
         console.log(this.entries)
@@ -323,7 +322,7 @@ export const useRssStore = defineStore('rss', {
           this.entries = data.entries;
           this.entries_total = data.total;
         }
-        return data.total
+        return this.entries_total
       } catch (e) {
         console.log(e);
       }
@@ -338,7 +337,7 @@ export const useRssStore = defineStore('rss', {
           this.entries = data.entries;
           this.entries_total = data.total;
         }
-        return data.total
+        return this.entries_total
       } catch (e) {
         console.log(e);
       }
@@ -350,6 +349,7 @@ export const useRssStore = defineStore('rss', {
         const response: EntriesQueryResponse = await get_board_entries(boardId, request);
         this.entries = response.entries;
         this.entries_total = response.total;
+        return this.entries.length;
       } catch (e) {
         console.log(e);
       }

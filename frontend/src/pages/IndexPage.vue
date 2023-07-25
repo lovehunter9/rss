@@ -2,7 +2,7 @@
   <div class="index-root bg-color-white">
 
     <q-splitter v-model="splitterModel" unit="px" disable style="height: 100%;"
-                v-if="store.entries.length > 0">
+                v-if="!loadDataEmpty">
       <template v-slot:before>
         <div class="item-list">
           <div class="row justify-end items-center" v-if="store.menu_choice.type !== MenuType.Board">
@@ -70,12 +70,12 @@ const readRef = ref(require('../assets/menu/unread.svg'));
 const readTextRef = ref('Click to convert all articles to read');
 const readStatus = ref(false);
 const $q = useQuasar();
+const loadDataEmpty = ref(false);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 watch(() => store.menu_choice, (newValue) => {
   requestEntries()
 })
-
 
 watch(() => store.entries, (newValue) => {
   updateUI();
@@ -83,7 +83,6 @@ watch(() => store.entries, (newValue) => {
   immediate: true,
   deep: true
 })
-
 
 watch(() => readStatus.value, () => {
   if (readStatus.value) {
@@ -255,19 +254,37 @@ watch(
 
 const loadMoreEnable = ref(true)
 
-
 const requestEntries = async (hasMore = false) => {
   if (store.menu_choice.type === MenuType.Search || store.menu_choice.type === MenuType.Trend) {
     return
   }
-  if (store.menu_choice.type === MenuType.Today || store.menu_choice.type === MenuType.ReadLater || store.menu_choice.type === MenuType.Board) {
-    if (store.menu_choice.type === MenuType.Today) {
-      return
-    }
-    if (store.menu_choice.type === MenuType.Board) {
-      await store.get_board_entries(store.menu_choice.value || 0,new BoardEntriesQueryRequest({offset: 0}))
-    }
-    return 0
+
+  const loadDataAnim = async (loadData : () => Promise<number | undefined>) => {
+    $q.loading.show()
+    const dataLength = await loadData();
+    loadDataEmpty.value = dataLength == 0
+    $q.loading.hide()
+    return dataLength
+  }
+
+  if (store.menu_choice.type === MenuType.Today) {
+    await loadDataAnim(async () => {
+      return await store.get_today();
+    })
+    return
+  }
+
+  if (store.menu_choice.type === MenuType.ReadLater) {
+    await loadDataAnim(async () => {
+      return await store.get_readLater();
+    })
+    return
+  }
+  if (store.menu_choice.type === MenuType.Board) {
+    await loadDataAnim(async () => {
+     return await store.get_board_entries(store.menu_choice.value || 0,new BoardEntriesQueryRequest({offset: 0}))
+    })
+    return
   }
 
   const entriesQurey = new EntriesQueryRequest({
@@ -281,7 +298,14 @@ const requestEntries = async (hasMore = false) => {
     entriesQurey.status = EntryStatus.Unread;
   }
 
-  const updateAccount = await store.get_entries(entriesQurey)
+  let entryLength;
+  if (entriesQurey.offset == 0){
+    entryLength = await loadDataAnim(async () => {
+      return await store.get_entries(entriesQurey)
+    })
+  }else {
+    entryLength = await store.get_entries(entriesQurey)
+  }
 
   if (store.entries.length > 0) {
     const find = store.entries.find(entry => {
@@ -289,7 +313,7 @@ const requestEntries = async (hasMore = false) => {
     })
     readStatus.value = !find;
   }
-  return updateAccount
+  return entryLength
 }
 
 let loading = false

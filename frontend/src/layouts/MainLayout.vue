@@ -384,14 +384,12 @@ export default defineComponent({
         // );
         goto('/')
       } else if (type == MenuType.Today) {
-        store.get_today();
         goto('/')
       } else if (type == MenuType.Discover) {
         goto('/discover')
       } else if (type == MenuType.Unread) {
         goto('/')
       } else if (type == MenuType.ReadLater) {
-        store.get_readLater();
         goto('/')
       } else if (type == MenuType.Board) {
         goto('/')

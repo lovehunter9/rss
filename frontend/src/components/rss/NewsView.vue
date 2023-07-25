@@ -11,7 +11,7 @@
           <change-entry-board-menu-component :item-id="`${item.id}`" :board_ids="item.board_ids"
             @add-to-board="addToBoard" />
         </q-img>
-        <img class="icon-end" src="../../assets/menu/share.svg">
+        <img class="icon-end" src="../../assets/menu/share.svg" @click="onShare">
       </div>
     </div>
 
@@ -71,7 +71,7 @@ import { useRssStore } from 'stores/rss';
 import { Entry, EntryContent, EntryStatus, MenuType } from 'src/types';
 import { formatContentHtml, newsBus, newsBusMessage, utcToStamp } from 'src/utils/utils'
 import { useRouter } from 'vue-router';
-import { date } from 'quasar'
+import {date, useQuasar} from 'quasar'
 import ChangeEntryBoardMenuComponent from 'components/rss/ChangeEntryBoardMenuComponent.vue'
 import { addEntryToBoard, removeEntryToBoard } from 'src/api/api';
 
@@ -83,6 +83,7 @@ const readTextRef = ref('Click to convert the current article as unread');
 const markTextRef = ref('Read later');
 const readStatus = ref(true);
 const markStatus = ref(false);
+const $q = useQuasar();
 
 const itemContent = ref<EntryContent | undefined>()
 
@@ -149,13 +150,11 @@ function updateUI() {
   }
 }
 
-
 function readChange() {
   if (props.item) {
     store.mark_entry_read(props.item.id, readStatus.value ? EntryStatus.Unread : EntryStatus.Read)
   }
 }
-
 
 // const showSelfTitle = ref(false)
 watch(
@@ -206,6 +205,14 @@ const nextImage = () => {
   return require('../../assets/menu/forward.svg')
 }
 
+const onShare = () =>{
+  if (props.item && props.item.url){
+    window.open(props.item.url)
+  }else {
+    $q.notify('url error')
+  }
+}
+
 const jumpToFeed = () => {
   store.menu_choice = {
     type: MenuType.Feed,
@@ -243,7 +250,6 @@ const addToBoard = async (itemId: string, boardId: number, updateBoardIds: strin
 const supportAudio = (mime_type: string) => {
   return mime_type.toLowerCase().startsWith('audio')
 }
-
 
 </script>
 
