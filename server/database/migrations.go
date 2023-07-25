@@ -807,4 +807,10 @@ var migrations = []func(tx *sql.Tx) error{
 		_, err = tx.Exec(sql)
 		return err
 	},
+	func(tx *sql.Tx) (err error) {
+		sql := `ALTER TABLE recommend_entries ADD COLUMN cloud_id int default 0 ;
+				`
+		_, err = tx.Exec(sql)
+		return err
+	},
 }

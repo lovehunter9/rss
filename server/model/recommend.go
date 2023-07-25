@@ -35,6 +35,7 @@ type RecommendEntry struct {
 	Content     string    `json:"content"`
 	FullContent string    `json:"full_content"`
 	Hash        string    `json:"hash"`
+	CloudID     int64     `json:"cloud_id"`
 }
 
 type RecommendResult struct {

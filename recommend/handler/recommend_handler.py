@@ -19,14 +19,15 @@ class RecommendHandler:
         self.current_logger = CommonTool().get_logger()
         self.commont_tool = CommonTool()
 
-    def downLastPackage(self, baseModel):
+    def downLastPackage(self, user, baseModel):
         start_time = datetime.now()
         data_handler = DataHandler()
         apiUrl = os.environ.get('package_share_api', 'http://127.0.0.1:8081/api/share/s3packages')
+        apiUrl = apiUrl + '?model_name=' + user.model_name + '&model_version=' + user.model_version
         if len(baseModel) > 0:
             lasttime = int(time.mktime(baseModel[0].fetch_at.timetuple()))
-            apiUrl = apiUrl + '?lasttime=' + str(lasttime)
-        self.current_logger.debug(f'downLastPackage url {apiUrl}')
+            apiUrl = apiUrl + '&lasttime=' + str(lasttime)
+        self.current_logger.info(f'downLastPackage url {apiUrl}')
         htmlResponse = requests.get(apiUrl)
         self.current_logger.debug(f'downLastPackage result {htmlResponse.text}')
         packageData = json.loads(htmlResponse.text)
@@ -38,8 +39,8 @@ class RecommendHandler:
         tool = RecommendPGDBTool()
         start_time = datetime.now()
         user = tool.select_users_model()
-        user.model_name = "bert"
-        user.model_version = "v1"
+        user.model_name = os.environ.get('model_name', 'bert')
+        user.model_version = os.environ.get('model_version', 'v2')
         self.current_logger.debug(f'model_name {user.model_name} model_version {user.model_version}')
         self.current_logger.debug(f'select_users_model time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
         data_handler = DataHandler()
@@ -61,7 +62,7 @@ class RecommendHandler:
         data_handler.download_feed()
         self.current_logger.debug(f'download_feed time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
 
-        self.downLastPackage(baseModel)
+        self.downLastPackage(user, baseModel)
         #start_time = datetime.now()
         #data_handler.down_latest_article_embedding_package(user)
         #self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
@@ -77,7 +78,7 @@ class RecommendHandler:
 
         recommend_tool = RecommendTool(base_url_to_embedding_dict, user.model_name, user.model_version)
         start_time = datetime.now()
-        result = recommend_tool.recommend(query_url_to_embedding_dict, 100)
+        result = recommend_tool.recommend(query_url_to_embedding_dict, 1000)
         self.current_logger.debug(f'recommend time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
         saveResultList = []
         rank = 1

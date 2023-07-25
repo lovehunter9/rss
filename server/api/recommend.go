@@ -12,6 +12,7 @@ import (
 
 	"miniflux.app/http/request"
 	"miniflux.app/http/response/json"
+	"miniflux.app/logger"
 	"miniflux.app/model"
 	feedHandler "miniflux.app/reader/handler"
 )
@@ -39,6 +40,7 @@ func (h *handler) getRecommendList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	offset := RecommendCachePage * limit
+	logger.Info("getRecommendList %d,%d,%d", recommendBase.Batch, RecommendCachePage, offset)
 	list, err := h.store.RecommendList(recommendBase.Batch, offset, limit)
 	if err != nil {
 		json.ServerError(w, r, err)
@@ -190,14 +192,22 @@ func (h *handler) fetchRecommendContent(w http.ResponseWriter, r *http.Request) 
 	entryID := request.RouteInt64Param(r, "entryID")
 
 	stat := h.initRecommendStat(entryID)
+
 	if stat != nil {
 		stat.ClickNum = stat.ClickNum + 1
 		h.store.UpdateStatEntryRead(stat)
 	}
 
-	content := h.store.GetRecommendFullContent(entryID)
-	json.OK(w, r, map[string]string{"content": content})
-
+	entry, _ := h.store.RecommendEntry(entryID)
+	if entry != nil {
+		if entry.FullContent == "" && entry.CloudID != 0 {
+			fullContent, _ := h.s3action.GetObject(entry.CloudID)
+			entry.FullContent = fullContent
+			h.store.UpdateRecommendFullContent(entryID, entry)
+		}
+		json.OK(w, r, map[string]string{"content": entry.FullContent})
+	}
+	json.OK(w, r, map[string]string{"content": ""})
 }
 
 func (h *handler) recommendReadCompleteStat(w http.ResponseWriter, r *http.Request) {

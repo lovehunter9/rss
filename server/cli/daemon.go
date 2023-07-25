@@ -15,6 +15,7 @@ import (
 	"miniflux.app/config"
 	"miniflux.app/logger"
 	"miniflux.app/metric"
+	"miniflux.app/s3action"
 	"miniflux.app/service/httpd"
 	"miniflux.app/service/scheduler"
 	"miniflux.app/storage"
@@ -22,7 +23,7 @@ import (
 	"miniflux.app/worker"
 )
 
-func startDaemon(store *storage.Storage) {
+func startDaemon(store *storage.Storage, s3action *s3action.S3action) {
 	logger.Info("Starting Miniflux...")
 
 	stop := make(chan os.Signal, 1)
@@ -37,7 +38,7 @@ func startDaemon(store *storage.Storage) {
 
 	var httpServer *http.Server
 	if config.Opts.HasHTTPService() {
-		httpServer = httpd.Serve(store, pool)
+		httpServer = httpd.Serve(store, s3action, pool)
 	}
 
 	if config.Opts.HasMetricsCollector() {

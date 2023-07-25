@@ -19,6 +19,7 @@ import (
 	"miniflux.app/googlereader"
 	"miniflux.app/http/request"
 	"miniflux.app/logger"
+	"miniflux.app/s3action"
 	"miniflux.app/storage"
 	"miniflux.app/ui"
 	"miniflux.app/version"
@@ -31,7 +32,7 @@ import (
 )
 
 // Serve starts a new HTTP server.
-func Serve(store *storage.Storage, pool *worker.Pool) *http.Server {
+func Serve(store *storage.Storage, s3action *s3action.S3action, pool *worker.Pool) *http.Server {
 	certFile := config.Opts.CertFile()
 	keyFile := config.Opts.CertKeyFile()
 	certDomain := config.Opts.CertDomain()
@@ -40,7 +41,7 @@ func Serve(store *storage.Storage, pool *worker.Pool) *http.Server {
 		ReadTimeout:  300 * time.Second,
 		WriteTimeout: 300 * time.Second,
 		IdleTimeout:  300 * time.Second,
-		Handler:      setupHandler(store, pool),
+		Handler:      setupHandler(store, s3action, pool),
 	}
 
 	switch {
@@ -165,7 +166,7 @@ func startHTTPServer(server *http.Server) {
 	}()
 }
 
-func setupHandler(store *storage.Storage, pool *worker.Pool) *mux.Router {
+func setupHandler(store *storage.Storage, s3action *s3action.S3action, pool *worker.Pool) *mux.Router {
 	router := mux.NewRouter()
 
 	if config.Opts.BasePath() != "" {
@@ -184,7 +185,7 @@ func setupHandler(store *storage.Storage, pool *worker.Pool) *mux.Router {
 
 	fever.Serve(router, store)
 	googlereader.Serve(router, store)
-	api.Serve(router, store, pool)
+	api.Serve(router, store, s3action, pool)
 	ui.Serve(router, store, pool)
 
 	router.HandleFunc("/healthcheck", func(w http.ResponseWriter, r *http.Request) {

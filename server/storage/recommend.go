@@ -27,8 +27,8 @@ func (s *Storage) LastRecommendBase() (*model.RecommendBase, error) {
 func (s *Storage) RecommendEntry(entryID int64) (*model.RecommendEntry, error) {
 	var entry model.RecommendEntry
 
-	query := `SELECT id,feed_id,title, author,url,content,published_at,full_content,hash FROM recommend_entries where id=$1`
-	err := s.db.QueryRow(query, entryID).Scan(&entry.ID, &entry.FeedId, &entry.Title, &entry.Author, &entry.URL, &entry.Content, &entry.PublishedAt, &entry.FullContent, &entry.Hash)
+	query := `SELECT id,feed_id,title, author,url,content,published_at,full_content,hash,cloud_id FROM recommend_entries where id=$1`
+	err := s.db.QueryRow(query, entryID).Scan(&entry.ID, &entry.FeedId, &entry.Title, &entry.Author, &entry.URL, &entry.Content, &entry.PublishedAt, &entry.FullContent, &entry.Hash, &entry.CloudID)
 
 	switch {
 	case err == sql.ErrNoRows:
@@ -67,7 +67,7 @@ func (s *Storage) GetRecommendCount(batch int) int {
 
 }
 func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, error) {
-	query := `SELECT r.batch, e.id entry_id, e.title, e.author,e.url,e.content,e.published_at,r.score,r.rank,
+	query := `SELECT r.batch, e.id entry_id, e.title, e.author,e.url,e.published_at,r.score,r.rank,
 	 f.title feed_title,f.feed_url,f.site_url,f.icon_type,f.icon_content icon_byte_content,f.category_id,f.category_title,e.full_content ,e.image_url
 	 FROM recommend_result r,recommend_entries e,recommend_feed f 
 	 WHERE r.batch=$1 and r.url=e.url and e.feed_id=f.id
@@ -83,7 +83,7 @@ func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, err
 		var recommend model.Recommend
 		recommend.Feed = &model.RecommendFeed{}
 		if err := rows.Scan(&recommend.Batch, &recommend.EntryID, &recommend.Title,
-			&recommend.Author, &recommend.URL, &recommend.Content, &recommend.PublishedAt, &recommend.Score, &recommend.Rank,
+			&recommend.Author, &recommend.URL, &recommend.PublishedAt, &recommend.Score, &recommend.Rank,
 			&recommend.Feed.Title, &recommend.Feed.FeedUrl, &recommend.Feed.SiteUrl,
 			&recommend.Feed.IconType, &recommend.Feed.IconByteContent, &recommend.Feed.CategoryID, &recommend.Feed.CategoryTitle, &recommend.FullContent, &recommend.ImageUrl); err != nil {
 			return nil, fmt.Errorf(`store: unable to fetch recommends row: %v`, err)
@@ -110,7 +110,16 @@ func (s *Storage) GetRecommendFullContent(entryId int64) string {
 	query := `SELECT full_content FROM recommend_entries WHERE id=$1`
 	s.db.QueryRow(query, entryId).Scan(&content)
 	return content
+}
 
+func (s *Storage) UpdateRecommendFullContent(entryId int64, entry *model.RecommendEntry) error {
+	query := `UPDATE entries SET full_content=$1 WHERE id=$2 `
+	_, err := s.db.Exec(query, entry.FullContent, entryId)
+	if err != nil {
+		return fmt.Errorf(`store: unable to update full content  %v: %v`, entryId, err)
+	}
+
+	return nil
 }
 
 func (s *Storage) RecommendFeedQuery(categoryID, categoryName, name, link string) (model.RecommendFeeds, error) {
