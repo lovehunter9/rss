@@ -817,8 +817,11 @@ var migrations = []func(tx *sql.Tx) error{
 		sql := `
 			CREATE TABLE recommend_blacklist (
 				id bigserial not null,
-				feed_url text not null,
+				feed_id int not null,
+				feed_url text not null unique,
+				feed_title text default '',
 				entry_url text default '',
+				entry_title text default '',
 				full_content text default '',
 				status int default 0,
 				primary key (id)

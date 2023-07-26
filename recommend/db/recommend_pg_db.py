@@ -136,3 +136,15 @@ class RecommendResultModel(RecommendPGBaseModel):
     class Meta:
         db_table = 'recommend_result'
         primary_key = False
+
+
+class RecommendBlacklist(RecommendPGBaseModel):
+    id = BigIntegerField(null=False, unique=True, index=True)
+    feed_url = TextField(null=False)
+    entry_url = TextField(null=True, index=True)
+    full_content = TextField(null=True)
+    status = IntegerField(null=True)
+
+    class Meta:
+        db_table = 'recommend_blacklist'
+        primary_key = False
