@@ -105,6 +105,12 @@ func Serve(router *mux.Router, store *storage.Storage, s3action *s3action.S3acti
 	sr.HandleFunc("/recommend/{entryID}/readComplete", handler.recommendReadCompleteStat).Methods(http.MethodPut)
 	sr.HandleFunc("/recommend/readTimeStat", handler.recommendReadTimeStat).Methods(http.MethodPut)
 
+	sr.HandleFunc("/recommend/blacklist", handler.getBlacklist).Methods(http.MethodGet)
+	sr.HandleFunc("/recommend/addBlacklist", handler.addBalcklist).Methods(http.MethodPost)
+	sr.HandleFunc("/recommend/blacklist/{id}", handler.removeBlacklist).Methods(http.MethodDelete)
+	sr.HandleFunc("/recommend/setOption", handler.setRecommendOption).Methods(http.MethodPut)
+	sr.HandleFunc("/recommend/getOption", handler.getRecommendOption).Methods(http.MethodGet)
+
 	sr.HandleFunc("/page/addPageToBoard", handler.addPageToBoard).Methods(http.MethodPut)
 	sr.HandleFunc("/rss/contentQuery", handler.contentQuery).Methods(http.MethodGet)
 

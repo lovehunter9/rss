@@ -813,4 +813,22 @@ var migrations = []func(tx *sql.Tx) error{
 		_, err = tx.Exec(sql)
 		return err
 	},
+	func(tx *sql.Tx) (err error) {
+		sql := `
+			CREATE TABLE recommend_blacklist (
+				id bigserial not null,
+				feed_url text not null,
+				entry_url text default '',
+				full_content text default '',
+				status int default 0,
+				primary key (id)
+			);
+
+			
+			ALTER TABLE users ADD COLUMN recommend_language text default 'en_US';
+			ALTER TABLE users ADD COLUMN show_recommend_result text default 't';
+		`
+		_, err = tx.Exec(sql)
+		return err
+	},
 }

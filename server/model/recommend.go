@@ -71,3 +71,18 @@ type ReadTimeStatRequest struct {
 type Recommends []*Recommend
 
 type RecommendFeeds []*RecommendFeed
+
+type OptionSettingRequest struct {
+	Language   []string `json:"language"`
+	ShowResult bool     `json:"show_recommend_result"`
+}
+
+type Blacklist struct {
+	ID          int64   `json:"id"`
+	FeedUrl     string  `json:"feed_url"`
+	EntryUrl    string  `json:"entry_url"`
+	FullContent *string `json:"full_content"`
+	Status      int     `json:"status"`
+}
+
+type Blacklists []*Blacklist

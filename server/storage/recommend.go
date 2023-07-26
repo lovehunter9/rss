@@ -3,6 +3,7 @@ package storage // import "miniflux.app/storage"
 import (
 	"database/sql"
 	"encoding/base64"
+	"errors"
 	"fmt" // Categories returns all categories that belongs to the given user.
 
 	"miniflux.app/model"
@@ -156,4 +157,69 @@ func (s *Storage) RecommendFeedQuery(categoryID, categoryName, name, link string
 
 	return feeds, nil
 
+}
+
+func (s *Storage) GetBlacklist(offset, limit int) (model.Blacklists, error) {
+	query := `SELECT id,feed_url,entry_url,status from recommend_blacklist ORDER BY id desc  OFFSET $1 limit $2`
+	rows, err := s.db.Query(query, offset, limit)
+	if err != nil {
+		return nil, fmt.Errorf(`store: unable to fetch BlackList: %v`, err)
+	}
+	defer rows.Close()
+
+	lists := make(model.Blacklists, 0)
+	for rows.Next() {
+		var blacklist model.Blacklist
+		if err := rows.Scan(&blacklist.ID, &blacklist.FeedUrl, &blacklist.EntryUrl, &blacklist.Status); err != nil {
+			return nil, fmt.Errorf(`store: unable to fetch recommends row: %v`, err)
+		}
+		lists = append(lists, &blacklist)
+	}
+
+	return lists, nil
+}
+
+// CreateCategory creates a new category.
+func (s *Storage) AddBlacklist(request *model.Blacklist) error {
+
+	query := `
+		INSERT INTO recommend_blacklist
+			(feed_url, entry_url)
+		VALUES
+			($1, $2)
+		RETURNING
+			id
+	`
+	err := s.db.QueryRow(
+		query,
+		request.FeedUrl,
+		request.EntryUrl,
+	).Scan(
+		&request.ID,
+	)
+
+	if err != nil {
+		return fmt.Errorf(`store: unable to create Blacklist %q: %v`, request.FeedUrl, err)
+	}
+
+	return nil
+}
+
+func (s *Storage) RemoveBlacklist(id int64) error {
+	query := `DELETE FROM recommend_blacklist WHERE id = $1 `
+	result, err := s.db.Exec(query, id)
+	if err != nil {
+		return fmt.Errorf(`store: unable to remove this blacklist: %v`, err)
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf(`store: unable to remove this blacklist: %v`, err)
+	}
+
+	if count == 0 {
+		return errors.New(`store: no blacklist has been removed`)
+	}
+
+	return nil
 }

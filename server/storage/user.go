@@ -328,7 +328,9 @@ func (s *Storage) UserByID(userID int64) (*model.User, error) {
 			default_reading_speed,
 			cjk_reading_speed,
 			default_home_page,
-			categories_sorting_order
+			categories_sorting_order,
+			recommend_language,
+			show_recommend_result
 		FROM
 			users
 		WHERE
@@ -362,7 +364,9 @@ func (s *Storage) UserByUsername(username string) (*model.User, error) {
 			default_reading_speed,
 			cjk_reading_speed,
 			default_home_page,
-			categories_sorting_order
+			categories_sorting_order,
+			recommend_language,
+			show_recommend_result
 		FROM
 			users
 		WHERE
@@ -396,7 +400,9 @@ func (s *Storage) UserByField(field, value string) (*model.User, error) {
 			default_reading_speed,
 			cjk_reading_speed,
 			default_home_page,
-			categories_sorting_order
+			categories_sorting_order,
+			recommend_language,
+			show_recommend_result
 		FROM
 			users
 		WHERE
@@ -437,7 +443,9 @@ func (s *Storage) UserByAPIKey(token string) (*model.User, error) {
 			u.default_reading_speed,
 			u.cjk_reading_speed,
 			u.default_home_page,
-			u.categories_sorting_order
+			u.categories_sorting_order,
+			recommend_language,
+			show_recommend_result
 		FROM
 			users u
 		LEFT JOIN
@@ -473,6 +481,8 @@ func (s *Storage) fetchUser(query string, args ...interface{}) (*model.User, err
 		&user.CJKReadingSpeed,
 		&user.DefaultHomePage,
 		&user.CategoriesSortingOrder,
+		&user.RecommendLanguage,
+		&user.ShowRecommendResult,
 	)
 
 	if err == sql.ErrNoRows {
@@ -658,4 +668,14 @@ func (s *Storage) HasPassword(userID int64) (bool, error) {
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	return string(bytes), err
+}
+
+func (s *Storage) SetRecommendOpinion(language string, showResult bool, userID int64) error {
+	query := `UPDATE users SET recommend_language=$1,show_recommend_result=$2 WHERE id=$3`
+	_, err := s.db.Exec(query, language, showResult, userID)
+	if err != nil {
+		return fmt.Errorf(`store: unable to set language: %v`, err)
+	}
+
+	return nil
 }

@@ -8,6 +8,7 @@ import (
 	json_parser "encoding/json"
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"miniflux.app/http/request"
@@ -255,5 +256,77 @@ func (h *handler) initRecommendStat(entryID int64) *model.StatEntry {
 		return &insertStat
 	}
 	return stat
+
+}
+
+func (h *handler) getBlacklist(w http.ResponseWriter, r *http.Request) {
+	limit := request.QueryIntParam(r, "limit", 20)
+	offset := request.QueryIntParam(r, "offset", 0)
+	list, err := h.store.GetBlacklist(offset, limit)
+	if err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
+
+	json.OK(w, r, list)
+}
+
+func (h *handler) addBalcklist(w http.ResponseWriter, r *http.Request) {
+	var boardRequest model.Blacklist
+	if err := json_parser.NewDecoder(r.Body).Decode(&boardRequest); err != nil {
+		json.BadRequest(w, r, err)
+		return
+	}
+	err := h.store.AddBlacklist(&boardRequest)
+	if err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
+
+	json.Created(w, r, boardRequest)
+}
+
+func (h *handler) removeBlacklist(w http.ResponseWriter, r *http.Request) {
+	id := request.RouteInt64Param(r, "id")
+	if err := h.store.RemoveBlacklist(id); err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
+
+	json.NoContent(w, r)
+}
+
+func (h *handler) setRecommendOption(w http.ResponseWriter, r *http.Request) {
+	userID := request.UserID(r)
+	_, err := h.store.UserByID(userID)
+	if err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
+	var request model.OptionSettingRequest
+	if err := json_parser.NewDecoder(r.Body).Decode(&request); err != nil {
+		json.BadRequest(w, r, err)
+		return
+	}
+	for _, item := range request.Language {
+		if item != "en_US" && item != "zh_CN" {
+			json.ServerError(w, r, errors.New("language error"))
+			return
+		}
+	}
+
+	h.store.SetRecommendOpinion(strings.Join(request.Language, ","), request.ShowResult, userID)
+	json.NoContent(w, r)
+
+}
+
+func (h *handler) getRecommendOption(w http.ResponseWriter, r *http.Request) {
+	userID := request.UserID(r)
+	user, err := h.store.UserByID(userID)
+	if err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
+	json.OK(w, r, &model.OptionSettingRequest{Language: strings.Split(user.RecommendLanguage, ","), ShowResult: user.ShowRecommendResult})
 
 }

@@ -35,6 +35,8 @@ type User struct {
 	CJKReadingSpeed        int        `json:"cjk_reading_speed"`
 	DefaultHomePage        string     `json:"default_home_page"`
 	CategoriesSortingOrder string     `json:"categories_sorting_order"`
+	RecommendLanguage      string     `json:"recommend_language"`
+	ShowRecommendResult    bool       `json:"show_recommend_result"`
 }
 
 // UserCreationRequest represents the request to create a user.
