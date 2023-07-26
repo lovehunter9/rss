@@ -12,7 +12,7 @@
           <div class="text-sub-label text-minor-color"></div>
           <q-scroll-area class="list-view">
             <div v-for="item in store.recommends" :key="item.entry_id">
-              <trend-entry-view :recommend="item" :selected="item.entry_id === selectRecommendRef?.entry_id"/>
+              <trend-entry-view :recommend="item" :selected="item.entry_id === recommendRef?.entry_id"/>
               <q-separator />
             </div>
             <footer-loading-component :has-data="false"/>
@@ -22,8 +22,8 @@
 
       <template v-slot:after>
         <div class="column items-center justify-center" style="height: 100vh;">
-          <!-- <div class="entry-content text-minor-color" v-html="selectRecommendRef.content"  v-if="selectRecommendRef"/> -->
-          <trend-detail v-if="selectRecommendRef" :item="selectRecommendRef" @goPageAction="goIndex"/>
+          <!-- <div class="entry-content text-minor-color" v-html="recommendRef.content"  v-if="recommendRef"/> -->
+          <trend-detail v-if="recommendRef" :item="recommendRef" @goPageAction="pushToRecommend"/>
           <div class="text-7A7A7A column items-center justify-center" v-else>
             <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148"/>
             {{ 'No item selected.' }}
@@ -42,17 +42,24 @@ import {onMounted, ref, watch} from 'vue';
 import EmptyView from 'components/rss/EmptyView.vue';
 import {Recommend} from 'src/types';
 import TrendDetail from './trend/TrendDetailComponent.vue'
-import {useRoute} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 import TrendEntryView from 'components/rss/TrendEntryView.vue';
 import FooterLoadingComponent from 'components/rss/FooterLoadingComponent.vue';
 const Route = useRoute()
-
+const router = useRouter()
 const store = useRssStore();
 
 const splitterModel = ref(400)
 const isRequest = ref(false)
 
-const selectRecommendRef = ref<Recommend | undefined>()
+const recommendRef = ref<Recommend | undefined>()
+
+function pushToRecommend(index: number) {
+  let recommend = store.recommends[index];
+  router.push({
+    path: '/trend2/' + ('' + recommend.entry_id)
+  });
+}
 
 onMounted(() => {
   requestRecommendList()
@@ -60,7 +67,7 @@ onMounted(() => {
 
 const requestRecommendList = async () => {
   store.recommends = []
-  selectRecommendRef.value = undefined
+  recommendRef.value = undefined
   isRequest.value = true
   await store.get_recommendList()
   isRequest.value = false
@@ -76,8 +83,10 @@ watch(
     }
 
     let entry_id = Number(newValue);
-    selectRecommendRef.value = undefined
-    selectRecommendRef.value = store.recommends.find((recommend) => recommend.entry_id == entry_id);
+    recommendRef.value = undefined
+    setTimeout(() => {
+      recommendRef.value = store.recommends.find((recommend) => recommend.entry_id == entry_id);
+    }, 0);
   }
 );
 

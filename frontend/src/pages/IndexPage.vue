@@ -30,7 +30,7 @@
 
       <template v-slot:after>
         <div class="column items-center justify-center" style="height: 100vh;">
-          <news-view v-if="item" :item="item"/>
+          <news-view v-if="entryRef" :item="entryRef"/>
           <div class="text-7A7A7A column items-center justify-center" v-else>
             <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148"/>
             {{ 'No item selected.' }}
@@ -227,7 +227,7 @@ function removeBoard() {
 }
 
 const splitterModel = ref(400)
-const item = ref<Entry | undefined>()
+const entryRef = ref<Entry | undefined>()
 
 watch(
   () => Route.params.entry_id,
@@ -240,13 +240,13 @@ watch(
 
     let entry_id = Number(newValue);
     let entry = store.get_local_entry(entry_id);
-    item.value = undefined
+    entryRef.value = undefined
     if (entry) {
       if (entry.status != EntryStatus.Read) {
         store.mark_entry_read(entry_id, EntryStatus.Read);
       }
       setTimeout(() => {
-        item.value = entry;
+        entryRef.value = entry;
       }, 0);
     } else {
       selectIndex.value = -1
@@ -257,7 +257,7 @@ watch(
 const onRefresh = () => {
   store.entries = []
   store.entries_total = 0
-  item.value = undefined
+  entryRef.value = undefined
   requestEntries(false)
 }
 
