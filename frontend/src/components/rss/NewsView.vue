@@ -175,7 +175,6 @@ watch(
 onMounted(async () => {
   // updateEntry(props.item);
   //store.get_local_entry(1);
-  console.log('new !!!!!!!')
 });
 
 const preAction = () => {

@@ -2,7 +2,7 @@
   <div class="index-root bg-color-white">
 
     <q-splitter v-model="splitterModel" unit="px" disable style="height: 100%;"
-                v-if="store.recommends.length > 0 || isRequest">
+                v-if="!loadDataEmpty">
       <template v-slot:before>
         <div class="item-list">
           <div class="row justify-end items-center">
@@ -15,7 +15,7 @@
               <trend-entry-view :recommend="item" :selected="item.entry_id === recommendRef?.entry_id"/>
               <q-separator />
             </div>
-            <footer-loading-component :has-data="false"/>
+            <footer-loading-component :has-data="isRequest"/>
           </q-scroll-area>
         </div>
       </template>
@@ -45,14 +45,16 @@ import TrendDetail from './trend/TrendDetailComponent.vue'
 import {useRoute, useRouter} from 'vue-router';
 import TrendEntryView from 'components/rss/TrendEntryView.vue';
 import FooterLoadingComponent from 'components/rss/FooterLoadingComponent.vue';
+import {useQuasar} from 'quasar';
 const Route = useRoute()
 const router = useRouter()
 const store = useRssStore();
 
 const splitterModel = ref(400)
 const isRequest = ref(false)
-
 const recommendRef = ref<Recommend | undefined>()
+const loadDataEmpty = ref(false);
+const $q = useQuasar();
 
 function pushToRecommend(index: number) {
   let recommend = store.recommends[index];
@@ -61,16 +63,27 @@ function pushToRecommend(index: number) {
   });
 }
 
+const loadDataAnim = async (loadData : () => Promise<number | undefined>) => {
+  $q.loading.show()
+  const dataLength = await loadData();
+  loadDataEmpty.value = dataLength == 0
+  $q.loading.hide()
+  return dataLength
+}
+
 onMounted(() => {
-  requestRecommendList()
+  loadDataAnim(() => {
+    return requestRecommendList()
+  })
 })
 
 const requestRecommendList = async () => {
   store.recommends = []
   recommendRef.value = undefined
   isRequest.value = true
-  await store.get_recommendList()
+  const list = await store.get_recommendList()
   isRequest.value = false
+  return list ? list.length : 0
 }
 
 watch(

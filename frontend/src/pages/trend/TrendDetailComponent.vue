@@ -31,7 +31,7 @@
         {{ getTime() }}
       </span>
       <div class="html-content text-major-color" v-if="item">
-        <div v-html="recommendRef" ref="htmlRef" id="dicccccc" />
+        <div v-html="recommendRef" />
       </div>
     </div>
   </div>
@@ -39,7 +39,6 @@
 
 <script lang="ts" setup>
 import {
-  onMounted,
   PropType, ref, watch
 } from 'vue';
 
@@ -58,20 +57,11 @@ const $q = useQuasar()
 
 const store = useRssStore();
 const recommendRef = ref();
-const htmlRef = ref();
 
 let props = defineProps({
   item: {
     type: Object as PropType<Recommend>,
     required: true
-  }
-})
-
-onMounted(() => {
-  const element = document.getElementById('dicccccc')
-  if (element){
-    htmlRef.value.scrollTop = 0
-    element.scrollTop = 0
   }
 })
 
@@ -151,12 +141,6 @@ watch(
     if (!newVal) {
       recommendRef.value = '';
       return;
-    }
-    const element = document.getElementById('dicccccc')
-    if (element){
-      element.scrollTo({
-        top : element.scrollHeight
-      })
     }
     recommendRef.value = formatContentHtml(newVal.full_content)
   }
