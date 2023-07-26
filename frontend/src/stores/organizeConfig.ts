@@ -104,7 +104,8 @@ export class OptionalFeed extends BaseOption<Feed> {
 
 export enum ORGANIZE_TYPE {
   FEED = 'feed',
-  CATEGORY = 'category'
+  CATEGORY = 'category',
+  BASIC = 'basic'
 }
 
 export class BaseOrganize<T extends BaseOption<U>, U> {
