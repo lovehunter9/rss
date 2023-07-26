@@ -7,7 +7,7 @@
         <div class="item-list">
           <div class="row justify-end items-center" v-if="store.menu_choice.type !== MenuType.Board">
             <img class="icon-read-all" :src="readRef" @click="readAll" :title="readTextRef">
-            <img class="icon-refresh" src="../assets/menu/refresh.svg">
+            <img class="icon-refresh" src="../assets/menu/refresh.svg" @click="onRefresh">
           </div>
           <div class="row justify-end items-center" v-else>
             <img class="icon-read-all" src="../assets/menu/modify.svg" @click="editBoard">
@@ -23,7 +23,7 @@
                             @onClickCallback="onClickCallback(index)"/>
               </div>
             </q-list>
-            <footer-loading-component v-show="loadMoreEnable"/>
+            <footer-loading-component :has-data="loadMoreEnable"/>
           </q-scroll-area>
         </div>
       </template>
@@ -93,6 +93,8 @@ watch(() => readStatus.value, () => {
     readTextRef.value = 'Click to convert all articles to read'
   }
 })
+
+const loadMoreEnable = ref(true)
 
 onMounted(() => {
 
@@ -252,7 +254,12 @@ watch(
   }
 );
 
-const loadMoreEnable = ref(true)
+const onRefresh = () => {
+  store.entries = []
+  store.entries_total = 0
+  item.value = undefined
+  requestEntries(false)
+}
 
 const requestEntries = async (hasMore = false) => {
   if (store.menu_choice.type === MenuType.Search || store.menu_choice.type === MenuType.Trend) {
@@ -260,10 +267,12 @@ const requestEntries = async (hasMore = false) => {
   }
 
   const loadDataAnim = async (loadData : () => Promise<number | undefined>) => {
+    loadMoreEnable.value = true
     $q.loading.show()
     const dataLength = await loadData();
     loadDataEmpty.value = dataLength == 0
     $q.loading.hide()
+    loadMoreEnable.value = dataLength !== undefined && dataLength >= 10;
     return dataLength
   }
 
@@ -304,6 +313,9 @@ const requestEntries = async (hasMore = false) => {
       return await store.get_entries(entriesQurey)
     })
   }else {
+    await new Promise((r) => {
+      setTimeout(r,1000)
+    })
     entryLength = await store.get_entries(entriesQurey)
   }
 
@@ -326,7 +338,6 @@ const onScroll = (info: any) => {
   if (info.verticalPosition + info.verticalContainerSize >= info.verticalSize - 30) {
     loading = true
     onLoadRef(() => {
-      console.log('loading done');
       loading = false
     });
   }
@@ -334,7 +345,9 @@ const onScroll = (info: any) => {
 
 const onLoadRef = async (done: (() => void)) => {
   requestEntries(true).then((number) => {
-    loadMoreEnable.value = number !== undefined && number >= 50;
+    loadMoreEnable.value = number !== undefined && number >= 10;
+    console.log(loadMoreEnable.value)
+    console.log(number)
     done()
   })
 }

@@ -12,7 +12,7 @@
       <!-- <div class="search-detail"> -->
 
       <!-- <search-view placeholder="Search by topic,website,Rss URL" class="detail-width search-view" @onSearch="onSearch"/> -->
-      <entry-search-view class="detail-width search-view" :is-use-select="false"
+      <search-entry-view class="detail-width search-view" :is-use-select="false"
       @show-all-value="showDetails" :filter-data-func="rssStore.discoverFeedRequest"/>
       <!-- <q-scroll-area v-if="!showDetail" class="confirmDialogArea"> -->
       <div class="row justify-start confirmDialogArea" v-if="!showDetail">
@@ -43,8 +43,8 @@ import { RecommendFeed } from 'src/types';
 import { ref } from 'vue';
 import './discover/css/discover.scss'
 import DiscoverDetail from './discover/DiscoverDetail.vue';
-import EntrySearchView from '../components/rss/EntrySearchView.vue'
 import { useRssStore } from 'src/stores/rss';
+import SearchEntryView from 'components/rss/SearchEntryView.vue';
 
 const rssStore = useRssStore()
 

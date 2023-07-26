@@ -6,35 +6,32 @@
         <img class="icon-start" :src="nextImage()" title="next" @click="nextAction">
       </div>
       <div class="row justify-end items-center">
-        <!-- <img class="icon-end" :src="readRef" :title="readTextRef" @click="readChange" />
-        <q-img class="icon-end" :src="markRef" :title="markTextRef">
-          <change-entry-board-menu-component :item-id="`${item.id}`" :board_ids="item.board_ids" @add-to-board="addToBoard" />
-        </q-img> -->
+        <q-img :src="markRef" :title="markTextRef" width="20px" height="20px" @click.stop='' style="margin-right: 5px;">
+          <change-entry-board-menu-component :item-id="`${item.entry_id}`" @add-to-board="addToBoard"/>
+        </q-img>
         <img class="icon-end" src="../../assets/menu/share.svg" @click="jumpToPageHome">
       </div>
     </div>
 
-
-
     <div class="content-bg">
 
       <div class="row justify-between items-center">
-        <div class="author">
-          <div class="text-major-color">{{ item.author }}</div>
+        <div class="row justify-start items-center author">
+          <q-img v-if="item.feed.icon_content.length > 8" class="feed-icon"
+                 :src="'data:image/png;' + item.feed.icon_content"/>
+          <div class="text-major-color feed-title">{{ item.feed.feed_title }}</div>
         </div>
-
-        <q-img v-if="item.feed.icon_content.length > 8" class="entry-icon"
-          :src="'data:image/png;' + item.feed.icon_content" />
+        <subscribe-feed :feed-url="item.feed.feed_url"/>
       </div>
-      <q-separator style="margin-top:16px;margin-bottom: 16px;" />
+      <q-separator style="margin-top:16px;margin-bottom: 16px;"/>
       <h1 class="new-title">
         <a href="javascript:;" class="text-major-color" @click="jumpToPageHome()">{{ item.title }}</a>
       </h1>
       <span class="time text-minor-color">
         {{ getTime() }}
       </span>
-      <div class="html-content text-major-color" v-if="item.full_content">
-        <div v-html="formatContentHtml(item.full_content)"></div>
+      <div class="html-content text-major-color" v-if="item">
+        <div v-html="recommendRef" ref="htmlRef" id="dicccccc" />
       </div>
     </div>
   </div>
@@ -42,21 +39,39 @@
 
 <script lang="ts" setup>
 import {
-  PropType
+  onMounted,
+  PropType, ref, watch
 } from 'vue';
 
-import { useRssStore } from '../../stores/rss';
-import {Recommend } from '../../types';
-import {utcToStamp } from '../../utils/utils'
-import { formatContentHtml} from 'src/utils/utils'
-import { date } from 'quasar'
+import {useRssStore} from 'stores/rss';
+import {Recommend} from 'src/types';
+import {utcToStamp} from 'src/utils/utils'
+import {formatContentHtml} from 'src/utils/utils'
+import {date, useQuasar} from 'quasar'
+import {addRecommendToBoard} from 'src/api/api';
+import ChangeEntryBoardMenuComponent from 'components/rss/ChangeEntryBoardMenuComponent.vue';
+import SubscribeFeed from 'components/rss/SubscribeFeed.vue';
+
+const markRef = ref(require('assets/menu/unbookmark.svg'))
+const markTextRef = ref('Add to board')
+const $q = useQuasar()
 
 const store = useRssStore();
+const recommendRef = ref();
+const htmlRef = ref();
 
 let props = defineProps({
   item: {
     type: Object as PropType<Recommend>,
     required: true
+  }
+})
+
+onMounted(() => {
+  const element = document.getElementById('dicccccc')
+  if (element){
+    htmlRef.value.scrollTop = 0
+    element.scrollTop = 0
   }
 })
 
@@ -100,6 +115,19 @@ const nextImage = () => {
   return require('../../assets/menu/forward.svg')
 }
 
+const addToBoard = async (itemId: string, boardId: number) => {
+  try {
+    await addRecommendToBoard({
+      entry_id: Number(itemId),
+      board_id: boardId
+    })
+    $q.notify('Add Success')
+  } catch (error) {
+    console.log(error);
+    $q.notify('Add Fail')
+  }
+}
+
 const jumpToPageHome = () => {
   window.open(props.item.url)
 }
@@ -115,6 +143,27 @@ function getTime() {
 }
 
 const emit = defineEmits(['goPageAction']);
+
+watch(
+  () => props.item,
+  async (newVal: Recommend) => {
+    console.log(newVal)
+    if (!newVal) {
+      recommendRef.value = '';
+      return;
+    }
+    const element = document.getElementById('dicccccc')
+    if (element){
+      element.scrollTo({
+        top : element.scrollHeight
+      })
+    }
+    recommendRef.value = formatContentHtml(newVal.full_content)
+  }
+  , {
+    deep: true,
+    immediate: true
+  });
 
 </script>
 
@@ -161,9 +210,20 @@ const emit = defineEmits(['goPageAction']);
     }
 
 
-    .entry-icon {
-      width: 28px;
-      height: 28px;
+    .feed-icon {
+      width: 32px;
+      height: 32px;
+      margin-right: 10px;
+      border-radius: 50%;
+    }
+
+    .feed_title{
+      color: #1A130F;
+      font-family: Roboto;
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 14px; /* 116.667% */
     }
 
     .time {
@@ -182,21 +242,19 @@ const emit = defineEmits(['goPageAction']);
       font-weight: 400;
       font-size: 14px;
       line-height: 20px;
-
       word-break: break-all;
       padding-bottom: 30px;
     }
   }
 
-
   .new-title {
     a:link {
-        text-decoration: none;
-      }
+      text-decoration: none;
+    }
 
-      a:hover {
-        color: blue
-      }
+    a:hover {
+      color: blue
+    }
   }
 }
 </style>

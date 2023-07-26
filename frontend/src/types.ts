@@ -683,6 +683,8 @@ export interface Recommend {
   feed: {
     id: number
     feed_title: string
+    feed_desc : string
+    feed_url : string
     site_url: string
     icon_type?: string
     icon_byte_content?: string

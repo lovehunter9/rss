@@ -175,6 +175,7 @@ watch(
 onMounted(async () => {
   // updateEntry(props.item);
   //store.get_local_entry(1);
+  console.log('new !!!!!!!')
 });
 
 const preAction = () => {
@@ -312,21 +313,15 @@ const supportAudio = (mime_type: string) => {
     .html-content {
       margin-top: 20px;
       width: 100%;
-
-      // height: calc(100% - 146px);
-
       font-family: 'Roboto';
       font-style: normal;
       font-weight: 400;
       font-size: 14px;
       line-height: 20px;
-
       word-break: break-all;
       padding-bottom: 30px;
     }
   }
-
-
 
 }
 </style>
