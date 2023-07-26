@@ -33,7 +33,7 @@
         </q-btn-dropdown>
 
         <div class="edit-title text-minor-color">RSS URL</div>
-        <edit-view class="edit-view" placeholder="Enter Rss URL" :text="props.text" @input="onInput" />
+        <edit-view :is-read-only="isTrend" class="edit-view" placeholder="Enter Rss URL" :text="props.text" @input="onInput" />
       </div>
 
       <div class="row justify-end items-end" style="width: 100%">
@@ -50,7 +50,7 @@ import EditView from 'components/rss/EditView.vue';
 import { ref, onMounted } from 'vue';
 import { useRssStore } from 'stores/rss';
 import AddFolderDialog from 'components/dialog/AddFolderDialog.vue';
-import { create_feed, get_feeds } from 'src/api/api';
+import {addRecommendFeed, create_feed, get_feeds} from 'src/api/api';
 import { Category, FeedCreationRequest } from 'src/types';
 
 const inputRef = ref()
@@ -66,6 +66,11 @@ const props = defineProps({
     type: String,
     default: '',
     require: false
+  },
+  isTrend : {
+    type : Boolean,
+    default : false,
+    require : false
   }
 })
 
@@ -106,15 +111,19 @@ async function addFeed() {
   Loading.show();
 
   try {
-    await create_feed({
-      category_id: folderRef.value?.id,
-      feed_url: inputRef.value
-    } as FeedCreationRequest);
 
+    const feedRequest = {
+      category_id : folderRef.value?.id,
+      feed_url : inputRef.value
+    }as FeedCreationRequest;
+
+    if (props.isTrend){
+      await addRecommendFeed(feedRequest);
+    }else {
+      await create_feed(feedRequest);
+    }
     await get_feeds();
-
     await store.refresh_category_and_feeds();
-
     onDialogOK();
   } catch (e) {
     console.log(e);
@@ -218,7 +227,6 @@ function createFolder() {
       height: 16px;
       width: 16px
     }
-
 
   }
 }

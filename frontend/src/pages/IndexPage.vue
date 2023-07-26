@@ -7,7 +7,7 @@
         <div class="item-list">
           <div class="row justify-end items-center" v-if="store.menu_choice.type !== MenuType.Board">
             <img class="icon-read-all" :src="readRef" @click="readAll" :title="readTextRef">
-            <img class="icon-refresh" src="../assets/menu/refresh.svg">
+            <img class="icon-refresh" src="../assets/menu/refresh.svg" @click="onRefresh">
           </div>
           <div class="row justify-end items-center" v-else>
             <img class="icon-read-all" src="../assets/menu/modify.svg" @click="editBoard">
@@ -23,14 +23,14 @@
                             @onClickCallback="onClickCallback(index)"/>
               </div>
             </q-list>
-            <footer-loading-component v-show="loadMoreEnable"/>
+            <footer-loading-component :has-data="loadMoreEnable"/>
           </q-scroll-area>
         </div>
       </template>
 
       <template v-slot:after>
         <div class="column items-center justify-center" style="height: 100vh;">
-          <news-view v-if="item" :item="item"/>
+          <news-view v-if="entryRef" :item="entryRef"/>
           <div class="text-7A7A7A column items-center justify-center" v-else>
             <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148"/>
             {{ 'No item selected.' }}
@@ -93,6 +93,8 @@ watch(() => readStatus.value, () => {
     readTextRef.value = 'Click to convert all articles to read'
   }
 })
+
+const loadMoreEnable = ref(true)
 
 onMounted(() => {
 
@@ -225,7 +227,7 @@ function removeBoard() {
 }
 
 const splitterModel = ref(400)
-const item = ref<Entry | undefined>()
+const entryRef = ref<Entry | undefined>()
 
 watch(
   () => Route.params.entry_id,
@@ -238,13 +240,13 @@ watch(
 
     let entry_id = Number(newValue);
     let entry = store.get_local_entry(entry_id);
-    item.value = undefined
+    entryRef.value = undefined
     if (entry) {
       if (entry.status != EntryStatus.Read) {
         store.mark_entry_read(entry_id, EntryStatus.Read);
       }
       setTimeout(() => {
-        item.value = entry;
+        entryRef.value = entry;
       }, 0);
     } else {
       selectIndex.value = -1
@@ -252,7 +254,12 @@ watch(
   }
 );
 
-const loadMoreEnable = ref(true)
+const onRefresh = () => {
+  store.entries = []
+  store.entries_total = 0
+  entryRef.value = undefined
+  requestEntries(false)
+}
 
 const requestEntries = async (hasMore = false) => {
   if (store.menu_choice.type === MenuType.Search || store.menu_choice.type === MenuType.Trend) {
@@ -260,10 +267,12 @@ const requestEntries = async (hasMore = false) => {
   }
 
   const loadDataAnim = async (loadData : () => Promise<number | undefined>) => {
+    loadMoreEnable.value = true
     $q.loading.show()
     const dataLength = await loadData();
     loadDataEmpty.value = dataLength == 0
     $q.loading.hide()
+    loadMoreEnable.value = dataLength !== undefined && dataLength >= 10;
     return dataLength
   }
 
@@ -304,6 +313,9 @@ const requestEntries = async (hasMore = false) => {
       return await store.get_entries(entriesQurey)
     })
   }else {
+    await new Promise((r) => {
+      setTimeout(r,1000)
+    })
     entryLength = await store.get_entries(entriesQurey)
   }
 
@@ -326,7 +338,6 @@ const onScroll = (info: any) => {
   if (info.verticalPosition + info.verticalContainerSize >= info.verticalSize - 30) {
     loading = true
     onLoadRef(() => {
-      console.log('loading done');
       loading = false
     });
   }
@@ -334,7 +345,9 @@ const onScroll = (info: any) => {
 
 const onLoadRef = async (done: (() => void)) => {
   requestEntries(true).then((number) => {
-    loadMoreEnable.value = number !== undefined && number >= 50;
+    loadMoreEnable.value = number !== undefined && number >= 10;
+    console.log(loadMoreEnable.value)
+    console.log(number)
     done()
   })
 }

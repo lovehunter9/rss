@@ -16,13 +16,7 @@
             </div>
           </div>
         </div>
-        <div class="row justify-center items-center subscribe-btn"
-          @click="addToFeed(feed.feed_url)">
-          <img src="../../assets/menu/subsribe.svg" :width="16" :height="16" />
-          <div class="subscribe-title text-primary-color">
-            Subscribe
-          </div>
-        </div>
+        <subscribe-feed :feed-url="feed.feed_url"/>
         <!-- <div class="subscribe-title text-primary-color" v-if="feed.isSubsribe">
           Subscribed
         </div> -->
@@ -46,10 +40,8 @@
 
 <script setup lang='ts'>
 import { PropType } from 'vue';
-// import { getRequireImage } from 'src/utils/utils'
-import { useQuasar } from 'quasar';
-import AddFeedDialog from 'components/dialog/AddFeedDialog.vue';
 import {RecommendFeed} from 'src/types'
+import SubscribeFeed from 'components/rss/SubscribeFeed.vue';
 
 // interface SearchFeedInterface {
 //   title: string,
@@ -63,36 +55,12 @@ import {RecommendFeed} from 'src/types'
 //   }[]
 // }
 
-const props = defineProps({
+defineProps({
   feed: {
     type: Object as PropType<RecommendFeed>,
     required: true
   }
 })
-
-const $q = useQuasar()
-const addToFeed = (url: string) => {
-  $q.dialog({
-    component: AddFeedDialog,
-    componentProps: {
-      text: url
-    }
-  })
-    .onOk(() => {
-      console.log('OK');
-      // emit('backAction')
-      // eslint-disable-next-line vue/no-mutating-props
-      // props.feed.isSubsribe = true
-    })
-    .onCancel(() => {
-      console.log('Cancel');
-    })
-    .onDismiss(() => {
-      console.log('Called on OK or Cancel');
-      //     });
-    })
-}
-
 
 </script>
 
@@ -130,24 +98,6 @@ const addToFeed = (url: string) => {
         font-size: 14px;
         line-height: 16px;
       }
-    }
-
-
-    .subscribe-btn {
-      // width:110px;
-      padding: 8px 18px;
-      // height: 32px;
-      border: 1px solid #E0E0E0;
-      border-radius: 6px;
-    }
-
-    .subscribe-title {
-      font-family: 'Roboto';
-      font-style: normal;
-      font-weight: 400;
-      font-size: 12px;
-      line-height: 14px;
-      margin-left: 8px;
     }
   }
 

@@ -11,29 +11,19 @@
             <span class="text-feed-create text-minor-color">{{ getTime() }}</span>
           </div>
         </div>
-        <div class="row justify-end items-center">
-          <q-img :src="markRef" :title="markTextRef" width="20px" height="20px" @click.stop='' style="margin-right: 5px;">
-            <change-entry-board-menu-component :item-id="`${recommend.entry_id}`" @add-to-board="addToBoard" />
-          </q-img>
-          <img class="icon-end" src="../../assets/menu/share.svg" @click.stop='jumpToPageHome'>
-        </div>
       </div>
       <span class="text-entry-title text-major-color">{{ recommend.title }}</span>
       <q-img :src="recommend.image_url" v-if="recommend.image_url" ></q-img>
     </div>
   </q-item>
-  <!-- <div class="line" /> -->
 </template>
 
 <script setup lang='ts'>
-import { PropType, ref } from 'vue';
-import { Recommend } from 'src/types'
-import { addRecommendToBoard } from 'src/api/api';
-import ChangeEntryBoardMenuComponent from 'components/rss/ChangeEntryBoardMenuComponent.vue'
-import { useQuasar } from 'quasar';
-const markRef = ref(require('../../assets/menu/unbookmark.svg'))
-const markTextRef = ref('Add to board')
-const $q = useQuasar()
+import {PropType} from 'vue';
+import { Recommend} from 'src/types'
+import {useRouter} from 'vue-router';
+import {getPastTime, utcToStamp} from 'src/utils/utils';
+const router = useRouter()
 
 const props = defineProps({
   recommend: {
@@ -48,34 +38,16 @@ const props = defineProps({
 
 function getTime() {
   if (props.recommend) {
-    // return getPastTime(new Date, utcToStamp(props.recommend.published_at))
-    return props.recommend.published_at
+    return getPastTime(new Date, utcToStamp(props.recommend.published_at))
   }
   return '';
 }
 
-const addToBoard = async (itemId: string, boardId: number) => {
-  try {
-    await addRecommendToBoard({
-      entry_id: Number(itemId),
-      board_id: boardId
-    })
-    $q.notify('Add Success')
-  } catch (error) {
-    console.log(error);
-    $q.notify('Add Fail')
-  }
-}
-
-const jumpToPageHome = () => {
-  window.open(props.recommend.url)
-}
-
 const itemOnClick = () => {
-  emit('onClickCallback')
+  router.push({
+    path: '/trend2/' + ('' + props.recommend.entry_id)
+  });
 }
-
-const emit = defineEmits(['onClickCallback'])
 
 </script>
 

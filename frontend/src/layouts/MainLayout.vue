@@ -12,7 +12,7 @@
             <q-icon name="search" size="16px" style="margin-left: 8px;" class="text-minor-color"></q-icon>
             <div style="margin-left:10px;"> Search </div>
           </div> -->
-          <entry-search-view class="detail-width search-view" :isUseSelect="false" placeholder="Search" :item-width="225" :filter-data-func="store.rssContentQuery" @show-all-value="showSearchResultAllValue"/>
+          <search-entry-view class="detail-width search-view" :isUseSelect="false" placeholder="Search" :item-width="225" :filter-data-func="store.rssContentQuery" @show-all-value="showSearchResultAllValue"/>
 
           <div class="btn-add row justify-center items-center">
             <q-img style="width: 12px;height: 12px" src="../assets/menu/add.svg">
@@ -158,16 +158,16 @@ import contextMenu, {RIGHT_MENU_TYPE} from 'components/RightMenuInstance';
 import {newsBus, newsBusMessage} from 'src/utils/utils';
 import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import { formatLocalImage } from '../utils/utils'
-import EntrySearchView from '../components/rss/EntrySearchView.vue'
 import { getEntryById,getEntryListByIds } from 'src/api/api'
+import SearchEntryView from 'components/rss/SearchEntryView.vue';
 
 export default defineComponent({
   name: 'MainLayout',
 
   components: {
+    SearchEntryView,
     // SearchView,
     LayoutLeftItemMenu,
-    EntrySearchView
   },
 
   setup() {

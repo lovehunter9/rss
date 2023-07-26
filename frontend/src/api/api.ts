@@ -428,6 +428,17 @@ export const addRecommendToBoard = async (req: EntryToBoardRequest) => {
   return data
 }
 
+export const addRecommendFeed = async (req: FeedCreationRequest) => {
+  //`json:"category_id"`
+  //`json:"feed_url"`
+  const rssStore = useRssStore();
+  const data = await axios.post(
+    rssStore.url + '/api/recommend/addFeed',
+    req
+  )
+  return data
+}
+
 export const addPageToBoard = async (req: PageToBoard) => {
   const rssStore = useRssStore();
   const data = await axios.put(
