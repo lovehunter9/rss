@@ -3,16 +3,17 @@
     <q-checkbox dense size="md" v-model="selection" color="orange" @update:model-value="onSelected"/>
     <div class="row items-center feed-text-layout">
       <div class="row" style="flex: 15">
-        <q-img v-if="item.data.icon_content.length > 8" class="feed-icon" style="margin-right: 12px;"
-               :src="'data:image/png;' + item.data.icon_content" />
+        <q-img v-if="item.data.icon_content && item.data.icon_content.length > 8" class="feed-icon"
+               style="margin-right: 12px;"
+               :src="'data:image/png;' + item.data.icon_content"/>
         <div class="text-title text-major-color">{{ item.data.feed_title }}</div>
-        <div class="text-url text-minor-color" >{{ item.data.entry_title }}</div>
+        <div class="text-url text-minor-color">{{ item.data.entry_title }}</div>
       </div>
     </div>
 
     <img class="delete-icon" src="../../assets/menu/delete.svg" @click="remove">
   </div>
-  <q-separator inset />
+  <q-separator inset/>
 </template>
 
 <script setup lang="ts">
@@ -22,7 +23,7 @@ import {useOrganizeStore} from 'stores/organize';
 import {useQuasar} from 'quasar';
 import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import {OptionalBlacklist} from 'stores/organizeConfig';
-import {DeleteType} from "src/types";
+import {DeleteType} from 'src/types';
 
 const props = defineProps({
   item: {

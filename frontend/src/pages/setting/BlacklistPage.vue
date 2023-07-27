@@ -4,8 +4,8 @@
       <img class="black-icon" src="../../assets/menu/back_gray_arrow.svg" :width="9" :height="16" @click="goBack">
       <div class="black_title">Blacklist</div>
     </div>
-    <blacklist-title v-if="organizeStore.organizeData.dataList.length > 0"/>
-    <q-list v-if="organizeStore.organizeData.dataList.length > 0">
+    <blacklist-title v-if="organizeStore.organizeData.dataList && organizeStore.organizeData.dataList.length > 0"/>
+    <q-list v-if="organizeStore.organizeData.dataList && organizeStore.organizeData.dataList.length > 0">
       <blacklist-item v-for="item in organizeStore.organizeData.dataList" :key="item.getId()" :item="item"/>
     </q-list>
     <empty-view class="empty-view justify-center items-center" title="No Blacklist"
