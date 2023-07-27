@@ -8,16 +8,25 @@
 
 <script setup lang="ts">
 import {onMounted, ref} from 'vue';
-import {getShowRecommendReason, setShowRecommendReason} from 'src/utils/utils';
+import {useRssStore} from 'stores/rss';
+import {useQuasar} from 'quasar';
+import {setRecommendOption} from 'src/api/api';
+
+const $q = useQuasar();
+const store = useRssStore();
 
 const showTrendReason = ref();
 
 onMounted(() => {
-  showTrendReason.value = getShowRecommendReason()
+  showTrendReason.value = store.setting.show_recommend_result
 })
 
 const setRecommendReason = (value : boolean) => {
-  setShowRecommendReason(value)
+  store.setting.show_recommend_result = value
+  $q.loading.show();
+  setRecommendOption(store.setting)
+  console.log(store.setting)
+  $q.loading.hide()
 }
 
 </script>

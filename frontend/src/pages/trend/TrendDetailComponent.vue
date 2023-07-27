@@ -51,7 +51,7 @@ import {
 
 import {useRssStore} from 'stores/rss';
 import {Recommend} from 'src/types';
-import {getShowRecommendReason, utcToStamp} from 'src/utils/utils'
+import {utcToStamp} from 'src/utils/utils'
 import {formatContentHtml} from 'src/utils/utils'
 import {date, useQuasar} from 'quasar'
 import {addRecommendToBoard} from 'src/api/api';
@@ -74,7 +74,7 @@ let props = defineProps({
 })
 
 onMounted(() => {
-  showRecommendReasonRef.value = getShowRecommendReason()
+  showRecommendReasonRef.value = store.setting.show_recommend_result
   console.log(showRecommendReasonRef.value)
 })
 

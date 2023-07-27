@@ -17,7 +17,7 @@ import {
   MenuType,
   SDKQueryRequest,
   Recommend,
-  RssContentQueryItem
+  RssContentQueryItem, OptionSetting
 } from 'src/types';
 
 import {
@@ -44,7 +44,7 @@ import {
   today_mark_all_as_read, unread_mark_all_as_read,
   update_board,
   update_entry_status,
-  update_feed,
+  update_feed, getRecommendOption,
 } from 'src/api/api';
 
 export type DataState = {
@@ -66,6 +66,8 @@ export type DataState = {
   recommends: Recommend[]
 
   searchResult: RssContentQueryItem[]
+
+  setting : OptionSetting;
 };
 
 export const useRssStore = defineStore('rss', {
@@ -87,7 +89,11 @@ export const useRssStore = defineStore('rss', {
       //entry_choice: undefined,
       leftDrawerOpen: false,
       dialogShow: false,
-      recommends: []
+      recommends: [],
+      setting : {
+        show_recommend_result : false,
+        language : []
+      }
     } as unknown as DataState;
   },
   getters: {
@@ -132,6 +138,14 @@ export const useRssStore = defineStore('rss', {
         this.refresh_feeds_counter();
       } catch (e) {
         console.log(e);
+      }
+    },
+
+    async get_basic_setting(){
+      try {
+        this.setting = await getRecommendOption();
+      }catch (e){
+        console.log(e)
       }
     },
 

@@ -760,9 +760,9 @@ export interface Blacklist{
 //   ShowResult bool     `json:"show_recommend_result"`
 // }
 
-export interface OptionSettingRequest{
+export interface OptionSetting{
   language : string[]
-  showResult : boolean
+  show_recommend_result : boolean
 }
 
 export interface RssContentQueryItem {

@@ -22,7 +22,8 @@ import {
   RecommendFeed,
   RssContentQuery,
   Entry,
-  RssContentQueryItem, OptionSettingRequest,
+  RssContentQueryItem,
+  OptionSetting,
 } from 'src/types';
 import { useRssStore } from 'src/stores/rss';
 
@@ -442,7 +443,7 @@ export const addRecommendFeed = async (req: FeedCreationRequest) => {
 export const getBlackList = async () => {
   const rssStore = useRssStore();
   const data = await axios.get(
-    rssStore.url + '/api/recommend/addFeed'
+    rssStore.url + '/api/≈addFeed'
   )
   return data
 }
@@ -464,10 +465,10 @@ export const removeBlackList = async (id : string) => {
   return data
 }
 
-export const setRecommendOption = async (request : OptionSettingRequest) => {
+export const setRecommendOption = async (request : OptionSetting) => {
   const rssStore = useRssStore();
   const data = await axios.put(
-    rssStore.url + '/api/setOption',
+    rssStore.url + '/api/recommend/setOption',
     request
   )
   return data
@@ -475,8 +476,8 @@ export const setRecommendOption = async (request : OptionSettingRequest) => {
 
 export const getRecommendOption = async () => {
   const rssStore = useRssStore();
-  const data = await axios.get(
-    rssStore.url + '/api/getOption'
+  const data : OptionSetting = await axios.get(
+    rssStore.url + '/api/recommend/getOption'
   )
   return data
 }

@@ -267,6 +267,8 @@ onMounted(async () => {
 
   await store.refresh_category_and_feeds();
 
+  await store.get_basic_setting();
+
   todayCount.value = await store.get_today() || 0
 
 });
