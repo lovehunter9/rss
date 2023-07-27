@@ -466,6 +466,7 @@ export const removeBlackList = async (id : string) => {
 }
 
 export const setRecommendOption = async (request : OptionSetting) => {
+  console.log(request)
   const rssStore = useRssStore();
   const data = await axios.put(
     rssStore.url + '/api/recommend/setOption',
