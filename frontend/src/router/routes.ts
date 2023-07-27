@@ -16,7 +16,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'folderSetting',
-        component: () => import('pages/OrganizePage.vue'),
+        component: () => import('pages/setting/OrganizePage.vue'),
       },
       {
         path: 'trend',
@@ -37,6 +37,10 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'searchresult/:entry_id',
         component: () => import('pages/SearchResultPage.vue')
+      },
+      {
+        path: 'blacklist',
+        component: () => import('pages/setting/BlacklistPage.vue')
       }
     ],
   },

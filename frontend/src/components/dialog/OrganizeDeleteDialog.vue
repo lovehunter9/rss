@@ -3,26 +3,34 @@
     <q-card class="q-dialog-plugin">
 
       <div class="text-title text-major-color" v-show="type === DeleteType.FEED">Delete Feed</div>
-      <div class="text-title text-major-color" v-show="type === DeleteType.Folder">Delete Folder</div>
-      <div class="text-title text-major-color" v-show="type === DeleteType.Board">Delete Board</div>
+      <div class="text-title text-major-color" v-show="type === DeleteType.FOLDER">Delete Folder</div>
+      <div class="text-title text-major-color" v-show="type === DeleteType.BOARD">Delete Board</div>
+      <div class="text-title text-major-color" v-show="type === DeleteType.BLACKLIST">Remove Blacklist</div>
 
       <img class="icon-close" src="../../assets/menu/close.svg" @click="onDialogCancel">
 
-      <div class="text-content-base text-major-color" v-show="type === DeleteType.FEED">Do you want to remove the selected RSS
-        feeds？</div>
-      <div class="text-content-base text-major-color" v-show="type === DeleteType.Folder">Do you want to delete this folder?
+      <div class="text-content-base text-major-color" v-show="type === DeleteType.FEED">Do you want to remove the
+        selected RSS feeds？
       </div>
-      <div class="text-content-base text-major-color" v-show="type === DeleteType.Board">Do you want to delete this Board?</div>
+      <div class="text-content-base text-major-color" v-show="type === DeleteType.FOLDER">Do you want to delete this
+        folder?
+      </div>
+      <div class="text-content-base text-major-color" v-show="type === DeleteType.BOARD">Do you want to delete this
+        board?
+      </div>
+      <div class="text-content-base text-major-color" v-show="type === DeleteType.BLACKLIST">Do you want to remove this
+        article?
+      </div>
 
-      <div class="text-content-base text-minor-color" v-show="type === DeleteType.Folder">This will cause removal of all feeds under this
-        folder.
+      <div class="text-content-base text-minor-color" v-show="type === DeleteType.FOLDER">This will cause removal of all
+        feeds under this folder.
       </div>
-      <div class="text-content-base text-minor-color" v-show="type === DeleteType.Board">This will cause removal of all feeds under this
-        Board.
+      <div class="text-content-base text-minor-color" v-show="type === DeleteType.BOARD">This will cause removal of all
+        feeds under this Board.
       </div>
 
       <div class="row justify-end items-end" style="width: 100%">
-        <q-btn dense class="btn-confirm" label="Confirm" @click="onDialogOK" />
+        <q-btn dense class="btn-confirm" label="Confirm" @click="onDialogOK"/>
       </div>
     </q-card>
   </q-dialog>
@@ -30,9 +38,9 @@
 
 <script setup lang="ts">
 
-import { useDialogPluginComponent } from 'quasar';
-import { DeleteType } from 'src/types';
-import { PropType } from 'vue';
+import {useDialogPluginComponent} from 'quasar';
+import {DeleteType} from 'src/types';
+import {PropType} from 'vue';
 
 defineProps({
   type: {
@@ -41,7 +49,7 @@ defineProps({
   }
 })
 
-const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent();
+const {dialogRef, onDialogOK, onDialogCancel} = useDialogPluginComponent();
 
 </script>
 

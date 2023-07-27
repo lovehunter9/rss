@@ -1,11 +1,12 @@
 <template>
   <q-item class="entry-root" clickable dense manualFocus :active="selected" activeClass="itemActiveStyle">
     <div class="row justify-start" style="width:100%;" @click="onEntryClick">
-      <div class="circle" v-if="!readStatusRef" />
-      <div class="circle-temp" v-else />
+      <div class="circle" v-if="!readStatusRef"/>
+      <div class="circle-temp" v-else/>
       <div class="layout-right column justify-start">
         <div class="row justify-start" style="width: 100%;">
-          <q-img v-if="store.feeds_icon[entry.feed_id] && store.feeds_icon[entry.feed_id].data" class="entry-icon" :src="store.feeds_icon[entry.feed_id] && store.feeds_icon[entry.feed_id].data ? store.feeds_icon[entry.feed_id].data : '' "/>
+          <q-img v-if="store.feeds_icon[entry.feed_id] && store.feeds_icon[entry.feed_id].data" class="entry-icon"
+                 :src="store.feeds_icon[entry.feed_id] && store.feeds_icon[entry.feed_id].data ? store.feeds_icon[entry.feed_id].data : '' "/>
           <div class="column feed-layout justify-start" :class="{
             'margin-left-title' : store.feeds_icon[entry.feed_id] && store.feeds_icon[entry.feed_id].data
           }">
@@ -15,7 +16,7 @@
         </div>
         <span class="text-entry-title text-major-color">{{ entry.title }}</span>
         <!-- <span class="text-entry-title text-major-color">{{ entry.image_url }}</span> -->
-        <q-img :src="entry!.image_url" v-if="entry?.image_url" ></q-img>
+        <q-img :src="entry!.image_url" v-if="entry?.image_url"></q-img>
       </div>
     </div>
   </q-item>
@@ -24,11 +25,11 @@
 
 <script setup lang="ts">
 
-import { Entry, EntryStatus } from 'src/types';
-import { PropType, ref, watch } from 'vue';
-import { useRssStore } from 'stores/rss';
-import { useRouter } from 'vue-router';
-import { getPastTime, utcToStamp } from 'src/utils/utils';
+import {Entry, EntryStatus} from 'src/types';
+import {PropType, ref, watch} from 'vue';
+import {useRssStore} from 'stores/rss';
+import {useRouter} from 'vue-router';
+import {getPastTime, utcToStamp} from 'src/utils/utils';
 
 const store = useRssStore()
 const router = useRouter()
@@ -57,9 +58,9 @@ watch(() => props.entry, () => {
   else {
     readStatusRef.value = false
   }
-},{
-  deep : true,
-  immediate : true
+}, {
+  deep: true,
+  immediate: true
 })
 
 function onEntryClick() {
@@ -156,10 +157,10 @@ function getTime() {
 }
 
 .itemActiveStyle {
-    background-color: rgba(26, 19, 15, 0.05);
-  }
+  background-color: rgba(26, 19, 15, 0.05);
+}
 
-.line{
+.line {
   float: right;
   height: 1px;
   width: calc(100% - 32px);

@@ -6,10 +6,11 @@
         <img class="icon-start" :src="nextImage()" title="next" @click="nextAction">
       </div>
       <div class="row justify-end items-center">
-        <q-img :src="markRef" :title="markTextRef" width="20px" height="20px" @click.stop='' style="margin-right: 5px;">
+        <q-img class="icon-end" :src="markRef" :title="markTextRef">
           <change-entry-board-menu-component :item-id="`${item.entry_id}`" @add-to-board="addToBoard"/>
         </q-img>
         <img class="icon-end" src="../../assets/menu/share.svg" @click="jumpToPageHome">
+        <img class="icon-end" src="../../assets/menu/blacklist.svg" @click="addBlackList">
       </div>
     </div>
 
@@ -35,7 +36,7 @@
         <div class="recommend-reason column justify-start" v-if="showRecommendReasonRef">
           <div class="line"/>
           <div class="recommend-title">
-            Article Recommendation Score : {{item.score}}
+            Article Recommendation Score : {{ item.score }}
           </div>
         </div>
       </div>
@@ -54,9 +55,10 @@ import {Recommend} from 'src/types';
 import {utcToStamp} from 'src/utils/utils'
 import {formatContentHtml} from 'src/utils/utils'
 import {date, useQuasar} from 'quasar'
-import {addRecommendToBoard} from 'src/api/api';
+import {addRecommendToBoard, getBlackList} from 'src/api/api';
 import ChangeEntryBoardMenuComponent from 'components/rss/ChangeEntryBoardMenuComponent.vue';
 import SubscribeFeed from 'components/rss/SubscribeFeed.vue';
+import {addToBlackList} from 'src/api/api';
 
 const markRef = ref(require('assets/menu/unbookmark.svg'))
 const markTextRef = ref('Add to board')
@@ -77,6 +79,16 @@ onMounted(() => {
   showRecommendReasonRef.value = store.setting.show_recommend_result
   console.log(showRecommendReasonRef.value)
 })
+
+const addBlackList = () => {
+  addToBlackList({
+    feed_id: props.item.feed.id,
+    // feed_title : props.item.feed.feed_title,
+    // feed_url : props.item.feed.feed_url,
+    entry_url : props.item.url,
+    entry_title : props.item.title
+  })
+}
 
 const preAction = () => {
   if (!canGoPre()) {
@@ -242,7 +254,7 @@ watch(
       word-break: break-all;
       padding-bottom: 30px;
 
-      .recommend-reason{
+      .recommend-reason {
 
         .line {
           float: right;
@@ -252,7 +264,7 @@ watch(
           background: #E0E0E0;
         }
 
-        .recommend-title{
+        .recommend-title {
           color: #857C77;
           font-family: Roboto;
           font-size: 12px;

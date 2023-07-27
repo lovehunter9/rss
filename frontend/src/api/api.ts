@@ -23,7 +23,7 @@ import {
   RssContentQuery,
   Entry,
   RssContentQueryItem,
-  OptionSetting,
+  OptionSetting, Blacklist,
 } from 'src/types';
 import { useRssStore } from 'src/stores/rss';
 
@@ -442,13 +442,13 @@ export const addRecommendFeed = async (req: FeedCreationRequest) => {
 
 export const getBlackList = async () => {
   const rssStore = useRssStore();
-  const data = await axios.get(
-    rssStore.url + '/api/≈addFeed'
+  const data : Blacklist[] = await axios.get(
+    rssStore.url + '/api/recommend/blacklist'
   )
   return data
 }
 
-export const addBlackList = async (req : {feedId : string,entryUrl : string,entryTitle : string}) => {
+export const addToBlackList = async (req : {feed_id : number,entry_url : string,entry_title : string}) => {
   const rssStore = useRssStore();
   const data = await axios.post(
     rssStore.url + '/api/recommend/addBlacklist',
@@ -460,7 +460,7 @@ export const addBlackList = async (req : {feedId : string,entryUrl : string,entr
 export const removeBlackList = async (id : string) => {
   const rssStore = useRssStore();
   const data = await axios.delete(
-    rssStore.url + '/api/recommend/' + id
+    rssStore.url + '/api/recommend/blacklist/' + id
   )
   return data
 }

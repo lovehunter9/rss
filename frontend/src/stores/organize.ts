@@ -1,9 +1,9 @@
 import {defineStore} from 'pinia';
 import {Category, Feed,} from 'src/types';
-import {ORGANIZE_TYPE, OrganizeCategory, OrganizeFeed} from 'stores/organizeConfig';
+import {ORGANIZE_TYPE, OrganizeBlacklist, OrganizeCategory, OrganizeFeed} from 'stores/organizeConfig';
 
 class temp{
-  organizeData : OrganizeFeed | OrganizeCategory = new OrganizeFeed([])
+  organizeData : OrganizeFeed | OrganizeCategory | OrganizeBlacklist = new OrganizeFeed([])
 }
 
 export const useOrganizeStore = defineStore('organizeStore', {
@@ -38,10 +38,15 @@ export const useOrganizeStore = defineStore('organizeStore', {
       if (this.organizeData.type === type){
         return
       }
-      if (type === ORGANIZE_TYPE.FEED){
-        this.organizeData = new OrganizeFeed([])
-      }else {
-        this.organizeData = new OrganizeCategory([])
+      switch (type){
+        case ORGANIZE_TYPE.FEED:
+          this.organizeData = new OrganizeFeed([])
+          break
+        case ORGANIZE_TYPE.CATEGORY:
+          this.organizeData = new OrganizeCategory([])
+          break
+        case ORGANIZE_TYPE.BLACKLIST:
+          this.organizeData = new OrganizeBlacklist([]);
       }
       this.organizeData.updateList(feedTitle,searchData)
     },

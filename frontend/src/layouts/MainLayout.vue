@@ -142,7 +142,7 @@ import contextMenu, {RIGHT_MENU_TYPE} from 'components/RightMenuInstance';
 import {newsBus, newsBusMessage} from 'src/utils/utils';
 import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import {formatLocalImage} from '../utils/utils'
-import {getEntryById, getEntryListByIds} from 'src/api/api'
+import {getEntryById, getEntryListByIds, removeBlackList} from 'src/api/api'
 import SearchEntryView from 'components/rss/SearchEntryView.vue';
 
 const $q = useQuasar();
@@ -204,7 +204,7 @@ function removeBoard(boardId: number) {
   $q.dialog({
     component: OrganizeDeleteDialog,
     componentProps: {
-      type: DeleteType.Board
+      type: DeleteType.BOARD
     }
   }).onOk(async () => {
     await store.remove_local_board(boardId)
@@ -268,6 +268,8 @@ onMounted(async () => {
   await store.refresh_category_and_feeds();
 
   await store.get_basic_setting();
+
+  await store.get_blacklist();
 
   todayCount.value = await store.get_today() || 0
 
