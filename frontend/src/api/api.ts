@@ -439,6 +439,49 @@ export const addRecommendFeed = async (req: FeedCreationRequest) => {
   return data
 }
 
+// export const getBlackList = async () => {
+//   const rssStore = useRssStore();
+//   const data = await axios.post(
+//     rssStore.url + '/api/recommend/addFeed',
+//     req
+//   )
+//   return data
+// }
+//
+// export const addBlackList = async () => {
+//   const rssStore = useRssStore();
+//   const data = await axios.post(
+//     rssStore.url + '/api/recommend/addBlacklist',
+//     req
+//   )
+//   return data
+// }
+//
+// export const removeBlackList = async (id : string) => {
+//   const rssStore = useRssStore();
+//   const data = await axios.delete(
+//     rssStore.url + '/api/recommend/' + id
+//   )
+//   return data
+// }
+//
+// export const setRecommendOption = async (id : string) => {
+//   const rssStore = useRssStore();
+//   const data = await axios.delete(
+//     rssStore.url + '/api/recommend/' + id
+//   )
+//   return data
+// }
+//
+// export const getRecommendOption = async () => {
+//   const rssStore = useRssStore();
+//   const data = await axios.post(
+//     rssStore.url + '/api/recommend/addFeed',
+//     req
+//   )
+//   return data
+// }
+
 export const addPageToBoard = async (req: PageToBoard) => {
   const rssStore = useRssStore();
   const data = await axios.put(
