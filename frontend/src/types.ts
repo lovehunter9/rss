@@ -726,6 +726,45 @@ export interface RecommendFeed {
   category_title: string
 }
 
+
+// type Blacklist struct {
+//   +	ID              int64   `json:"id"`
+//   +	FeedID          int64   `json:"feed_id"`
+//   +	FeedUrl         string  `json:"feed_url"`
+//   +	FeedTitle       string  `json:"feed_title"`
+//   +	IconType        *string `json:"icon_type"`
+//   +	IconByteContent []byte  `json:"icon_byte_content"`
+//   +	IconContent     string  `json:"icon_content"`
+//   +	EntryUrl        string  `json:"entry_url"`
+//   +	EntryTitle      string  `json:"entry_title"`
+//   +	FullContent     *string `json:"full_content"`
+//   +	Status          int     `json:"status"`
+// }
+
+export interface Blacklist{
+  id : number
+  feed_id : number
+  feed_url : string
+  feed_title : string
+  icon_type : string
+  icon_byte_content : string
+  icon_content : string
+  entry_url : string
+  entry_title : string
+  full_content : string
+  status : number
+}
+
+// type OptionSettingRequest struct {
+//   Language   []string `json:"language"`
+//   ShowResult bool     `json:"show_recommend_result"`
+// }
+
+export interface OptionSetting{
+  language : string[]
+  show_recommend_result : boolean
+}
+
 export interface RssContentQueryItem {
   name: string
   entry_id: number

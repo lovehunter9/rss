@@ -21,7 +21,7 @@
       <!--      </div>-->
     </div>
     <div class="manager-layout column justify-start" v-if="organizeType === ORGANIZE_TYPE.BASIC">
-
+      <basic-setting-page/>
     </div>
     <div class="manager-layout column justify-start" v-else>
       <div class="selected-layout row justify-start items-center"
@@ -114,6 +114,7 @@ import {useOrganizeStore} from 'stores/organize';
 import {ORGANIZE_TYPE} from 'stores/organizeConfig';
 import EmptyView from 'components/rss/EmptyView.vue';
 import {newsBus, newsBusMessage} from 'src/utils/utils'
+import BasicSettingPage from 'pages/BasicSettingPage.vue';
 
 const store = useRssStore();
 const folderOptionsRef = ref<string[]>([]);

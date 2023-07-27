@@ -23,6 +23,7 @@ import {
   RssContentQuery,
   Entry,
   RssContentQueryItem,
+  OptionSetting,
 } from 'src/types';
 import { useRssStore } from 'src/stores/rss';
 
@@ -435,6 +436,49 @@ export const addRecommendFeed = async (req: FeedCreationRequest) => {
   const data = await axios.post(
     rssStore.url + '/api/recommend/addFeed',
     req
+  )
+  return data
+}
+
+export const getBlackList = async () => {
+  const rssStore = useRssStore();
+  const data = await axios.get(
+    rssStore.url + '/api/≈addFeed'
+  )
+  return data
+}
+
+export const addBlackList = async (req : {feedId : string,entryUrl : string,entryTitle : string}) => {
+  const rssStore = useRssStore();
+  const data = await axios.post(
+    rssStore.url + '/api/recommend/addBlacklist',
+    req
+  )
+  return data
+}
+
+export const removeBlackList = async (id : string) => {
+  const rssStore = useRssStore();
+  const data = await axios.delete(
+    rssStore.url + '/api/recommend/' + id
+  )
+  return data
+}
+
+export const setRecommendOption = async (request : OptionSetting) => {
+  console.log(request)
+  const rssStore = useRssStore();
+  const data = await axios.put(
+    rssStore.url + '/api/recommend/setOption',
+    request
+  )
+  return data
+}
+
+export const getRecommendOption = async () => {
+  const rssStore = useRssStore();
+  const data : OptionSetting = await axios.get(
+    rssStore.url + '/api/recommend/getOption'
   )
   return data
 }

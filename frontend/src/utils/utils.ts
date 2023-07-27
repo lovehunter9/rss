@@ -138,3 +138,15 @@ export const formatLocalImage = (name: string, path = '/',imageType = 'svg', isH
 
   return require(`../assets${path}/${formatName}.${imageType}`);
 }
+
+// export function getShowRecommendReason() : boolean{
+//   const data = localStorage.getItem('showRecommendReason')
+//   if (data){
+//     return Boolean(data);
+//   }
+//   return false;
+// }
+//
+// export function setShowRecommendReason(show : boolean){
+//   localStorage.setItem('showRecommendReason',show ? '1' : '0')
+// }

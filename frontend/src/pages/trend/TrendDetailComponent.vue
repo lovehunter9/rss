@@ -31,7 +31,13 @@
         {{ getTime() }}
       </span>
       <div class="html-content text-major-color" v-if="item">
-        <div v-html="recommendRef" />
+        <div v-html="recommendRef"/>
+        <div class="recommend-reason column justify-start" v-if="showRecommendReasonRef">
+          <div class="line"/>
+          <div class="recommend-title">
+            Article Recommendation Score : {{item.score}}
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -39,6 +45,7 @@
 
 <script lang="ts" setup>
 import {
+  onMounted,
   PropType, ref, watch
 } from 'vue';
 
@@ -57,12 +64,18 @@ const $q = useQuasar()
 
 const store = useRssStore();
 const recommendRef = ref();
+const showRecommendReasonRef = ref(false)
 
 let props = defineProps({
   item: {
     type: Object as PropType<Recommend>,
     required: true
   }
+})
+
+onMounted(() => {
+  showRecommendReasonRef.value = store.setting.show_recommend_result
+  console.log(showRecommendReasonRef.value)
 })
 
 const preAction = () => {
@@ -201,7 +214,7 @@ watch(
       border-radius: 50%;
     }
 
-    .feed_title{
+    .feed_title {
       color: #1A130F;
       font-family: Roboto;
       font-size: 12px;
@@ -228,6 +241,27 @@ watch(
       line-height: 20px;
       word-break: break-all;
       padding-bottom: 30px;
+
+      .recommend-reason{
+
+        .line {
+          float: right;
+          height: 1px;
+          width: 100%;
+          margin-top: 32px;
+          background: #E0E0E0;
+        }
+
+        .recommend-title{
+          color: #857C77;
+          font-family: Roboto;
+          font-size: 12px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 16px;
+          margin-top: 8px;
+        }
+      }
     }
   }
 
