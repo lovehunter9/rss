@@ -23,7 +23,7 @@ var migrations = []func(tx *sql.Tx) error{
 				username text not null unique,
 				password text,
 				is_admin bool default 'f',
-				language text default 'en_US',
+				language text default 'en',
 				timezone text default 'UTC',
 				theme text default 'default',
 				last_login_at timestamp with time zone,
@@ -828,9 +828,27 @@ var migrations = []func(tx *sql.Tx) error{
 			);
 
 			
-			ALTER TABLE users ADD COLUMN recommend_language text default 'en_US';
+			ALTER TABLE users ADD COLUMN recommend_language text default 'en';
 			ALTER TABLE users ADD COLUMN show_recommend_result text default 't';
 		`
+		_, err = tx.Exec(sql)
+		return err
+	},
+	func(tx *sql.Tx) (err error) {
+		sql := `ALTER TABLE recommend_entries ADD COLUMN keyword text default '' ;
+				ALTER TABLE recommend_entries ADD COLUMN language text default 'en' ;
+				ALTER TABLE recommend_result ADD COLUMN language text default 'en' ;
+				ALTER TABLE entries ADD COLUMN language text  ;
+				ALTER TABLE recommend ADD COLUMN language text  ;
+				CREATE TABLE recommend_result_keyword (
+					id serial not null,
+					batch int not null,
+					keyword text not null,
+					url text not null,
+					rank int not null,
+					primary key (id)
+				);
+				`
 		_, err = tx.Exec(sql)
 		return err
 	},

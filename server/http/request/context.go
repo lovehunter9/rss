@@ -61,7 +61,7 @@ func UserTimezone(r *http.Request) string {
 func UserLanguage(r *http.Request) string {
 	language := getContextStringValue(r, UserLanguageContextKey)
 	if language == "" {
-		language = "en_US"
+		language = "en"
 	}
 	return language
 }

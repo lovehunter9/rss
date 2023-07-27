@@ -116,7 +116,7 @@ class ModelToolUnitTest(unittest.TestCase):
         # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_newspaper
         tool = RecommendPGDBTool()
         current_model_tool = ModelTool("/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model")
-        entries = tool.select_read_entries(100)
+        entries = tool.select_read_entries(100, 'en')
         user = tool.select_users_model()
 
         id_to_document = dict()
@@ -160,3 +160,29 @@ class ModelToolUnitTest(unittest.TestCase):
         packageData = json.loads(response.text)
         for data in packageData:
             print(data['model_version'])
+
+    def test_download_increment_package(self):
+        # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_download_increment_package
+        download_dir = "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model"
+        current_model_tool = ModelTool(download_dir)
+        url_to_article_dict, url_to_embedding_dict = current_model_tool.download_increment_package("bert", "v1",
+                                                                                                   "article_embeddding_package_bert_v1_97b08d6ac2ab51c7cca581eaf352d1b5")
+        print(len(url_to_article_dict))
+        print(len(url_to_embedding_dict))
+
+    def test_download_keyword_sortinfo_package(self):
+        # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_download_keyword_sortinfo_package
+        download_dir = "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model"
+        current_model_tool = ModelTool(download_dir)
+        keyword_sortinfo_list = current_model_tool.download_keyword_sortinfo_package('en')
+        for current in keyword_sortinfo_list:
+            print(current["keyword"])
+            print(len(current["urls"]))
+        #print(keyword_sortinfo_list)
+
+    def test_infer_text_language_type(self):
+        # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_infer_text_language_type
+        download_dir = "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model"
+        current_model_tool = ModelTool(download_dir)
+        language_type = current_model_tool.infer_text_language_type("what happen")
+        print(language_type)

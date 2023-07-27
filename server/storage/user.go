@@ -297,7 +297,7 @@ func (s *Storage) UpdateUser(user *model.User) error {
 func (s *Storage) UserLanguage(userID int64) (language string) {
 	err := s.db.QueryRow(`SELECT language FROM users WHERE id = $1`, userID).Scan(&language)
 	if err != nil {
-		return "en_US"
+		return "en"
 	}
 
 	return language

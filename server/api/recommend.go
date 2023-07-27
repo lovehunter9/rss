@@ -312,7 +312,7 @@ func (h *handler) setRecommendOption(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for _, item := range request.Language {
-		if item != "en_US" && item != "zh_CN" {
+		if item != "en" && item != "zh-cn" {
 			json.ServerError(w, r, errors.New("language error"))
 			return
 		}

@@ -30,10 +30,10 @@ class DataHandler:
         current_model_tool = ModelTool(path)
         current_model_tool.init_model(user.model_name, user.model_version)
 
-    def get_readed_entries(self, user):
+    def get_readed_entries(self, user, language):
         tool = RecommendPGDBTool()
         current_model_tool = ModelTool(path)
-        entries = tool.select_read_entries(read_entries_num)
+        entries = tool.select_read_entries(read_entries_num, language)
 
         result_list = dict()
         id_to_document = dict()
@@ -157,9 +157,9 @@ class DataHandler:
             if len(embedding_list) > 0:
                 tool.batch_insert_recommend_entries_embedding(embedding_list)
 
-    def get_tobe_recommended_entries(self, user):
+    def get_tobe_recommended_entries(self, user, language):
         tool = RecommendPGDBTool()
-        entries = tool.select_tobe_recommended_entries(user.model_name, user.model_version, down_latest_number)
+        entries = tool.select_tobe_recommended_entries(user.model_name, user.model_version, down_latest_number, language)
         blacklists = tool.select_recommend_blacklist()
         black_list = dict()
         for current_item in blacklists:
@@ -214,3 +214,27 @@ class DataHandler:
         if len(feedList) > 0:
             tool.batch_insert_recommend_feed_model(feedList)
         self.current_logger.debug(f'insert downloaded feed to db')
+
+    def check_readed_entries_language(self):
+        tool = RecommendPGDBTool()
+        current_model_tool = ModelTool(path)
+        entries = tool.select_read_entries_check_language(read_entries_num * 2)
+        for current_entry in entries:
+            if not current_entry['language']:
+                language = current_model_tool.infer_text_language_type(current_entry['full_content'])
+                tool.update_read_entries_language(language, current_entry['id'])
+
+    def download_keyword_sortinfo_package(self, batch, language):
+        tool = RecommendPGDBTool()
+        current_model_tool = ModelTool(path)
+        keyword_sortinfo_list = current_model_tool.download_keyword_sortinfo_package(language)
+        list = []
+        rank = 1
+        for current_keyword in keyword_sortinfo_list:
+            for current_url in current["urls"]:
+                item = {'batch': batch, 'keyword': current["keyword"], 'url': current_url, 'rank': rank}
+                rank = rank + 1
+                list.append(item)
+
+        if len(list) > 0:
+            tool.batch_insert_keyword_list(list)

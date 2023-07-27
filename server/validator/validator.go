@@ -24,7 +24,7 @@ func NewValidationError(translationKey string) *ValidationError {
 }
 
 func (v *ValidationError) String() string {
-	return locale.NewPrinter("en_US").Printf(v.TranslationKey)
+	return locale.NewPrinter("en").Printf(v.TranslationKey)
 }
 
 func (v *ValidationError) Error() error {

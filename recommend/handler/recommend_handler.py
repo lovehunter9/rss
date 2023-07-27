@@ -56,7 +56,7 @@ class RecommendHandler:
             batch = 1
         else:
             batch = baseModel[0].batch + 1
-        tool.insert_recommend_model(batch)
+        tool.insert_recommend_model(batch, user.recommend_language)
 
         start_time = datetime.now()
         data_handler.download_feed()
@@ -67,24 +67,35 @@ class RecommendHandler:
         #data_handler.down_latest_article_embedding_package(user)
         #self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
 
-        start_time = datetime.now()
-        query_url_to_embedding_dict = data_handler.get_readed_entries(user)
-        self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
-        self.current_logger.debug(f'query_url_to_embedding_dict length {len(query_url_to_embedding_dict)}')
+        data_handler.check_readed_entries_language()
+        self.current_logger.debug('check_readed_entries_language finish ...')
 
-        start_time = datetime.now()
-        base_url_to_embedding_dict = data_handler.get_tobe_recommended_entries(user)
-        self.current_logger.debug(f'get_tobe_recommended_entries time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+        lst = user.recommend_language.split(",")
+        recommend_result_number = os.environ.get('recommend_result_number', 1000)
+        result_number_each = recommend_result_number // len(lst)
+        for language in lst:
+            self.current_logger.debug(f'recommend language: {language},result number:{result_number_each}')
 
-        recommend_tool = RecommendTool(base_url_to_embedding_dict, user.model_name, user.model_version)
-        start_time = datetime.now()
-        result = recommend_tool.recommend(query_url_to_embedding_dict, 1000)
-        self.current_logger.debug(f'recommend time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
-        saveResultList = []
-        rank = 1
-        for detail in result:
-            result = {'batch': batch, 'url': detail[0], 'score': detail[1], 'rank': rank}
-            saveResultList.append(result)
-            rank = rank + 1
-        self.current_logger.debug(f'saveResultList {len(saveResultList)}')
-        tool.batch_insert_recommend_result(saveResultList)
+            start_time = datetime.now()
+            query_url_to_embedding_dict = data_handler.get_readed_entries(user, language)
+            self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+            self.current_logger.debug(f'query_url_to_embedding_dict length {len(query_url_to_embedding_dict)}')
+
+            start_time = datetime.now()
+            base_url_to_embedding_dict = data_handler.get_tobe_recommended_entries(user, language)
+            self.current_logger.debug(f'get_tobe_recommended_entries time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+
+            recommend_tool = RecommendTool(base_url_to_embedding_dict, user.model_name, user.model_version)
+            start_time = datetime.now()
+            result = recommend_tool.recommend(query_url_to_embedding_dict, 1000)
+            self.current_logger.debug(f'recommend time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+            saveResultList = []
+            rank = 1
+            for detail in result:
+                result = {'batch': batch, 'url': detail[0], 'score': detail[1], 'rank': rank, 'language': language}
+                saveResultList.append(result)
+                rank = rank + 1
+            self.current_logger.debug(f'saveResultList {len(saveResultList)}')
+            tool.batch_insert_recommend_result(saveResultList)
+
+            data_handler.download_keyword_sortinfo_package(batch, language)

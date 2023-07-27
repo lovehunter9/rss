@@ -28,8 +28,8 @@ class RecommendPGDBTool:
     def select_recommend_model(self):
         return RecommendModel.select().order_by(RecommendModel.id.desc()).limit(1).execute()
 
-    def insert_recommend_model(self, batch):
-        RecommendModel.insert(batch=batch).execute()
+    def insert_recommend_model(self, batch, language):
+        RecommendModel.insert(batch=batch, language=language).execute()
 
     def empty_recommend_feed_model(self):
         RecommendFeedModel.delete().execute()
@@ -67,22 +67,35 @@ class RecommendPGDBTool:
         q = RecommendEntriesEmbedingModel.insert_many(model_list)
         q.execute()
 
-    def select_read_entries(self, resultLimit):
+    def select_read_entries(self, resultLimit, language):
         result_list = list(
             EntriesModel.select(EntriesModel.id, EntriesModel.published_at, EntriesModel.url,
+                                EntriesModel.full_content).where((~EntriesModel.last_read_at.is_null()) & EntriesModel.language == language).order_by(
+                                    EntriesModel.last_read_at.desc()).limit(resultLimit).execute())
+        result_dict_list = list()
+        for current_model in result_list:
+            result_dict_list.append(model_to_dict(current_model))
+        return result_dict_list
+
+    def select_read_entries_check_language(self, resultLimit):
+        result_list = list(
+            EntriesModel.select(EntriesModel.id, EntriesModel.language,
                                 EntriesModel.full_content).where(~EntriesModel.last_read_at.is_null()).order_by(EntriesModel.last_read_at.desc()).limit(resultLimit).execute())
         result_dict_list = list()
         for current_model in result_list:
             result_dict_list.append(model_to_dict(current_model))
         return result_dict_list
 
-    def select_tobe_recommended_entries(self, model, version, resultLimit):
+    def update_read_entries_language(self, language, entry_id):
+        EntriesModel.update(language=language).where(id == entry_id).execute()
+
+    def select_tobe_recommended_entries(self, model, version, resultLimit, language):
         result_list = list(
             RecommendEntriesModel.select(RecommendEntriesModel.url, RecommendEntriesModel.published_at, RecommendEntriesEmbedingModel.embedding, RecommendFeedModel.feed_url).join(
                 RecommendEntriesEmbedingModel, on=(RecommendEntriesModel.url == RecommendEntriesEmbedingModel.url), attr='relation').join(
                     RecommendFeedModel, on=(RecommendEntriesModel.feed_id == RecommendFeedModel.id),
-                    attr='feedrelation').where((RecommendEntriesEmbedingModel.model_name == model) & (RecommendEntriesEmbedingModel.model_version == version)).order_by(
-                        RecommendEntriesModel.id.desc()).limit(resultLimit).execute())
+                    attr='feedrelation').where((RecommendEntriesEmbedingModel.model_name == model) & (RecommendEntriesEmbedingModel.model_version == version)
+                                               & (RecommendEntriesModel.language == language)).order_by(RecommendEntriesModel.id.desc()).limit(resultLimit).execute())
 
         result_dict_list = list()
         for current_model in result_list:
@@ -107,3 +120,7 @@ class RecommendPGDBTool:
         for current_model in result_list:
             result_dict_list.append(model_to_dict(current_model))
         return result_dict_list
+
+    def batch_insert_keyword_list(self, model_list):
+        q = RecommendKeywordlist.insert_many(model_list)
+        q.execute()

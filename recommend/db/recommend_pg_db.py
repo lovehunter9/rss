@@ -27,6 +27,7 @@ class UsersModel(RecommendPGBaseModel):
     id = BigIntegerField(null=False, unique=True, index=True)
     model_name = TextField(null=False)
     model_version = TextField(null=False)
+    recommend_language = TextField(null=False)
 
     class Meta:
         db_table = 'users'
@@ -51,6 +52,7 @@ class EntriesModel(RecommendPGBaseModel):
     created_at = DateTimeField(null=False, index=True)
     published_at = DateTimeField(null=False, index=True)
     last_read_at = DateTimeField(null=False, index=True)
+    language = TextField(null=True)
 
     class Meta:
         db_table = 'entries'
@@ -73,6 +75,7 @@ class RecommendModel(RecommendPGBaseModel):
     id = BigIntegerField(null=False, unique=True, index=True)
     batch = IntegerField(null=False)
     fetch_at = DateTimeField(null=False)
+    language = TextField(null=True)
 
     class Meta:
         db_table = 'recommend'
@@ -91,6 +94,8 @@ class RecommendEntriesModel(RecommendPGBaseModel):
     content = TextField(null=True)
     full_content = TextField(null=True)
     image_url = TextField(null=True)
+    keyword = TextField(null=True)
+    language = TextField(null=True)
 
     class Meta:
         db_table = 'recommend_entries'
@@ -132,6 +137,7 @@ class RecommendResultModel(RecommendPGBaseModel):
     entry_id = DateTimeField(null=False, index=True)
     score = DecimalField(null=True)
     rank = IntegerField(null=True)
+    language = TextField(null=True)
 
     class Meta:
         db_table = 'recommend_result'
@@ -147,4 +153,16 @@ class RecommendBlacklist(RecommendPGBaseModel):
 
     class Meta:
         db_table = 'recommend_blacklist'
+        primary_key = False
+
+
+class RecommendKeywordlist(RecommendPGBaseModel):
+    id = BigIntegerField(null=False, unique=True, index=True)
+    batch = IntegerField(null=True)
+    keyword = TextField(null=False)
+    url = TextField(null=True, index=True)
+    rank = TextField(null=True)
+
+    class Meta:
+        db_table = 'recommend_result_keyword'
         primary_key = False

@@ -80,7 +80,7 @@ var pluralForms = map[string]pluralFormFunc{
 	"uk_UA": pluralFormRuSrUa,
 	"sr_RS": pluralFormRuSrUa,
 	// nplurals=1; plural=0;
-	"zh_CN": func(n int) int {
+	"zh-cn": func(n int) int {
 		return 0
 	},
 }

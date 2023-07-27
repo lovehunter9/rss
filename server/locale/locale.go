@@ -7,13 +7,13 @@ package locale // import "miniflux.app/locale"
 // AvailableLanguages returns the list of available languages.
 func AvailableLanguages() map[string]string {
 	return map[string]string{
-		"en_US": "English",
+		"en":    "English",
 		"es_ES": "Español",
 		"fr_FR": "Français",
 		"de_DE": "Deutsch",
 		"pl_PL": "Polski",
 		"pt_BR": "Português Brasileiro",
-		"zh_CN": "简体中文",
+		"zh-cn": "简体中文",
 		"zh_TW": "繁體中文",
 		"nl_NL": "Nederlands",
 		"ru_RU": "Русский",
