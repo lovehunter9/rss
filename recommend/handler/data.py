@@ -160,12 +160,18 @@ class DataHandler:
     def get_tobe_recommended_entries(self, user):
         tool = RecommendPGDBTool()
         entries = tool.select_tobe_recommended_entries(user.model_name, user.model_version, down_latest_number)
+        blacklists = tool.select_recommend_blacklist()
+        black_list = dict()
+        for current_item in blacklists:
+            black_list[current_item['feed_url']] = {"status": current_item['status']}
+
         result_list = dict()
         for current_entry in entries:
-            result_list[current_entry['url']] = {
-                "embedding": np.array(current_entry['embedding'], dtype=np.float32),
-                "created_at": current_entry['published_at'].replace(tzinfo=None)
-            }
+            if current_entry['url'] not in black_list:
+                result_list[current_entry['url']] = {
+                    "embedding": np.array(current_entry['embedding'], dtype=np.float32),
+                    "created_at": current_entry['published_at'].replace(tzinfo=None)
+                }
         return result_list
 
     def down_valid_model_and_version(self):

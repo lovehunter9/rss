@@ -272,18 +272,21 @@ func (h *handler) getBlacklist(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) addBalcklist(w http.ResponseWriter, r *http.Request) {
-	var boardRequest model.Blacklist
-	if err := json_parser.NewDecoder(r.Body).Decode(&boardRequest); err != nil {
+	var request model.Blacklist
+	if err := json_parser.NewDecoder(r.Body).Decode(&request); err != nil {
 		json.BadRequest(w, r, err)
 		return
 	}
-	err := h.store.AddBlacklist(&boardRequest)
+	recommendFeed, _ := h.store.RecommendFeed(request.FeedID)
+	request.FeedUrl = recommendFeed.FeedUrl
+	request.FeedTitle = recommendFeed.Title
+	err := h.store.AddBlacklist(&request)
 	if err != nil {
 		json.ServerError(w, r, err)
 		return
 	}
 
-	json.Created(w, r, boardRequest)
+	json.Created(w, r, request)
 }
 
 func (h *handler) removeBlacklist(w http.ResponseWriter, r *http.Request) {

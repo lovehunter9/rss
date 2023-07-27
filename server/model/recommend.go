@@ -78,11 +78,17 @@ type OptionSettingRequest struct {
 }
 
 type Blacklist struct {
-	ID          int64   `json:"id"`
-	FeedUrl     string  `json:"feed_url"`
-	EntryUrl    string  `json:"entry_url"`
-	FullContent *string `json:"full_content"`
-	Status      int     `json:"status"`
+	ID              int64   `json:"id"`
+	FeedID          int64   `json:"feed_id"`
+	FeedUrl         string  `json:"feed_url"`
+	FeedTitle       string  `json:"feed_title"`
+	IconType        *string `json:"icon_type"`
+	IconByteContent []byte  `json:"icon_byte_content"`
+	IconContent     string  `json:"icon_content"`
+	EntryUrl        string  `json:"entry_url"`
+	EntryTitle      string  `json:"entry_title"`
+	FullContent     *string `json:"full_content"`
+	Status          int     `json:"status"`
 }
 
 type Blacklists []*Blacklist

@@ -22,7 +22,7 @@ import {
   RecommendFeed,
   RssContentQuery,
   Entry,
-  RssContentQueryItem,
+  RssContentQueryItem, OptionSettingRequest,
 } from 'src/types';
 import { useRssStore } from 'src/stores/rss';
 
@@ -439,48 +439,47 @@ export const addRecommendFeed = async (req: FeedCreationRequest) => {
   return data
 }
 
-// export const getBlackList = async () => {
-//   const rssStore = useRssStore();
-//   const data = await axios.post(
-//     rssStore.url + '/api/recommend/addFeed',
-//     req
-//   )
-//   return data
-// }
-//
-// export const addBlackList = async () => {
-//   const rssStore = useRssStore();
-//   const data = await axios.post(
-//     rssStore.url + '/api/recommend/addBlacklist',
-//     req
-//   )
-//   return data
-// }
-//
-// export const removeBlackList = async (id : string) => {
-//   const rssStore = useRssStore();
-//   const data = await axios.delete(
-//     rssStore.url + '/api/recommend/' + id
-//   )
-//   return data
-// }
-//
-// export const setRecommendOption = async (id : string) => {
-//   const rssStore = useRssStore();
-//   const data = await axios.delete(
-//     rssStore.url + '/api/recommend/' + id
-//   )
-//   return data
-// }
-//
-// export const getRecommendOption = async () => {
-//   const rssStore = useRssStore();
-//   const data = await axios.post(
-//     rssStore.url + '/api/recommend/addFeed',
-//     req
-//   )
-//   return data
-// }
+export const getBlackList = async () => {
+  const rssStore = useRssStore();
+  const data = await axios.get(
+    rssStore.url + '/api/recommend/addFeed'
+  )
+  return data
+}
+
+export const addBlackList = async (req : {feedId : string,entryUrl : string,entryTitle : string}) => {
+  const rssStore = useRssStore();
+  const data = await axios.post(
+    rssStore.url + '/api/recommend/addBlacklist',
+    req
+  )
+  return data
+}
+
+export const removeBlackList = async (id : string) => {
+  const rssStore = useRssStore();
+  const data = await axios.delete(
+    rssStore.url + '/api/recommend/' + id
+  )
+  return data
+}
+
+export const setRecommendOption = async (request : OptionSettingRequest) => {
+  const rssStore = useRssStore();
+  const data = await axios.put(
+    rssStore.url + '/api/setOption',
+    request
+  )
+  return data
+}
+
+export const getRecommendOption = async () => {
+  const rssStore = useRssStore();
+  const data = await axios.get(
+    rssStore.url + '/api/getOption'
+  )
+  return data
+}
 
 export const addPageToBoard = async (req: PageToBoard) => {
   const rssStore = useRssStore();

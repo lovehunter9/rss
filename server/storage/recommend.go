@@ -160,7 +160,7 @@ func (s *Storage) RecommendFeedQuery(categoryID, categoryName, name, link string
 }
 
 func (s *Storage) GetBlacklist(offset, limit int) (model.Blacklists, error) {
-	query := `SELECT id,feed_url,entry_url,status from recommend_blacklist ORDER BY id desc  OFFSET $1 limit $2`
+	query := `SELECT b.id,b.feed_url,b.feed_title,b.entry_url,b.status,f.icon_type,f.icon_content icon_byte_content from recommend_blacklist b ,recommend_feed f where b.feed_id=f.id ORDER BY b.id desc  OFFSET $1 limit $2`
 	rows, err := s.db.Query(query, offset, limit)
 	if err != nil {
 		return nil, fmt.Errorf(`store: unable to fetch BlackList: %v`, err)
@@ -170,9 +170,11 @@ func (s *Storage) GetBlacklist(offset, limit int) (model.Blacklists, error) {
 	lists := make(model.Blacklists, 0)
 	for rows.Next() {
 		var blacklist model.Blacklist
-		if err := rows.Scan(&blacklist.ID, &blacklist.FeedUrl, &blacklist.EntryUrl, &blacklist.Status); err != nil {
+		if err := rows.Scan(&blacklist.ID, &blacklist.FeedUrl, &blacklist.EntryUrl, &blacklist.EntryTitle, &blacklist.Status, &blacklist.IconType, &blacklist.IconByteContent); err != nil {
 			return nil, fmt.Errorf(`store: unable to fetch recommends row: %v`, err)
 		}
+		blacklist.IconContent = fmt.Sprintf("%s;base64,%s", blacklist.IconContent, base64.StdEncoding.EncodeToString(blacklist.IconByteContent))
+		blacklist.IconByteContent = nil
 		lists = append(lists, &blacklist)
 	}
 
@@ -184,16 +186,19 @@ func (s *Storage) AddBlacklist(request *model.Blacklist) error {
 
 	query := `
 		INSERT INTO recommend_blacklist
-			(feed_url, entry_url)
+			(feed_id,feed_url, feed_title,entry_url,entry_title)
 		VALUES
-			($1, $2)
+			($1, $2,$3,$4,$5)
 		RETURNING
 			id
 	`
 	err := s.db.QueryRow(
 		query,
+		request.FeedID,
 		request.FeedUrl,
+		request.FeedTitle,
 		request.EntryUrl,
+		request.EntryTitle,
 	).Scan(
 		&request.ID,
 	)
