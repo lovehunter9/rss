@@ -22,7 +22,7 @@
 
       <template v-slot:after>
         <div class="column items-center justify-center" style="height: 100vh;">
-          <trend-detail v-if="recommendRef" :item="recommendRef" @goPageAction="pushToRecommend"/>
+          <trend-detail v-if="recommendRef" :item="recommendRef" @goPageAction="pushToRecommend"  @onRefresh="requestRecommendList"/>
           <div class="text-7A7A7A column items-center justify-center" v-else>
             <BtIcon class="q-mb-lg" src="itemSelect" :width="215" :height="148"/>
             {{ 'No item selected.' }}

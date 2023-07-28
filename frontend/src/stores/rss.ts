@@ -507,6 +507,13 @@ export const useRssStore = defineStore('rss', {
       } catch (error) {
         console.log(error);
       }
+    },
+
+    async remove_recommendList(recommend : Recommend){
+      const index = this.recommends.indexOf(recommend);
+      if (index > -1){
+        this.recommends.splice(index,1)
+      }
     }
   },
 });
