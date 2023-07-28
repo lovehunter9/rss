@@ -1,12 +1,12 @@
 <template>
   <div class="root column justify-center items-center">
     <img class="empty" src="../../assets/empty.svg">
-    <span class="title text-major-color">{{ 'Personalize your Feedly' }}</span>
+    <span class="title text-major-color">{{ title ? title : 'Personalize your Feedly' }}</span>
     <span
-      class="label text-minor-color">{{
+      class="label text-minor-color">{{ content ? content :
         'The most interesting articles published by the feeds you personally follow will be here'
       }}</span>
-    <q-btn class="btn-confirm add-btn" flat dense label="Add feeds" @click="addFeed" v-show="addFee"/>
+    <q-btn class="btn-confirm add-btn" flat dense label="Add feeds" @click="addFeedClick" v-show="addFeed"/>
   </div>
 </template>
 
@@ -18,14 +18,24 @@ import {useQuasar} from 'quasar';
 const $q = useQuasar()
 
 defineProps({
-  addFee : {
+  title : {
+    type : String,
+    default : '',
+    require : false,
+  },
+  content : {
+    type : String,
+    default : '',
+    require : false,
+  },
+  addFeed : {
     type : Boolean,
     default : true,
     require : false
   }
 })
 
-const addFeed = () => {
+const addFeedClick = () => {
   $q.dialog({
     component: AddFeedDialog,
     componentProps: {}

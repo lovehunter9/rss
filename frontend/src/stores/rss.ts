@@ -17,7 +17,7 @@ import {
   MenuType,
   SDKQueryRequest,
   Recommend,
-  RssContentQueryItem, OptionSetting
+  RssContentQueryItem, OptionSetting, Blacklist
 } from 'src/types';
 
 import {
@@ -44,7 +44,7 @@ import {
   today_mark_all_as_read, unread_mark_all_as_read,
   update_board,
   update_entry_status,
-  update_feed, getRecommendOption,
+  update_feed, getRecommendOption, removeBlackList, getBlackList,
 } from 'src/api/api';
 
 export type DataState = {
@@ -66,6 +66,7 @@ export type DataState = {
   recommends: Recommend[]
 
   searchResult: RssContentQueryItem[]
+  blacklist : Blacklist[];
 
   setting : OptionSetting;
 };
@@ -90,6 +91,7 @@ export const useRssStore = defineStore('rss', {
       leftDrawerOpen: false,
       dialogShow: false,
       recommends: [],
+      blacklist : [],
       setting : {
         show_recommend_result : false,
         language : []
@@ -274,6 +276,15 @@ export const useRssStore = defineStore('rss', {
       return this.feeds.find((feed) => feed.feed_url == feed_url);
     },
 
+    async get_blacklist() : Promise<Blacklist[]>{
+      try {
+        this.blacklist = await getBlackList();
+      } catch (e) {
+        console.log(e);
+      }
+      return this.blacklist;
+    },
+
     async remove_local_feed(id: number) {
       try {
         await remove_feed(id.toString());
@@ -287,6 +298,14 @@ export const useRssStore = defineStore('rss', {
       try {
         await remove_category(id.toString());
         await this.refresh_category_and_feeds()
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
+    async remove_local_blacklist(id: number) {
+      try {
+        await removeBlackList(id.toString());
       } catch (e) {
         console.log(e);
       }

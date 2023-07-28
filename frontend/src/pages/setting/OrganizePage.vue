@@ -114,7 +114,7 @@ import {useOrganizeStore} from 'stores/organize';
 import {ORGANIZE_TYPE} from 'stores/organizeConfig';
 import EmptyView from 'components/rss/EmptyView.vue';
 import {newsBus, newsBusMessage} from 'src/utils/utils'
-import BasicSettingPage from 'pages/BasicSettingPage.vue';
+import BasicSettingPage from 'pages/setting/BasicSettingPage.vue';
 
 const store = useRssStore();
 const folderOptionsRef = ref<string[]>([]);
@@ -169,7 +169,11 @@ newsBus.on(newsBusMessage.feedRefresh, () => {
 })
 
 onMounted(async () => {
-  await store.refresh_category_and_feeds()
+  if (organizeStore.organizeData.type === ORGANIZE_TYPE.BLACKLIST){
+    organizeStore.changeType(ORGANIZE_TYPE.FEED, folderRef.value, searchData)
+  }else {
+    await store.refresh_category_and_feeds()
+  }
 })
 
 </script>

@@ -1,5 +1,13 @@
-import {Category, Feed} from 'src/types';
+import {Blacklist, Category, Feed} from 'src/types';
 import {useRssStore} from 'stores/rss';
+
+
+export enum ORGANIZE_TYPE {
+  FEED = 'feed',
+  CATEGORY = 'category',
+  BLACKLIST = 'blacklist',
+  BASIC = 'basic'
+}
 
 export class BaseOption<T> {
   selected: boolean;
@@ -102,10 +110,15 @@ export class OptionalFeed extends BaseOption<Feed> {
   }
 }
 
-export enum ORGANIZE_TYPE {
-  FEED = 'feed',
-  CATEGORY = 'category',
-  BASIC = 'basic'
+export class OptionalBlacklist extends BaseOption<Blacklist> {
+
+  getId(): number {
+    return (this.data as Blacklist).id;
+  }
+
+  getType(): string {
+    return ORGANIZE_TYPE.FEED
+  }
 }
 
 export class BaseOrganize<T extends BaseOption<U>, U> {
@@ -247,6 +260,29 @@ export class OrganizeCategory extends BaseOrganize<OptionalCategory, Category> {
   async storeRemove(id: number): Promise<void> {
     const store = useRssStore()
     await store.remove_local_category(id)
+  }
+
+}
+
+export class OrganizeBlacklist extends BaseOrganize<OptionalBlacklist, Blacklist> {
+
+  constructor(dataList: OptionalBlacklist[]) {
+    super(dataList, ORGANIZE_TYPE.BLACKLIST);
+  }
+
+  updateList(): void {
+    const ssrStore = useRssStore()
+    const finalList = ssrStore.blacklist.map((value) => {
+      return new OptionalBlacklist(value)
+    })
+    this.dataList = finalList ? finalList : [];
+    console.log(this.dataList)
+    this._updateStatus()
+  }
+
+  async storeRemove(id: number): Promise<void> {
+    const store = useRssStore()
+    await store.remove_local_blacklist(id)
   }
 
 }

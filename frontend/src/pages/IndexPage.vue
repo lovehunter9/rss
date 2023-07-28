@@ -212,7 +212,7 @@ function removeBoard() {
   $q.dialog({
     component: OrganizeDeleteDialog,
     componentProps: {
-      type: DeleteType.Board
+      type: DeleteType.BOARD
     }
   }).onOk(async () => {
     if (store.menu_choice.value && store.menu_choice.value > 0){

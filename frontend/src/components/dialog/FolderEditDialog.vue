@@ -35,7 +35,7 @@
 
         </q-scroll-area>
 
-        <empty-view :add-fee="false" class="scroll-area" v-else/>
+        <empty-view :add-feed="false" class="scroll-area" v-else/>
 
       </div>
 

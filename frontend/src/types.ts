@@ -15,8 +15,9 @@ export enum MenuType {
 
 export enum DeleteType{
   FEED = 0,
-  Folder = 1,
-  Board= 2
+  FOLDER = 1,
+  BOARD= 2,
+  BLACKLIST = 4
 }
 
 export const menuTypeName = (menuType: MenuType) => {

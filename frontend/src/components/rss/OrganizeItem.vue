@@ -166,7 +166,7 @@ function remove() {
     if (organizeStore.organizeData.type === ORGANIZE_TYPE.FEED) {
       type = DeleteType.FEED
     } else {
-      type = DeleteType.Folder
+      type = DeleteType.FOLDER
     }
   }
   $q.dialog({
