@@ -7,9 +7,10 @@ package model // import "miniflux.app/model"
 import "time"
 
 type RecommendBase struct {
-	ID      int64     `json:"id"`
-	Batch   int       `json:"batch"`
-	FetchAt time.Time `json:"fetch_at"`
+	ID       int64     `json:"id"`
+	Batch    int       `json:"batch"`
+	FetchAt  time.Time `json:"fetch_at"`
+	Language string    `json:"language"`
 }
 
 type RecommendFeed struct {

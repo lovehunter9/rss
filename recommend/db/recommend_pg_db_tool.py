@@ -70,7 +70,7 @@ class RecommendPGDBTool:
     def select_read_entries(self, resultLimit, language):
         result_list = list(
             EntriesModel.select(EntriesModel.id, EntriesModel.published_at, EntriesModel.url,
-                                EntriesModel.full_content).where((~EntriesModel.last_read_at.is_null()) & EntriesModel.language == language).order_by(
+                                EntriesModel.full_content).where((~EntriesModel.last_read_at.is_null()) & (EntriesModel.language == language)).order_by(
                                     EntriesModel.last_read_at.desc()).limit(resultLimit).execute())
         result_dict_list = list()
         for current_model in result_list:
@@ -91,11 +91,13 @@ class RecommendPGDBTool:
 
     def select_tobe_recommended_entries(self, model, version, resultLimit, language):
         result_list = list(
-            RecommendEntriesModel.select(RecommendEntriesModel.url, RecommendEntriesModel.published_at, RecommendEntriesEmbedingModel.embedding, RecommendFeedModel.feed_url).join(
-                RecommendEntriesEmbedingModel, on=(RecommendEntriesModel.url == RecommendEntriesEmbedingModel.url), attr='relation').join(
-                    RecommendFeedModel, on=(RecommendEntriesModel.feed_id == RecommendFeedModel.id),
-                    attr='feedrelation').where((RecommendEntriesEmbedingModel.model_name == model) & (RecommendEntriesEmbedingModel.model_version == version)
-                                               & (RecommendEntriesModel.language == language)).order_by(RecommendEntriesModel.id.desc()).limit(resultLimit).execute())
+            RecommendEntriesModel.select(RecommendEntriesModel.url, RecommendEntriesModel.published_at, RecommendEntriesEmbedingModel.embedding,
+                                         RecommendEntriesModel.feed_id).join(RecommendEntriesEmbedingModel,
+                                                                             on=(RecommendEntriesModel.url == RecommendEntriesEmbedingModel.url),
+                                                                             attr='relation').where((RecommendEntriesEmbedingModel.model_name == model)
+                                                                                                    & (RecommendEntriesEmbedingModel.model_version == version)
+                                                                                                    & (RecommendEntriesModel.language == language)).order_by(
+                                                                                                        RecommendEntriesModel.id.desc()).limit(resultLimit).execute())
 
         result_dict_list = list()
         for current_model in result_list:
@@ -103,7 +105,7 @@ class RecommendPGDBTool:
                 'url': current_model.url,
                 'published_at': current_model.published_at,
                 'embedding': current_model.relation.embedding,
-                'feed_url': current_model.feedrelation.feed_url,
+                'feed_id': current_model.feed_id,
             }
             result_dict_list.append(entries)
         return result_dict_list
@@ -115,7 +117,7 @@ class RecommendPGDBTool:
             RecommendModelAndVersion.insert(model_name=model, model_version=version).execute()
 
     def select_recommend_blacklist(self):
-        result_list = list(RecommendBlacklist.select(RecommendBlacklist.feed_url, RecommendBlacklist.entry_url, RecommendBlacklist.full_content).execute())
+        result_list = list(RecommendBlacklist.select(RecommendBlacklist.feed_id, RecommendBlacklist.feed_url).execute())
         result_dict_list = list()
         for current_model in result_list:
             result_dict_list.append(model_to_dict(current_model))

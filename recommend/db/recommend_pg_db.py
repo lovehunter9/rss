@@ -94,6 +94,7 @@ class RecommendEntriesModel(RecommendPGBaseModel):
     content = TextField(null=True)
     full_content = TextField(null=True)
     image_url = TextField(null=True)
+    cloud_id = BigIntegerField(null=False)
     keyword = TextField(null=True)
     language = TextField(null=True)
 
@@ -146,6 +147,7 @@ class RecommendResultModel(RecommendPGBaseModel):
 
 class RecommendBlacklist(RecommendPGBaseModel):
     id = BigIntegerField(null=False, unique=True, index=True)
+    feed_id = BigIntegerField(null=False)
     feed_url = TextField(null=False)
     entry_url = TextField(null=True, index=True)
     full_content = TextField(null=True)
@@ -162,6 +164,7 @@ class RecommendKeywordlist(RecommendPGBaseModel):
     keyword = TextField(null=False)
     url = TextField(null=True, index=True)
     rank = TextField(null=True)
+    language = TextField(null=True)
 
     class Meta:
         db_table = 'recommend_result_keyword'

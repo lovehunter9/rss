@@ -12,8 +12,8 @@ import (
 func (s *Storage) LastRecommendBase() (*model.RecommendBase, error) {
 	var base model.RecommendBase
 
-	query := `SELECT id, batch, fetch_at FROM recommend order by id desc limit 1`
-	err := s.db.QueryRow(query).Scan(&base.ID, &base.Batch, &base.FetchAt)
+	query := `SELECT id, batch, fetch_at,language FROM recommend order by id desc limit 1`
+	err := s.db.QueryRow(query).Scan(&base.ID, &base.Batch, &base.FetchAt, &base.Language)
 
 	switch {
 	case err == sql.ErrNoRows:

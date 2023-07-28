@@ -41,6 +41,7 @@ func (h *handler) getRecommendList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	offset := RecommendCachePage * limit
+	//languagels := strings.Split(recommendBase.Language.Split(","))
 	logger.Info("getRecommendList %d,%d,%d", recommendBase.Batch, RecommendCachePage, offset)
 	list, err := h.store.RecommendList(recommendBase.Batch, offset, limit)
 	if err != nil {
@@ -278,6 +279,10 @@ func (h *handler) addBalcklist(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	recommendFeed, _ := h.store.RecommendFeed(request.FeedID)
+	if recommendFeed == nil {
+		json.BadRequest(w, r, errors.New("error.blacklist add error"))
+		return
+	}
 	request.FeedUrl = recommendFeed.FeedUrl
 	request.FeedTitle = recommendFeed.Title
 	err := h.store.AddBlacklist(&request)

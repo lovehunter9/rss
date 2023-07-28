@@ -175,10 +175,10 @@ class ModelToolUnitTest(unittest.TestCase):
         download_dir = "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model"
         current_model_tool = ModelTool(download_dir)
         keyword_sortinfo_list = current_model_tool.download_keyword_sortinfo_package('en')
-        for current in keyword_sortinfo_list:
-            print(current["keyword"])
-            print(len(current["urls"]))
-        #print(keyword_sortinfo_list)
+        #for current in keyword_sortinfo_list:
+        #    print(current["keyword"])
+        #    print(len(current["urls"]))
+        print(keyword_sortinfo_list)
 
     def test_infer_text_language_type(self):
         # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_infer_text_language_type

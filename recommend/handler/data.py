@@ -6,9 +6,9 @@ from recommend_model_sdk.tools.common_tool import CommonTool
 from recommend_model_sdk.tools.model_tool import ModelTool
 from db.recommend_pg_db_tool import *
 
-#path = os.environ.get('model_path', "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model")
+path = os.environ.get('model_path', "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model")
 
-path = os.environ.get('model_path', "/model")
+#path = os.environ.get('model_path', "/model")
 read_entries_num = int(os.environ.get('read_entries_num', 50))
 down_latest_number = int(os.environ.get('down_latest_number', 10000))
 
@@ -147,7 +147,10 @@ class DataHandler:
                         'content': current_articles['content'],
                         'full_content': current_articles['full_text'],
                         'title': current_articles['title'],
-                        'image_url': ''
+                        'image_url': '',
+                        'cloud_id': current_articles['cloud_id'],
+                        'language': current_articles['major_language'],
+                        'keyword': current_articles['keyword_list']
                     }
                     if 'image_url' in current_articles and bool(current_articles['image_url']):
                         article['image_url'] = current_articles['image_url']
@@ -163,11 +166,11 @@ class DataHandler:
         blacklists = tool.select_recommend_blacklist()
         black_list = dict()
         for current_item in blacklists:
-            black_list[current_item['feed_url']] = {"status": current_item['status']}
+            black_list[current_item['feed_id']] = {"feed_url": current_item['feed_url']}
 
         result_list = dict()
         for current_entry in entries:
-            if current_entry['url'] not in black_list:
+            if current_entry['feed_id'] not in black_list:
                 result_list[current_entry['url']] = {
                     "embedding": np.array(current_entry['embedding'], dtype=np.float32),
                     "created_at": current_entry['published_at'].replace(tzinfo=None)
@@ -231,8 +234,14 @@ class DataHandler:
         list = []
         rank = 1
         for current_keyword in keyword_sortinfo_list:
-            for current_url in current["urls"]:
-                item = {'batch': batch, 'keyword': current["keyword"], 'url': current_url, 'rank': rank}
+            for current_url in current_keyword["urls"]:
+                item = {
+                    'batch': batch,
+                    'keyword': current_keyword["keyword"],
+                    'url': current_url,
+                    'rank': rank,
+                    'language': language,
+                }
                 rank = rank + 1
                 list.append(item)
 

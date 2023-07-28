@@ -22,7 +22,7 @@ class RecommendHandler:
     def downLastPackage(self, user, baseModel):
         start_time = datetime.now()
         data_handler = DataHandler()
-        apiUrl = os.environ.get('package_share_api', 'http://127.0.0.1:8081/api/share/s3packages')
+        apiUrl = os.environ.get('package_share_api', 'http://52.22.173.234:8080/api/share/s3packages')
         apiUrl = apiUrl + '?model_name=' + user.model_name + '&model_version=' + user.model_version
         if len(baseModel) > 0:
             lasttime = int(time.mktime(baseModel[0].fetch_at.timetuple()))
@@ -83,7 +83,8 @@ class RecommendHandler:
 
             start_time = datetime.now()
             base_url_to_embedding_dict = data_handler.get_tobe_recommended_entries(user, language)
-            self.current_logger.debug(f'get_tobe_recommended_entries time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+            self.current_logger.debug(
+                f'get_tobe_recommended_entries length: {len(base_url_to_embedding_dict)}, time: {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
 
             recommend_tool = RecommendTool(base_url_to_embedding_dict, user.model_name, user.model_version)
             start_time = datetime.now()
