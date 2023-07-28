@@ -234,6 +234,7 @@ class DataHandler:
         list = []
         rank = 1
         for current_keyword in keyword_sortinfo_list:
+            entryCount = 1
             for current_url in current_keyword["urls"]:
                 item = {
                     'batch': batch,
@@ -242,8 +243,11 @@ class DataHandler:
                     'rank': rank,
                     'language': language,
                 }
-                rank = rank + 1
                 list.append(item)
+                entryCount = entryCount + 1
+                if entryCount > 3:
+                    break
+            rank = rank + 1
 
         if len(list) > 0:
             tool.batch_insert_keyword_list(list)

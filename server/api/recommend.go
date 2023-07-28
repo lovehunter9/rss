@@ -20,6 +20,7 @@ import (
 
 var RecommendCacheBatch int
 var RecommendCachePage int
+var RecommendKeywordCachePage int
 
 //每天活跃时间
 //每天活跃时间段
@@ -27,26 +28,31 @@ var RecommendCachePage int
 func (h *handler) getRecommendList(w http.ResponseWriter, r *http.Request) {
 	recommendBase, _ := h.store.LastRecommendBase()
 	count := h.store.GetRecommendCount(recommendBase.Batch)
-	//limit := request.QueryIntParam(r, "limit", 20)
-	//offset := request.QueryIntParam(r, "offset", 0)
-	limit := 5
+	keycount := h.store.GetKeywordRecommendCount(recommendBase.Batch)
+
+	limit := 4
 	if recommendBase.Batch != RecommendCacheBatch {
 		RecommendCacheBatch = recommendBase.Batch
 		RecommendCachePage = 0
-	} else {
-		RecommendCachePage = RecommendCachePage + 1
-		if (RecommendCachePage+1)*5 > count {
-			RecommendCachePage = 0
-		}
+		RecommendKeywordCachePage = 0
 	}
 
 	offset := RecommendCachePage * limit
-	//languagels := strings.Split(recommendBase.Language.Split(","))
 	logger.Info("getRecommendList %d,%d,%d", recommendBase.Batch, RecommendCachePage, offset)
 	list, err := h.store.RecommendList(recommendBase.Batch, offset, limit)
 	if err != nil {
 		json.ServerError(w, r, err)
 		return
+	}
+	keylist, _ := h.store.KeywordRecommendList(recommendBase.Batch, RecommendKeywordCachePage, 1)
+	list = append(list, keylist...)
+	RecommendCachePage = RecommendCachePage + 1
+	if (RecommendCachePage+1)*4 > count {
+		RecommendCachePage = 0
+	}
+	RecommendKeywordCachePage = RecommendKeywordCachePage + 1
+	if RecommendKeywordCachePage > keycount {
+		RecommendKeywordCachePage = 0
 	}
 	/*for _, item := range list {
 		if item.FullContent != "" {
@@ -59,7 +65,6 @@ func (h *handler) getRecommendList(w http.ResponseWriter, r *http.Request) {
 		}
 	}*/
 	json.OK(w, r, list)
-	//json.OK(w, r, &recommendResponse{Total: count, Entries: list})
 }
 
 func (h *handler) initEntry(userID, entryID int64, readLater bool) int64 {

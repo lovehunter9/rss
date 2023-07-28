@@ -72,7 +72,7 @@ func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, err
 	 f.title feed_title,f.feed_url,f.site_url,f.icon_type,f.icon_content icon_byte_content,f.category_id,f.category_title,e.full_content ,e.image_url,f.id
 	 FROM recommend_result r,recommend_entries e,recommend_feed f 
 	 WHERE r.batch=$1 and r.url=e.url and e.feed_id=f.id
-	 ORDER BY r.rank  OFFSET $2 limit $3`
+	 ORDER BY r.id  OFFSET $2 limit $3`
 	rows, err := s.db.Query(query, batch, offset, limit)
 	if err != nil {
 		return nil, fmt.Errorf(`store: unable to fetch boards: %v`, err)
@@ -227,4 +227,45 @@ func (s *Storage) RemoveBlacklist(id int64) error {
 	}
 
 	return nil
+}
+
+func (s *Storage) KeywordRecommendList(batch, offset, limit int) (model.Recommends, error) {
+	query := `SELECT r.batch, e.id entry_id, e.title, e.author,e.url,e.published_at,r.keyword,
+	 f.title feed_title,f.feed_url,f.site_url,f.icon_type,f.icon_content icon_byte_content,f.category_id,f.category_title,e.full_content ,e.image_url,f.id
+	 FROM recommend_result_keyword r,recommend_entries e,recommend_feed f 
+	 WHERE r.batch=$1 and r.url=e.url and e.feed_id=f.id
+	 ORDER BY r.rank  OFFSET $2 limit $3`
+	rows, err := s.db.Query(query, batch, offset, limit)
+	if err != nil {
+		return nil, fmt.Errorf(`store: unable to fetch boards: %v`, err)
+	}
+	defer rows.Close()
+
+	recommends := make(model.Recommends, 0)
+	for rows.Next() {
+		var recommend model.Recommend
+		recommend.Feed = &model.RecommendFeed{}
+		if err := rows.Scan(&recommend.Batch, &recommend.EntryID, &recommend.Title,
+			&recommend.Author, &recommend.URL, &recommend.PublishedAt, &recommend.Keyword,
+			&recommend.Feed.Title, &recommend.Feed.FeedUrl, &recommend.Feed.SiteUrl,
+			&recommend.Feed.IconType, &recommend.Feed.IconByteContent, &recommend.Feed.CategoryID, &recommend.Feed.CategoryTitle, &recommend.FullContent, &recommend.ImageUrl, &recommend.Feed.ID); err != nil {
+			return nil, fmt.Errorf(`store: unable to fetch recommends row: %v`, err)
+		}
+		recommend.Feed.IconContent = fmt.Sprintf("%s;base64,%s", recommend.Feed.IconContent, base64.StdEncoding.EncodeToString(recommend.Feed.IconByteContent))
+		recommend.Feed.IconByteContent = nil
+		recommends = append(recommends, &recommend)
+	}
+
+	return recommends, nil
+}
+
+func (s *Storage) GetKeywordRecommendCount(batch int) int {
+	query := `select count(*) from recommend_result_keyword where batch=$1 `
+	var result int
+	err := s.db.QueryRow(query, batch).Scan(&result)
+	if err != nil {
+		return 0
+	}
+	return result
+
 }

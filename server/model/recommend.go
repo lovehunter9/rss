@@ -53,6 +53,7 @@ type Recommend struct {
 	Title    string  `json:"title"`
 	Author   *string `json:"author"`
 	ImageUrl string  `json:"image_url"`
+	Keyword  *string `json:"keyword"`
 
 	PublishedAt time.Time      `json:"published_at"`
 	URL         string         `json:"url"`

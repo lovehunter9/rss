@@ -73,12 +73,14 @@ class RecommendHandler:
         lst = user.recommend_language.split(",")
         recommend_result_number = os.environ.get('recommend_result_number', 1000)
         result_number_each = recommend_result_number // len(lst)
+        resultListIndex = 0
+        recommendResultList = []
         for language in lst:
             self.current_logger.debug(f'recommend language: {language},result number:{result_number_each}')
 
             start_time = datetime.now()
             query_url_to_embedding_dict = data_handler.get_readed_entries(user, language)
-            self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+            self.current_logger.debug(f'c time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
             self.current_logger.debug(f'query_url_to_embedding_dict length {len(query_url_to_embedding_dict)}')
 
             start_time = datetime.now()
@@ -88,15 +90,37 @@ class RecommendHandler:
 
             recommend_tool = RecommendTool(base_url_to_embedding_dict, user.model_name, user.model_version)
             start_time = datetime.now()
-            result = recommend_tool.recommend(query_url_to_embedding_dict, 1000)
+            result = recommend_tool.recommend(query_url_to_embedding_dict, result_number_each)
             self.current_logger.debug(f'recommend time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
-            saveResultList = []
+
             rank = 1
+            recommendResultList.append([])
             for detail in result:
                 result = {'batch': batch, 'url': detail[0], 'score': detail[1], 'rank': rank, 'language': language}
-                saveResultList.append(result)
+                recommendResultList[resultListIndex].append(result)
                 rank = rank + 1
-            self.current_logger.debug(f'saveResultList {len(saveResultList)}')
-            tool.batch_insert_recommend_result(saveResultList)
+            self.current_logger.debug(f'saveResultList language：{language} len:{len(recommendResultList[resultListIndex])}')
 
             data_handler.download_keyword_sortinfo_package(batch, language)
+            self.current_logger.debug(f'download_keyword_sortinfo_package finish')
+            resultListIndex = resultListIndex + 1
+
+        saveResultList = []
+        if len(lst) == 1:
+            saveResultList = recommendResultList[0]
+        if len(lst) == 2:
+            i0, i1 = 0, 0
+            while i0 < len(recommendResultList[0]) and i1 < len(recommendResultList[1]):
+                saveResultList.append(recommendResultList[0][i0])
+                if i0 + 1 < len(recommendResultList[0]):
+                    saveResultList.append(recommendResultList[0][i0 + 1])
+                saveResultList.append(recommendResultList[1][i1])
+                if i1 + 1 < len(recommendResultList[1]):
+                    saveResultList.append(recommendResultList[1][i1 + 1])
+                i0 += 2
+                i1 += 2
+            saveResultList += recommendResultList[0][i0:]
+            saveResultList += recommendResultList[1][i1:]
+
+        tool.batch_insert_recommend_result(saveResultList)
+        self.current_logger.debug(f'saveResultList {len(saveResultList)}')
