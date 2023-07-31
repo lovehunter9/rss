@@ -84,7 +84,7 @@ function remove() {
   padding: 16px;
 
   .feed-text-layout {
-    width: calc(100% - 90px);
+    width: calc(100% - 40px);
     padding-left: 18px;
     display: flex;
     flex-direction: row;
@@ -130,12 +130,6 @@ function remove() {
       text-overflow: ellipsis;
       overflow: hidden;
     }
-  }
-
-  .modify-icon {
-    margin-right: 25px;
-    width: 20px;
-    height: 20px;
   }
 
   .delete-icon {

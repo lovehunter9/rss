@@ -28,7 +28,7 @@ const organizeStore = useOrganizeStore()
 const router = useRouter()
 
 onMounted(async () => {
-  await store.get_blacklist()
+  await store.get_blacklist(0)
   organizeStore.changeType(ORGANIZE_TYPE.BLACKLIST, '', '');
 })
 

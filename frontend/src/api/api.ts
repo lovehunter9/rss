@@ -447,11 +447,16 @@ export const addRecommendFeed = async (req: FeedCreationRequest) => {
   return data
 }
 
-export const getBlackList = async () => {
+export const getBlackList = async (offset: number,limit = 100) => {
   const rssStore = useRssStore();
   const data : Blacklist[] = await axios.get(
     rssStore.url + '/api/recommend/blacklist'
-  )
+    , {
+      params: {
+        offset,
+        limit
+      }
+    });
   return data
 }
 
