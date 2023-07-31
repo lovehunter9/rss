@@ -417,6 +417,13 @@ export async function get_recommendList(offset: number,limit = 20):Promise<Recom
   return data;
 }
 
+export async function fetchRecommendContent(entryID : number) : Promise<EntryContent>{
+  const rssStore = useRssStore();
+  const data: EntryContent = await axios.get(
+    rssStore.url + '/api/recommend/' + entryID + '/fetch-content');
+  return data;
+}
+
 export const addRecommendToBoard = async (req: EntryToBoardRequest) => {
   // saveToBoard /recommend/saveToBoard
   // EntryID int64 `json:"entry_id"`

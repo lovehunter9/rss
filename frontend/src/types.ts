@@ -680,7 +680,6 @@ export interface Recommend {
   author: string
   published_at: string
   url: string
-  full_content: string
   feed: {
     id: number
     feed_title: string
@@ -694,6 +693,7 @@ export interface Recommend {
     category_title: string
   }
   score: number
+  keyword : string
   rank: number
   image_url: string
 }
