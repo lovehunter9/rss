@@ -2,12 +2,18 @@
   <div class="feed-root row items-center">
     <q-checkbox dense size="md" v-model="selection" color="orange" @update:model-value="onSelected"/>
     <div class="row items-center feed-text-layout">
-      <div class="row" style="flex: 15">
-        <q-img v-if="item.data.icon_content && item.data.icon_content.length > 8" class="feed-icon"
+      <div class="row justify-start items-center" style="flex: 15">
+        <q-img  class="feed-icon"
                style="margin-right: 12px;"
-               :src="'data:image/png;' + item.data.icon_content"/>
-        <div class="text-title text-major-color">{{ item.data.feed_title }}</div>
-        <div class="text-url text-minor-color">{{ item.data.entry_title }}</div>
+               :src="'data:image/png;' + item.data.icon_content">
+          <template v-slot:error>
+            <div class="absolute-full flex flex-center bg-negative text-white">
+              img
+            </div>
+          </template>
+        </q-img>
+        <div class="text-feed-title text-major-color">{{ item.data.feed_title }}</div>
+        <div class="text-entry-title text-major-color">{{ item.data.entry_title }}</div>
       </div>
     </div>
 
@@ -95,40 +101,24 @@ function remove() {
       border-radius: 50%
     }
 
-    .text-title {
+    .text-feed-title {
       font-family: 'Roboto';
       font-style: normal;
       font-weight: 400;
       font-size: 12px;
+      max-width: 160px;
+      min-width: 160px;
+      line-height: 14px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .text-entry-title {
+      @extend .text-feed-title;
       max-width: 260px;
-      line-height: 14px;
-      margin-left: 10px;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
-
-    .text-url {
-      @extend .text-title;
-      margin-top: 4px;
-    }
-  }
-
-  .folder-text-layout {
-    width: calc(100% - 65px);
-
-    .text-title {
-      font-family: 'Roboto';
-      font-style: normal;
-      font-weight: 400;
-      font-size: 12px;
-      max-width: 400px;
-      line-height: 14px;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      text-overflow: ellipsis;
-      overflow: hidden;
+      min-width: 260px;
+      margin-left: 40px;
     }
   }
 
