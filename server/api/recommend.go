@@ -197,7 +197,7 @@ func (h *handler) recommendAddFeed(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) fetchRecommendContent(w http.ResponseWriter, r *http.Request) {
 	entryID := request.RouteInt64Param(r, "entryID")
-
+	logger.Info("fetchRecommendContent %d", entryID)
 	stat := h.initRecommendStat(entryID)
 
 	if stat != nil {
