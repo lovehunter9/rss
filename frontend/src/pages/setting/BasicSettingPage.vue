@@ -39,12 +39,12 @@ onMounted(() => {
   showTrendReason.value = store.setting.show_recommend_result
   const list = [];
   list.push({
-    title : 'en_US',
-    selected : store.setting.language.includes('en_US')
+    title : 'en',
+    selected : store.setting.language.includes('en')
   })
   list.push({
-    title : 'zh_CN',
-    selected : store.setting.language.includes('zh_CN')
+    title : 'zh-cn',
+    selected : store.setting.language.includes('zh-cn')
   })
   menuDataRef.value = list
 })

@@ -1,10 +1,10 @@
 <template>
   <div class="feed-root row items-center">
     <q-checkbox dense size="md" v-model="selection" color="orange" @update:model-value="onSelected"
-                v-show="data.getType() === ORGANIZE_TYPE.FEED"/>
+                v-show="item.getType() === ORGANIZE_TYPE.FEED"/>
 
     <div class="row items-center"
-         :class="data.getType() === ORGANIZE_TYPE.FEED ? 'feed-text-layout' : 'folder-text-layout'">
+         :class="item.getType() === ORGANIZE_TYPE.FEED ? 'feed-text-layout' : 'folder-text-layout'">
       <div class="row" style="flex: 15">
         <q-img class="feed-icon" :src="imgRef" v-show="imgRef"/>
         <div class="column justify-start items-start">
@@ -37,7 +37,7 @@ import FolderEditDialog from 'components/dialog/FolderEditDialog.vue';
 import {getPastTime, newsBus, newsBusMessage, utcToStamp} from 'src/utils/utils';
 
 const props = defineProps({
-  data: {
+  item: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     type: Object as PropType<BaseOption<any>>,
     require: true
@@ -58,14 +58,14 @@ const third = ref()
 const fourth = ref()
 const imgRef = ref()
 
-if (props.data) {
+if (props.item) {
 
   const filter = store.feeds.filter((feed) => {
-    if (props.data) {
-      if (props.data.getType() === ORGANIZE_TYPE.FEED) {
-        return feed.id == props.data.getId()
+    if (props.item) {
+      if (props.item.getType() === ORGANIZE_TYPE.FEED) {
+        return feed.id == props.item.getId()
       } else {
-        return feed.category.id == props.data.getId()
+        return feed.category.id == props.item.getId()
       }
     }
     return false
@@ -74,17 +74,17 @@ if (props.data) {
     console.log(filter)
     fourth.value = getLatestTime(filter)
   }
-  if (props.data.getType() === ORGANIZE_TYPE.FEED) {
-    if (store.feeds_icon && store.feeds_icon[(props.data.data as Feed).id] !== undefined) {
-      imgRef.value = store.feeds_icon[(props.data.data as Feed).id].data;
+  if (props.item.getType() === ORGANIZE_TYPE.FEED) {
+    if (store.feeds_icon && store.feeds_icon[(props.item.data as Feed).id] !== undefined) {
+      imgRef.value = store.feeds_icon[(props.item.data as Feed).id].data;
     }
 
-    first.value = (props.data.data as Feed).title
-    second.value = (props.data.data as Feed).feed_url
-    third.value = (props.data.data as Feed).category.title
+    first.value = (props.item.data as Feed).title
+    second.value = (props.item.data as Feed).feed_url
+    third.value = (props.item.data as Feed).category?.title
   } else {
-    first.value = (props.data.data as Category).title
-    third.value = (props.data.data as Category).feeds.length
+    first.value = (props.item.data as Category).title
+    third.value = (props.item.data as Category).feeds.length
   }
 }
 
@@ -111,33 +111,33 @@ if (props.parent) {
 }
 
 function onSelected(value: boolean) {
-  if (!props.data) {
+  if (!props.item) {
     return
   }
   if (props.parent) {
-    props.parent.setFeedSelected(props.data.getId(), value)
+    props.parent.setFeedSelected(props.item.getId(), value)
   } else {
-    organizeStore.setSelected(props.data.getId(), value)
+    organizeStore.setSelected(props.item.getId(), value)
   }
 }
 
 function edit() {
   console.log('edit')
-  if (props.data) {
+  if (props.item) {
 
     let opts: QDialogOptions;
     if (organizeStore.organizeData.type === ORGANIZE_TYPE.FEED || props.parent) {
       opts = {
         component: FeedEditDialog,
         componentProps: {
-          feed: props.data.data
+          feed: props.item.data
         }
       }
     } else {
       opts = {
         component: FolderEditDialog,
         componentProps: {
-          folder: props.data
+          folder: props.item
         }
       }
     }
@@ -173,8 +173,8 @@ function remove() {
     component: OrganizeDeleteDialog,
     componentProps: {type}
   }).onOk(async () => {
-    if (props.data) {
-      await organizeStore.delete(props.data.getId())
+    if (props.item) {
+      await organizeStore.delete(props.item.getId())
     }
   }).onCancel(() => {
     console.log('Cancel');

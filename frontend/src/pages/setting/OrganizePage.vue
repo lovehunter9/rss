@@ -75,7 +75,7 @@
           <organize-item
             :key="item.getType() + item.getId()"
             v-for="item in organizeStore.organizeData.dataList"
-            :data="item"/>
+            :item="item"/>
         </q-list>
       </q-scroll-area>
 

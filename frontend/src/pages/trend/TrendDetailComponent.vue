@@ -55,7 +55,7 @@ import {Recommend} from 'src/types';
 import {utcToStamp} from 'src/utils/utils'
 import {formatContentHtml} from 'src/utils/utils'
 import {date, useQuasar} from 'quasar'
-import {addRecommendToBoard, getBlackList} from 'src/api/api';
+import {addRecommendToBoard} from 'src/api/api';
 import ChangeEntryBoardMenuComponent from 'components/rss/ChangeEntryBoardMenuComponent.vue';
 import SubscribeFeed from 'components/rss/SubscribeFeed.vue';
 import {addToBlackList} from 'src/api/api';
@@ -83,11 +83,14 @@ onMounted(() => {
 const addBlackList = () => {
   addToBlackList({
     feed_id: props.item.feed.id,
-    // feed_title : props.item.feed.feed_title,
-    // feed_url : props.item.feed.feed_url,
-    entry_url : props.item.url,
-    entry_title : props.item.title
+    entry_url: props.item.url,
+    entry_title: props.item.title
   })
+  store.remove_recommendList(props.item)
+  nextAction();
+  if (store.recommends.length == 0) {
+    emit('onRefresh');
+  }
 }
 
 const preAction = () => {
@@ -157,7 +160,7 @@ function getTime() {
   return '';
 }
 
-const emit = defineEmits(['goPageAction']);
+const emit = defineEmits(['goPageAction','onRefresh']);
 
 watch(
   () => props.item,
