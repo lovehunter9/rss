@@ -207,9 +207,11 @@ func (h *handler) fetchRecommendContent(w http.ResponseWriter, r *http.Request) 
 
 	entry, _ := h.store.RecommendEntry(entryID)
 	if entry != nil {
+		logger.Info("[fetchRecommendContent ...:  content:%d id: %d]", len(entry.FullContent), entry.CloudID)
 		if entry.FullContent == "" && entry.CloudID != 0 {
 			fullContent, _ := h.s3action.GetObject(entry.CloudID)
 			entry.FullContent = fullContent
+			logger.Info("[fetchRecommendContent s3  content:%d ]", len(fullContent))
 			h.store.UpdateRecommendFullContent(entryID, entry)
 		}
 		json.OK(w, r, map[string]string{"content": entry.FullContent})
