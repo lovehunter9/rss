@@ -39,7 +39,7 @@
             Article Recommendation Score : {{ item.score }}
           </div>
           <div class="recommend-title" v-if="item.keyword">
-            Article Recommendation Keyword : {{item.keyword}}
+            Article Recommendation Keyword : {{ item.keyword }}
           </div>
         </div>
       </div>
@@ -163,12 +163,16 @@ function getTime() {
   return '';
 }
 
-const emit = defineEmits(['goPageAction','onRefresh']);
+const emit = defineEmits(['goPageAction', 'onRefresh']);
 
-async function updateEntry(recommend : Recommend) {
-  const entryContent = await fetchRecommendContent(recommend.entry_id);
-  if (entryContent) {
-    recommendRef.value = formatContentHtml(entryContent.content);
+async function updateEntry(recommend: Recommend) {
+  if (recommend.full_content) {
+    recommendRef.value = formatContentHtml(recommend.full_content);
+  } else {
+    const entryContent = await fetchRecommendContent(recommend.entry_id);
+    if (entryContent) {
+      recommendRef.value = formatContentHtml(entryContent.content);
+    }
   }
 }
 

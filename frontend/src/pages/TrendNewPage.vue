@@ -11,7 +11,12 @@
           <div class="text-label text-major-color"> Trend </div>
           <div class="text-sub-label text-minor-color"></div>
           <q-scroll-area class="list-view">
-            <div v-for="item in store.recommends" :key="item.entry_id">
+            <div class="entry" v-if="isLoadingData">
+              <entry-skeleton/>
+              <entry-skeleton/>
+              <entry-skeleton/>
+            </div>
+            <div v-else v-for="item in store.recommends" :key="item.entry_id">
               <trend-entry-view :recommend="item" :selected="item.entry_id === recommendRef?.entry_id"/>
               <q-separator />
             </div>
@@ -45,6 +50,7 @@ import {useRoute, useRouter} from 'vue-router';
 import TrendEntryView from 'components/rss/TrendEntryView.vue';
 import FooterLoadingComponent from 'components/rss/FooterLoadingComponent.vue';
 import {useQuasar} from 'quasar';
+import EntrySkeleton from "components/rss/EntrySkeleton.vue";
 const Route = useRoute()
 const router = useRouter()
 const store = useRssStore();
@@ -53,7 +59,7 @@ const splitterModel = ref(400)
 const isRequest = ref(false)
 const recommendRef = ref<Recommend | undefined>()
 const loadDataEmpty = ref(false);
-const $q = useQuasar();
+const isLoadingData = ref(true);
 
 function pushToRecommend(index: number) {
   let recommend = store.recommends[index];
@@ -63,10 +69,10 @@ function pushToRecommend(index: number) {
 }
 
 const loadDataAnim = async (loadData : () => Promise<number | undefined>) => {
-  $q.loading.show()
+  isLoadingData.value = true
   const dataLength = await loadData();
   loadDataEmpty.value = dataLength == 0
-  $q.loading.hide()
+  isLoadingData.value = false
   return dataLength
 }
 

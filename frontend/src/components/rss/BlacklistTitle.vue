@@ -3,14 +3,13 @@
     <q-checkbox dense indeterminate-value="null" size="md" v-model="selection" color="orange"
                 @update:model-value="onSelected"/>
     <div class="feed-text-layout" v-if="organizeStore.organizeData.status === false">
-      <span class="text-type text-minor-color" style="flex: 15">Feeds</span>
-      <span class="text text-minor-color" style="flex : 12">Article Title</span>
+      <span class="text-type text-minor-color">Feeds</span>
+      <span class="text text-minor-color">Article Title</span>
     </div>
     <div class="selection-layout row justify-between items-center" v-else>
       <span class="text text-minor-color">Selected {{
           organizeStore.getSelectedList().length
         }} of {{ organizeStore.organizeData.dataList.length }}</span>
-      <span class="text text-minor-color" style="flex : 12">Article Title</span>
       <div class="row items-center">
         <q-btn flat dense class="selected-button row justify-start items-center" style="margin-left: 8px"
                @click="remove">
@@ -82,7 +81,14 @@ watch(() => organizeStore.organizeData.status, (value) => {
     flex-direction: row;
 
     .text-type {
-      @extend .text;
+      font-family: 'Roboto';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 12px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
       margin-left: 10px;
       padding-left: 8px;
     }
@@ -94,28 +100,7 @@ watch(() => organizeStore.organizeData.status, (value) => {
       font-size: 12px;
       line-height: 12px;
       white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
-
-  }
-
-  .folder-text-layout {
-    width: calc(100% - 65px);
-    display: flex;
-    flex-direction: row;
-
-    .text-type {
-      @extend .text;
-    }
-
-    .text {
-      font-family: 'Roboto';
-      font-style: normal;
-      font-weight: 400;
-      font-size: 12px;
-      line-height: 12px;
-      white-space: nowrap;
+      margin-left: 210px;
       text-overflow: ellipsis;
       overflow: hidden;
     }

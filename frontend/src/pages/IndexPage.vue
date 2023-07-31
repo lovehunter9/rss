@@ -16,8 +16,14 @@
           <div class="text-label text-major-color">{{ labelRef }}</div>
           <div class="text-sub-label text-minor-color">{{ subLabelRef }}</div>
           <q-scroll-area class="list-view" @scroll="onScroll">
-            <q-list>
-
+            <q-list v-if="isLoadingData">
+              <div class="entry">
+                <entry-skeleton/>
+                <entry-skeleton/>
+                <entry-skeleton/>
+              </div>
+            </q-list>
+            <q-list v-else>
               <div v-for="(entry, index) in store.entries" :key="`it` + index" class="entry">
                 <entry-view :entry='entry' :selected="index === selectIndex"
                             @onClickCallback="onClickCallback(index)"/>
@@ -58,6 +64,7 @@ import {useQuasar} from 'quasar';
 import AddBoardDialog from 'components/dialog/AddBoardDialog.vue';
 import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import FooterLoadingComponent from 'components/rss/FooterLoadingComponent.vue'
+import EntrySkeleton from "components/rss/EntrySkeleton.vue";
 
 const store = useRssStore();
 const labelRef = ref('')
@@ -95,6 +102,7 @@ watch(() => readStatus.value, () => {
 })
 
 const loadMoreEnable = ref(true)
+const isLoadingData = ref(true)
 
 onMounted(() => {
 
@@ -268,10 +276,10 @@ const requestEntries = async (hasMore = false) => {
 
   const loadDataAnim = async (loadData : () => Promise<number | undefined>) => {
     loadMoreEnable.value = true
-    $q.loading.show()
+    isLoadingData.value = true
     const dataLength = await loadData();
     loadDataEmpty.value = dataLength == 0
-    $q.loading.hide()
+    isLoadingData.value = false
     loadMoreEnable.value = dataLength !== undefined && dataLength >= 10;
     return dataLength
   }

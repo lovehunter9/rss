@@ -269,7 +269,7 @@ onMounted(async () => {
 
   await store.get_basic_setting();
 
-  await store.get_blacklist();
+  await store.get_blacklist(0);
 
   todayCount.value = await store.get_today() || 0
 

@@ -276,9 +276,9 @@ export const useRssStore = defineStore('rss', {
       return this.feeds.find((feed) => feed.feed_url == feed_url);
     },
 
-    async get_blacklist() : Promise<Blacklist[]>{
+    async get_blacklist(offsite : number) : Promise<Blacklist[]>{
       try {
-        this.blacklist = await getBlackList();
+        this.blacklist = await getBlackList(offsite);
       } catch (e) {
         console.log(e);
       }

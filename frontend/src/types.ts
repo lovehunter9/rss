@@ -679,6 +679,7 @@ export interface Recommend {
   title: string
   author: string
   published_at: string
+  full_content : string
   url: string
   feed: {
     id: number
