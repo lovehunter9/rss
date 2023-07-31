@@ -118,6 +118,7 @@ func feedScheduler(store *storage.Storage, pool *worker.Pool, frequency, batchSi
 			logger.Debug("[Scheduler:Feed] Pushing %d jobs", len(jobs))
 			pool.Push(jobs)
 		}
+		logger.Info("feedScheduler ...")
 	}
 }
 
