@@ -827,7 +827,7 @@ var migrations = []func(tx *sql.Tx) error{
 				primary key (id)
 			);
 
-			ALTER TABLE recommend_blacklist ADD CONSTRAINT 'recommend_blacklist_feed_url_key' UNIQUE ('feed_url', 'entry_url');
+			ALTER TABLE recommend_blacklist ADD CONSTRAINT recommend_blacklist_feed_url_key UNIQUE (feed_url, entry_url);
 			ALTER TABLE users ADD COLUMN recommend_language text default 'en';
 			ALTER TABLE users ADD COLUMN show_recommend_result text default 't';
 		`
