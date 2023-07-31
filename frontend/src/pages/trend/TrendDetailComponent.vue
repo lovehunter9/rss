@@ -35,8 +35,11 @@
         <div v-html="recommendRef"/>
         <div class="recommend-reason column justify-start" v-if="showRecommendReasonRef">
           <div class="line"/>
-          <div class="recommend-title">
+          <div class="recommend-title" v-if="item.score">
             Article Recommendation Score : {{ item.score }}
+          </div>
+          <div class="recommend-title" v-if="item.keyword">
+            Article Recommendation Keyword : {{item.keyword}}
           </div>
         </div>
       </div>
@@ -55,7 +58,7 @@ import {Recommend} from 'src/types';
 import {utcToStamp} from 'src/utils/utils'
 import {formatContentHtml} from 'src/utils/utils'
 import {date, useQuasar} from 'quasar'
-import {addRecommendToBoard} from 'src/api/api';
+import {addRecommendToBoard, fetchRecommendContent} from 'src/api/api';
 import ChangeEntryBoardMenuComponent from 'components/rss/ChangeEntryBoardMenuComponent.vue';
 import SubscribeFeed from 'components/rss/SubscribeFeed.vue';
 import {addToBlackList} from 'src/api/api';
@@ -162,6 +165,13 @@ function getTime() {
 
 const emit = defineEmits(['goPageAction','onRefresh']);
 
+async function updateEntry(recommend : Recommend) {
+  const entryContent = await fetchRecommendContent(recommend.entry_id);
+  if (entryContent) {
+    recommendRef.value = formatContentHtml(entryContent.content);
+  }
+}
+
 watch(
   () => props.item,
   async (newVal: Recommend) => {
@@ -170,7 +180,7 @@ watch(
       recommendRef.value = '';
       return;
     }
-    recommendRef.value = formatContentHtml(newVal.full_content)
+    await updateEntry(newVal)
   }
   , {
     deep: true,
