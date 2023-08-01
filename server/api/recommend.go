@@ -205,7 +205,11 @@ func (h *handler) fetchRecommendContent(w http.ResponseWriter, r *http.Request) 
 		h.store.UpdateStatEntryRead(stat)
 	}
 
-	entry, _ := h.store.RecommendEntry(entryID)
+	entry, err := h.store.RecommendEntry(entryID)
+	if err != nil {
+		json.ServerError(w, r, err)
+		return
+	}
 	if entry != nil {
 		logger.Info("[fetchRecommendContent ...:  content:%d id: %d]", len(entry.FullContent), entry.CloudID)
 		if entry.FullContent == "" && entry.CloudID != 0 {
@@ -251,7 +255,11 @@ func (h *handler) initRecommendStat(entryID int64) *model.StatEntry {
 	recommendBase, _ := h.store.LastRecommendBase()
 	stat, _ := h.store.StatEntryRead(recommendBase.Batch, entryID)
 	if stat == nil {
-		result := h.store.GetRecommendResult(recommendBase.Batch, entryID)
+		result, err := h.store.GetRecommendResult(recommendBase.Batch, entryID)
+		if err != nil {
+			logger.Info("[initRecommendStat error :%s ]", err)
+			return nil
+		}
 		if result == nil {
 			return nil
 		}

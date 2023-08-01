@@ -97,12 +97,18 @@ func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, err
 	return recommends, nil
 }
 
-func (s *Storage) GetRecommendResult(batch int, entryId int64) *model.RecommendResult {
+func (s *Storage) GetRecommendResult(batch int, entryId int64) (*model.RecommendResult, error) {
 	var result model.RecommendResult
 	query := `SELECT r.batch,r.url,r.rank,r.score FROM recommend_result r, recommend_entries e WHERE r.url=e.url and r.batch=$1 and e.entry_id=$2`
-	s.db.QueryRow(query, batch, entryId).Scan(&result.Batch, &result.URL, &result.Rank, &result.Score)
-
-	return &result
+	err := s.db.QueryRow(query, batch, entryId).Scan(&result.Batch, &result.URL, &result.Rank, &result.Score)
+	switch {
+	case err == sql.ErrNoRows:
+		return nil, nil
+	case err != nil:
+		return nil, fmt.Errorf(`store: unable to fetch result: %v`, err)
+	default:
+		return &result, nil
+	}
 
 }
 
