@@ -36,7 +36,7 @@ func (action *S3action) GetObject(entryID int64) (string, error) {
 		log.Printf("Couldn't download large object from %v:%v. Here's why: %v\n",
 			bucket, key, downErr)
 	}
-	log.Println("download results:" + string(buffer.Bytes()))
+	//log.Println("download results:" + string(buffer.Bytes()))
 	return string(buffer.Bytes()), downErr
 }
 
