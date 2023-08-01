@@ -28,8 +28,8 @@ func (s *Storage) LastRecommendBase() (*model.RecommendBase, error) {
 func (s *Storage) RecommendEntry(entryID int64) (*model.RecommendEntry, error) {
 	var entry model.RecommendEntry
 
-	query := `SELECT id,feed_id,title, author,url,content,published_at,full_content,hash,cloud_id FROM recommend_entries where id=$1`
-	err := s.db.QueryRow(query, entryID).Scan(&entry.ID, &entry.FeedId, &entry.Title, &entry.Author, &entry.URL, &entry.Content, &entry.PublishedAt, &entry.FullContent, &entry.Hash, &entry.CloudID)
+	query := `SELECT id,feed_id,title,url,content,published_at,full_content,hash,cloud_id FROM recommend_entries where id=$1`
+	err := s.db.QueryRow(query, entryID).Scan(&entry.ID, &entry.FeedId, &entry.Title, &entry.URL, &entry.Content, &entry.PublishedAt, &entry.FullContent, &entry.Hash, &entry.CloudID)
 
 	switch {
 	case err == sql.ErrNoRows:
