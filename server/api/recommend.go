@@ -211,7 +211,6 @@ func (h *handler) fetchRecommendContent(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	if entry != nil {
-		logger.Info("[fetchRecommendContent ...:  content:%d id: %d]", len(entry.FullContent), entry.CloudID)
 		if entry.FullContent == "" && entry.CloudID != 0 {
 			fullContent, _ := h.s3action.GetObject(entry.CloudID)
 			entry.FullContent = fullContent
@@ -257,7 +256,7 @@ func (h *handler) initRecommendStat(entryID int64) *model.StatEntry {
 	if stat == nil {
 		result, err := h.store.GetRecommendResult(recommendBase.Batch, entryID)
 		if err != nil {
-			logger.Info("[initRecommendStat error :%s ]", err)
+			logger.Info("[initRecommendStat error :%v ]", err)
 			return nil
 		}
 		if result == nil {
