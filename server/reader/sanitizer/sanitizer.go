@@ -120,6 +120,10 @@ func sanitizeAttributes(baseURL, tagName string, attributes []html.Attribute) ([
 		}
 
 		if tagName == "img" && (attribute.Key == "width" || attribute.Key == "height") {
+			if strings.HasSuffix(value, "px") {
+				value = value[0 : len(value)-2]
+			}
+
 			if !isPositiveInteger(value) {
 				continue
 			}
@@ -522,6 +526,10 @@ func getAttributeValue(name string, attributes []html.Attribute) string {
 }
 
 func getIntegerAttributeValue(name string, attributes []html.Attribute) int {
-	number, _ := strconv.Atoi(getAttributeValue(name, attributes))
+	v := getAttributeValue(name, attributes)
+	if strings.HasSuffix(v, "px") {
+		v = v[0 : len(v)-2]
+	}
+	number, _ := strconv.Atoi(v)
 	return number
 }
