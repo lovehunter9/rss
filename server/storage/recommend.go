@@ -240,7 +240,7 @@ func (s *Storage) KeywordRecommendList(batch, offset, limit int) (model.Recommen
 	 f.title feed_title,f.feed_url,f.site_url,f.icon_type,f.icon_content icon_byte_content,f.category_id,f.category_title,e.full_content ,e.image_url,f.id
 	 FROM recommend_result_keyword r,recommend_entries e,recommend_feed f 
 	 WHERE r.batch=$1 and r.url=e.url and e.feed_id=f.id
-	 ORDER BY r.rank  OFFSET $2 limit $3`
+	 ORDER BY r.rank,r.id  OFFSET $2 limit $3`
 	rows, err := s.db.Query(query, batch, offset, limit)
 	if err != nil {
 		return nil, fmt.Errorf(`store: unable to fetch boards: %v`, err)

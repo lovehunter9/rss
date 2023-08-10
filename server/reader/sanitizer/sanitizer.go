@@ -120,6 +120,10 @@ func sanitizeAttributes(baseURL, tagName string, attributes []html.Attribute) ([
 		}
 
 		if tagName == "img" && (attribute.Key == "width" || attribute.Key == "height") {
+			if strings.HasSuffix(value, "px") {
+				value = value[0 : len(value)-2]
+			}
+
 			if !isPositiveInteger(value) {
 				continue
 			}
@@ -136,7 +140,7 @@ func sanitizeAttributes(baseURL, tagName string, attributes []html.Attribute) ([
 				} else {
 					continue
 				}
-			} else if tagName == "img" && attribute.Key == "src" && isValidDataAttribute(attribute.Val) {
+			} else if tagName == "img" && (attribute.Key == "src" || attribute.Key == "data-src") && isValidDataAttribute(attribute.Val) {
 				value = attribute.Val
 			} else if isAnchor("a", attribute) {
 				value = attribute.Val
@@ -152,9 +156,12 @@ func sanitizeAttributes(baseURL, tagName string, attributes []html.Attribute) ([
 				}
 			}
 		}
-
-		attrNames = append(attrNames, attribute.Key)
-		htmlAttrs = append(htmlAttrs, fmt.Sprintf(`%s="%s"`, attribute.Key, html.EscapeString(value)))
+		finalKey := attribute.Key
+		if tagName == "img" && attribute.Key == "data-src" {
+			finalKey = "src"
+		}
+		attrNames = append(attrNames, finalKey)
+		htmlAttrs = append(htmlAttrs, fmt.Sprintf(`%s="%s"`, finalKey, html.EscapeString(value)))
 	}
 
 	if !isAnchorLink {
@@ -207,7 +214,7 @@ func isValidAttribute(tagName, attributeName string) bool {
 
 func isExternalResourceAttribute(attribute string) bool {
 	switch attribute {
-	case "src", "href", "poster", "cite":
+	case "src", "href", "poster", "cite", "data-src":
 		return true
 	default:
 		return false
@@ -239,7 +246,7 @@ func hasRequiredAttributes(tagName string, attributes []string) bool {
 	elements := make(map[string][]string)
 	elements["a"] = []string{"href"}
 	elements["iframe"] = []string{"src"}
-	elements["img"] = []string{"src"}
+	elements["img"] = []string{"src", "data-src"}
 	elements["source"] = []string{"src", "srcset"}
 
 	for element, attrs := range elements {
@@ -371,7 +378,7 @@ func isValidIframeSource(baseURL, src string) bool {
 
 func getTagAllowList() map[string][]string {
 	whitelist := make(map[string][]string)
-	whitelist["img"] = []string{"alt", "title", "src", "srcset", "sizes", "width", "height"}
+	whitelist["img"] = []string{"alt", "title", "src", "srcset", "sizes", "width", "height", "data-src"}
 	whitelist["picture"] = []string{}
 	whitelist["audio"] = []string{"src"}
 	whitelist["video"] = []string{"poster", "height", "width", "src"}
@@ -519,6 +526,10 @@ func getAttributeValue(name string, attributes []html.Attribute) string {
 }
 
 func getIntegerAttributeValue(name string, attributes []html.Attribute) int {
-	number, _ := strconv.Atoi(getAttributeValue(name, attributes))
+	v := getAttributeValue(name, attributes)
+	if strings.HasSuffix(v, "px") {
+		v = v[0 : len(v)-2]
+	}
+	number, _ := strconv.Atoi(v)
 	return number
 }
