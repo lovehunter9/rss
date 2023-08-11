@@ -29,8 +29,12 @@
       <span class="time text-minor-color">
         {{ getTime() }}
       </span>
-      <div class="html-content text-major-color" v-if="item">
+      <!-- <div class="html-content text-major-color" v-if="item">
         <div v-html="entry"></div>
+      </div> -->
+
+      <div class="_textContentWrapper_ifq4i_1" v-if="item">
+        <div id="document-text-content" v-html="entry"/>
       </div>
 
 
@@ -323,4 +327,17 @@ const supportAudio = (mime_type: string) => {
   }
 
 }
+
+
+._textContentWrapper_ifq4i_1 {
+  margin: 0 auto 56px;
+  max-width: calc(var(--reading-editable-line-length) + var(--content-gutter) * 2);
+  margin-bottom: 115px;
+  padding: 0 1rem
+}
+
+._textContentWrapper_ifq4i_1._isYouTube_ifq4i_7 {
+    max-width: calc(var(--reading-editable-line-length) + var(--content-gutter) * 6);
+  }
+
 </style>
