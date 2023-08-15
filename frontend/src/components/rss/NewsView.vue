@@ -29,8 +29,12 @@
       <span class="time text-minor-color">
         {{ getTime() }}
       </span>
-      <div class="html-content text-major-color" v-if="item">
+      <!-- <div class="html-content text-major-color" v-if="item">
         <div v-html="entry"></div>
+      </div> -->
+
+      <div class="_textContentWrapper" v-if="item">
+        <div id="document-text-content" v-html="entry"/>
       </div>
 
 
@@ -280,9 +284,9 @@ const supportAudio = (mime_type: string) => {
   .content-bg {
     width: 100%;
     margin-top: 10px;
-    padding-left: 32px;
-    padding-right: 32px;
-    height: calc(100% - 78px);
+    // padding-left: 32px;
+    // padding-right: 32px;
+    //height: calc(100% - 78px);
     overflow-y: scroll;
 
     .author {
@@ -309,18 +313,32 @@ const supportAudio = (mime_type: string) => {
       line-height: 14px;
     }
 
-    .html-content {
-      margin-top: 20px;
-      width: 100%;
-      font-family: 'Roboto';
-      font-style: normal;
-      font-weight: 400;
-      font-size: 14px;
-      line-height: 20px;
-      word-break: break-all;
-      padding-bottom: 30px;
-    }
+    // .html-content {
+    //   margin-top: 20px;
+    //   width: 100%;
+    //   font-family: 'Roboto';
+    //   font-style: normal;
+    //   font-weight: 400;
+    //   font-size: 14px;
+    //   line-height: 20px;
+    //   word-break: break-all;
+    //   padding-bottom: 30px;
+    // }
+
+
+._textContentWrapper {
+  margin: 0 auto 56px;
+  max-width: calc(var(--reading-editable-line-length) + var(--content-gutter) * 2);
+  margin-bottom: 115px;
+  padding: 0 1rem
+}
+
+._textContentWrapper ._isYouTube {
+    max-width: calc(var(--reading-editable-line-length) + var(--content-gutter) * 6);
+  }
   }
 
 }
+
+
 </style>
