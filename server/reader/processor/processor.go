@@ -82,7 +82,8 @@ func ProcessFeedEntries(store *storage.Storage, feed *model.Feed, user *model.Us
 			}
 		}
 
-		entry.Content = rewrite.Rewriter(url, entry.Content, feed.RewriteRules)
+		//entry.Content = rewrite.Rewriter(url, entry.Content, feed.RewriteRules)
+		entry.Content = rewrite.Rewriter(url, entry.Content, "add_dynamic_image")
 
 		// The sanitizer should always run at the end of the process to make sure unsafe HTML is filtered.
 		entry.Content = sanitizer.Sanitize(url, entry.Content)
@@ -165,7 +166,8 @@ func ProcessEntryWebPage(feed *model.Feed, entry *model.Entry, user *model.User)
 		return scraperErr
 	}
 
-	content = rewrite.Rewriter(url, content, entry.Feed.RewriteRules)
+	//content = rewrite.Rewriter(url, content, entry.Feed.RewriteRules)
+	content = rewrite.Rewriter(url, content, "add_dynamic_image")
 	content = sanitizer.Sanitize(url, content)
 
 	if content != "" {
@@ -320,6 +322,7 @@ func ScraperWebPage(url string) (string, string) {
 		return "", ""
 	}
 
+	content = rewrite.Rewriter(url, content, "add_dynamic_image")
 	content = sanitizer.Sanitize(url, content)
 	var img string
 

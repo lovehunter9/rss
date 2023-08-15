@@ -105,7 +105,7 @@ func sanitizeAttributes(baseURL, tagName string, attributes []html.Attribute) ([
 
 	if tagName == "img" {
 		imgWidth := getIntegerAttributeValue("width", attributes)
-		isImageLargerThanLayout = imgWidth > 750
+		isImageLargerThanLayout = imgWidth > 1000
 	}
 
 	for _, attribute := range attributes {

@@ -91,6 +91,7 @@ func addDynamicImage(entryURL, entryContent string) string {
 
 	// Ordered most preferred to least preferred.
 	candidateAttrs := []string{
+		"_src",
 		"data-src",
 		"data-original",
 		"data-orig",

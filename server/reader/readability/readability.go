@@ -28,7 +28,7 @@ var (
 
 	blacklistCandidatesRegexp  = regexp.MustCompile(`(?i)popupbody|-ad|g-plus`)
 	okMaybeItsACandidateRegexp = regexp.MustCompile(`(?i)and|article|body|column|main|shadow`)
-	unlikelyCandidatesRegexp   = regexp.MustCompile(`(?i)banner|breadcrumbs|combx|comment|community|cover-wrap|disqus|extra|foot|header|legends|menu|modal|related|remark|replies|rss|shoutbox|sidebar|skyscraper|social|sponsor|supplemental|ad-break|agegate|pagination|pager|popup|yom-remote`)
+	unlikelyCandidatesRegexp   = regexp.MustCompile(`(?i)banner|breadcrumbs|combx|comment|community|cover-wrap|disqus|extra|foot|header|legends|menu|modal|related|remark|replies|rss|shoutbox|sidebar|skyscraper|social|sponsor|supplemental|ad-break|agegate|pagination|pager|popup|yom-remote|heading|subscribe`)
 
 	negativeRegexp = regexp.MustCompile(`(?i)hidden|^hid$|hid$|hid|^hid |banner|combx|comment|com-|contact|foot|footer|footnote|masthead|media|meta|modal|outbrain|promo|related|scroll|share|shoutbox|sidebar|skyscraper|sponsor|shopping|tags|tool|widget|byline|author|dateline|writtenby|p-author`)
 	positiveRegexp = regexp.MustCompile(`(?i)article|body|content|entry|hentry|h-entry|main|page|pagination|post|text|blog|story`)
@@ -92,7 +92,10 @@ func ExtractContent(page io.Reader) (string, error) {
 	topCandidate := getTopCandidate(document, candidates)
 	logger.Debug("[Readability] TopCandidate: %v", topCandidate)
 
+	checkBeginningAndEnd(topCandidate)
+
 	output := getArticle(topCandidate, candidates)
+
 	return output, nil
 }
 
@@ -148,6 +151,29 @@ func removeUnlikelyCandidates(document *goquery.Document) {
 		if blacklistCandidatesRegexp.MatchString(str) || (unlikelyCandidatesRegexp.MatchString(str) && !okMaybeItsACandidateRegexp.MatchString(str)) {
 			removeNodes(s)
 		}
+	})
+}
+
+func checkBeginningAndEnd(topCandidate *candidate) {
+	isMainTextStart := false
+	topCandidate.selection.Children().Each(func(i int, s *goquery.Selection) {
+		linkDensity := getLinkDensity(s)
+		content := s.Text()
+		contentLength := len(content)
+		if !isMainTextStart {
+			if contentLength >= 80 && linkDensity < .25 {
+				isMainTextStart = true
+			} else if contentLength < 80 && linkDensity == 0 && sentenceRegexp.MatchString(content) {
+				isMainTextStart = true
+			} else {
+				removeNodes(s)
+			}
+		} else {
+			if !(linkDensity < .10) {
+				removeNodes(s)
+			}
+		}
+
 	})
 }
 
@@ -249,8 +275,12 @@ func scoreNode(s *goquery.Selection) *candidate {
 // Get the density of links as a percentage of the content
 // This is the amount of text that is inside a link divided by the total text in the node.
 func getLinkDensity(s *goquery.Selection) float32 {
-	linkLength := len(s.Find("a").Text())
-	textLength := len(s.Text())
+	linkText := s.Find("a").Text()
+	text := s.Text()
+	text = strings.Replace(text, " ", "", -1)
+	text = strings.Replace(text, "\n", "", -1)
+	linkLength := len(linkText)
+	textLength := len(text)
 
 	if textLength == 0 {
 		return 0
