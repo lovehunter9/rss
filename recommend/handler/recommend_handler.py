@@ -128,8 +128,11 @@ class RecommendHandler:
             start_time = datetime.now()
             result = []
             if vector_database == 'weaviate':
+                supportLanauage = RecommendSupportLanguageEnum.ENGLISH
+                if language == 'en':
+                    supportLanauage = RecommendSupportLanguageEnum.CHINESE
                 recommend_tool = RecommendTool({}, user.model_name, user.model_version, VectorStoreEnum.WEAVIATE)
-                result = recommend_tool.recommend(query_url_to_embedding_dict, result_number_each, language)
+                result = recommend_tool.recommend(query_url_to_embedding_dict, result_number_each, major_language=supportLanauage)
             else:
                 base_url_to_embedding_dict = data_handler.get_tobe_recommended_entries(model_path, user, language)
                 recommend_tool = RecommendTool(base_url_to_embedding_dict, user.model_name, user.model_version)
