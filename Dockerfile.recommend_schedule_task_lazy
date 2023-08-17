@@ -1,0 +1,10 @@
+# FROM continuumio/anaconda3:2022.10-amazonlinux amazon vm
+# FROM continuumio/anaconda3:2022.10
+FROM python:3.8-slim
+ENV BASE_PATH /opt/recommend
+ENV MODEL_PATH /opt/model
+VOLUME [$MODEL_PATH]
+COPY recommend/  $BASE_PATH/
+# following save credentials in docker is not safe, in future we will remove it
+COPY resources/credentials  /root/.aws/ 
+CMD ["python","-u","/opt/recommend/schedule_task/schedule_task_lazy.py"]
