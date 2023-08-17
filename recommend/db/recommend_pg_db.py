@@ -136,6 +136,7 @@ class RecommendFeedModel(RecommendPGBaseModel):
 class RecommendResultModel(RecommendPGBaseModel):
     id = BigIntegerField(null=False, unique=True, index=True)
     batch = IntegerField(null=True)
+    cloud_id = BigIntegerField(null=True)
     url = BigIntegerField(null=True)
     entry_id = DateTimeField(null=False, index=True)
     score = DecimalField(null=True)

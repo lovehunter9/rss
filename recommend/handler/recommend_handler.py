@@ -143,7 +143,7 @@ class RecommendHandler:
             rank = 1
             recommendResultList.append([])
             for detail in result:
-                result = {'batch': batch, 'url': detail[0], 'score': detail[1], 'rank': rank, 'language': language}
+                result = {'batch': batch, 'cloud_id': detail[0], 'score': detail[1], 'rank': rank, 'language': language}
                 recommendResultList[resultListIndex].append(result)
                 rank = rank + 1
             self.current_logger.debug(f'saveResultList language：{language} len:{len(recommendResultList[resultListIndex])}')
