@@ -71,7 +71,7 @@ func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, err
 	query := `SELECT r.batch, e.id entry_id, e.title, e.author,e.url,e.published_at,r.score,r.rank,
 	 f.title feed_title,f.feed_url,f.site_url,f.icon_type,f.icon_content icon_byte_content,f.category_id,f.category_title,e.full_content ,e.image_url,f.id
 	 FROM recommend_result r,recommend_entries e,recommend_feed f 
-	 WHERE r.batch=$1 and r.url=e.url and e.feed_id=f.id
+	 WHERE r.batch=$1 and r.cloud_id=e.cloud_id and e.feed_id=f.id
 	 ORDER BY r.id  OFFSET $2 limit $3`
 	rows, err := s.db.Query(query, batch, offset, limit)
 	if err != nil {
@@ -99,7 +99,7 @@ func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, err
 
 func (s *Storage) GetRecommendResult(batch int, entryId int64) (*model.RecommendResult, error) {
 	var result model.RecommendResult
-	query := `SELECT r.batch,r.url,r.rank,r.score FROM recommend_result r, recommend_entries e WHERE r.url=e.url and r.batch=$1 and e.id=$2`
+	query := `SELECT r.batch,r.url,r.rank,r.score FROM recommend_result r, recommend_entries e WHERE r.cloud_id=e.cloud_id and r.batch=$1 and e.id=$2`
 	err := s.db.QueryRow(query, batch, entryId).Scan(&result.Batch, &result.URL, &result.Rank, &result.Score)
 	switch {
 	case err == sql.ErrNoRows:
