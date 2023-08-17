@@ -28,8 +28,8 @@ class RecommendPGDBTool:
     def select_recommend_model(self):
         return RecommendModel.select().order_by(RecommendModel.id.desc()).limit(1).execute()
 
-    def insert_recommend_model(self, batch, language):
-        RecommendModel.insert(batch=batch, language=language).execute()
+    def insert_recommend_model(self, batch, language, model_name, model_version):
+        RecommendModel.insert(batch=batch, language=language, model_name=model_name, model_version=model_version).execute()
 
     def empty_recommend_feed_model(self):
         RecommendFeedModel.delete().execute()
@@ -126,3 +126,31 @@ class RecommendPGDBTool:
     def batch_insert_keyword_list(self, model_list):
         q = RecommendKeywordlist.insert_many(model_list)
         q.execute()
+
+    def clear_recommend_result(self, batch):
+        RecommendResultModel.delete().where(RecommendResultModel.batch == batch).execute()
+
+    def clear_recommend_entries(self, clearTime):
+        #sql = "delete from  recommend_entries_embedding where url in (select url from recommend_entries where published_at<?)"
+        #params = (clearTime)
+        #RecommendEntriesEmbedingModel.execute_sql(sql, params)
+
+        RecommendEntriesModel.delete().where(RecommendEntriesModel.published_at < clearTime).execute()
+
+    def recommend_read_stat_list(self, batch):
+        result_list = RecommendReadStatModel.select(RecommendReadStatModel.entry_id, RecommendEntriesModel.cloud_id,
+                                                    RecommendEntriesModel.language).join(RecommendEntriesModel,
+                                                                                         on=(RecommendEntriesModel.id == RecommendReadStatModel.entry_id),
+                                                                                         attr='relation').where((RecommendReadStatModel.batch == batch)
+                                                                                                                & (RecommendReadStatModel.vector_data_check == 1)).execute()
+        result_dict_list = list()
+        for current_model in result_list:
+            stat = {
+                'cloud_id': current_model.relation.cloud_id,
+                'language': current_model.relation.language,
+            }
+            result_dict_list.append(stat)
+        return result_dict_list
+
+    def update_read_stat(self):
+        RecommendReadStatModel.update(vector_data_check=2).where(RecommendReadStatModel.vector_data_check == 1).execute()

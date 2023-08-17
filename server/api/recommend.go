@@ -22,6 +22,11 @@ var RecommendCacheBatch int
 var RecommendCachePage int
 var RecommendKeywordCachePage int
 
+const (
+	RecommendVectorCheckToDo   = 1
+	RecommendVectorCheckFinish = 2
+)
+
 //每天活跃时间
 //每天活跃时间段
 
@@ -202,6 +207,7 @@ func (h *handler) fetchRecommendContent(w http.ResponseWriter, r *http.Request) 
 
 	if stat != nil {
 		stat.ClickNum = stat.ClickNum + 1
+		stat.VectorDataCheck = RecommendVectorCheckToDo
 		h.store.UpdateStatEntryRead(stat)
 	}
 

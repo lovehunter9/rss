@@ -76,6 +76,8 @@ class RecommendModel(RecommendPGBaseModel):
     batch = IntegerField(null=False)
     fetch_at = DateTimeField(null=False)
     language = TextField(null=True)
+    model_name = TextField(null=False)
+    model_version = TextField(null=False)
 
     class Meta:
         db_table = 'recommend'
@@ -168,4 +170,15 @@ class RecommendKeywordlist(RecommendPGBaseModel):
 
     class Meta:
         db_table = 'recommend_result_keyword'
+        primary_key = False
+
+
+class RecommendReadStatModel(RecommendPGBaseModel):
+    id = BigIntegerField(null=False, unique=True, index=True)
+    batch = IntegerField(null=True)
+    entry_id = IntegerField(null=False)
+    vector_data_check = IntegerField(null=True, index=True)
+
+    class Meta:
+        db_table = 'stat_entry_read'
         primary_key = False

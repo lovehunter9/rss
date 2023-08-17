@@ -6,8 +6,7 @@ from recommend_model_sdk.tools.common_tool import CommonTool
 from recommend_model_sdk.tools.model_tool import ModelTool
 from db.recommend_pg_db_tool import *
 
-path = os.environ.get('model_path', "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model")
-
+#path = os.environ.get('model_path', "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model")
 #path = os.environ.get('model_path', "/model")
 read_entries_num = int(os.environ.get('read_entries_num', 50))
 down_latest_number = int(os.environ.get('down_latest_number', 10000))
@@ -19,20 +18,20 @@ class DataHandler:
         self.current_logger = CommonTool().get_logger()
         self.commont_tool = CommonTool()
 
-    def infer(self, docList):
+    def infer(self, model_path, docList):
         # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_infer
-        current_model_tool = ModelTool(path)
+        current_model_tool = ModelTool(model_path)
         model_name = "word2vec_google"
         model_version = "v1"
         print(current_model_tool.infer(model_name, model_version, docList))
 
-    def init_model(self, user):
-        current_model_tool = ModelTool(path)
+    def init_model(self, model_path, user):
+        current_model_tool = ModelTool(model_path)
         current_model_tool.init_model(user.model_name, user.model_version)
 
-    def get_readed_entries(self, user, language):
+    def get_readed_entries(self, model_path, user, language):
         tool = RecommendPGDBTool()
-        current_model_tool = ModelTool(path)
+        current_model_tool = ModelTool(model_path)
         entries = tool.select_read_entries(read_entries_num, language)
 
         result_list = dict()
@@ -63,9 +62,9 @@ class DataHandler:
             tool.batch_insert_entries_embedding_model(saveEmbeddingList)
         return result_list
 
-    def down_latest_article_embedding_package(self, user):
+    def down_latest_article_embedding_package(self, model_path, user):
         tool = RecommendPGDBTool()
-        current_model_tool = ModelTool(path)
+        current_model_tool = ModelTool(model_path)
 
         url_to_articles, url_to_embeddings = current_model_tool.download_latest_article_embedding_package(user.model_name, user.model_version, down_latest_number)
         self.current_logger.debug(f'down_latest_article_embedding_package downnuber:{down_latest_number}, num:{len(url_to_articles)}')
@@ -110,9 +109,9 @@ class DataHandler:
             if len(embedding_list) > 0:
                 tool.batch_insert_recommend_entries_embedding(embedding_list)
 
-    def download_increment_package(self, model_name, model_version, package_id):
+    def download_increment_package(self, model_name, model_version, model_path, package_id):
         tool = RecommendPGDBTool()
-        current_model_tool = ModelTool(path)
+        current_model_tool = ModelTool(model_path)
         #current_model_tool.download_increment_package("bert","v1","article_embeddding_package_bert_v1_97b08d6ac2ab51c7cca581eaf352d1b5")
         url_to_articles, url_to_embeddings = current_model_tool.download_increment_package(model_name, model_version, package_id)
         self.current_logger.debug(f'download_increment_package downnuber, num:{len(url_to_articles)}')
@@ -157,8 +156,8 @@ class DataHandler:
                     article_list.append(article)
             if len(article_list) > 0:
                 tool.batch_insert_recommend_entries(article_list)
-            if len(embedding_list) > 0:
-                tool.batch_insert_recommend_entries_embedding(embedding_list)
+            #if len(embedding_list) > 0:
+            #    tool.batch_insert_recommend_entries_embedding(embedding_list)
 
     def get_tobe_recommended_entries(self, user, language):
         tool = RecommendPGDBTool()
@@ -177,20 +176,20 @@ class DataHandler:
                 }
         return result_list
 
-    def down_valid_model_and_version(self):
+    def down_valid_model_and_version(self, model_path):
         tool = RecommendPGDBTool()
-        current_model_tool = ModelTool(path)
+        current_model_tool = ModelTool(model_path)
         result = current_model_tool.get_valid_model_and_version()
         for model, versionList in result.items():
             for v in versionList:
                 tool.check_model_and_version(model, v)
 
-    def download_feed(self):
+    def download_feed(self, model_path):
         tool = RecommendPGDBTool()
         tool.empty_recommend_feed_model()
         feedList = []
 
-        current_model_tool = ModelTool(path)
+        current_model_tool = ModelTool(model_path)
         feed_id_to_feed = current_model_tool.download_latest_all_feed()
         self.current_logger.debug(f'download feed id to feed compelete')
         for current_id, current_feed in feed_id_to_feed.items():
@@ -218,18 +217,18 @@ class DataHandler:
             tool.batch_insert_recommend_feed_model(feedList)
         self.current_logger.debug(f'insert downloaded feed to db')
 
-    def check_readed_entries_language(self):
+    def check_readed_entries_language(self, model_path):
         tool = RecommendPGDBTool()
-        current_model_tool = ModelTool(path)
+        current_model_tool = ModelTool(model_path)
         entries = tool.select_read_entries_check_language(read_entries_num * 2)
         for current_entry in entries:
             if not current_entry['language']:
                 language = current_model_tool.infer_text_language_type(current_entry['full_content'])
                 tool.update_read_entries_language(language, current_entry['id'])
 
-    def download_keyword_sortinfo_package(self, batch, language):
+    def download_keyword_sortinfo_package(self, model_path, batch, language):
         tool = RecommendPGDBTool()
-        current_model_tool = ModelTool(path)
+        current_model_tool = ModelTool(model_path)
         keyword_sortinfo_list = current_model_tool.download_keyword_sortinfo_package(language)
         list = []
         rank = 1

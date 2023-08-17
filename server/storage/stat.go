@@ -55,7 +55,7 @@ func (s *Storage) CreateStatEntryRead(request *model.StatEntry) (*model.StatEntr
 }
 
 func (s *Storage) UpdateStatEntryRead(stat *model.StatEntry) error {
-	query := `UPDATE stat_entry_read SET batch=$1, entry_id=$2,rank=$3,read_complete=$4,readlater_tag=$5,board_tag=$6,click_num=$7,read_time=$8 WHERE id=$9 `
+	query := `UPDATE stat_entry_read SET batch=$1, entry_id=$2,rank=$3,read_complete=$4,readlater_tag=$5,board_tag=$6,click_num=$7,read_time=$8,vector_data_check=$9 WHERE id=$10 `
 	_, err := s.db.Exec(
 		query,
 		stat.Batch,
@@ -66,6 +66,7 @@ func (s *Storage) UpdateStatEntryRead(stat *model.StatEntry) error {
 		stat.Board,
 		stat.ClickNum,
 		stat.ReadTime,
+		stat.VectorDataCheck,
 		stat.ID,
 	)
 

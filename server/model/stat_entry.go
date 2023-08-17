@@ -6,15 +6,16 @@ package model // import "miniflux.app/model"
 
 // Category represents a feed category.
 type StatEntry struct {
-	ID           int64 `json:"id"`
-	Batch        int   `json:"batch"`
-	EntryID      int64 `json:"entry_id"`
-	Rank         int   `json:"rank"`
-	ClickNum     int   `json:"click_num"`
-	ReadComplete bool  `json:"read_complete"`
-	ReadTime     int   `json:"read_time"`
-	ReadLater    bool  `json:"readlater_tag"`
-	Board        bool  `json:"board_tag"`
+	ID              int64 `json:"id"`
+	Batch           int   `json:"batch"`
+	EntryID         int64 `json:"entry_id"`
+	Rank            int   `json:"rank"`
+	ClickNum        int   `json:"click_num"`
+	ReadComplete    bool  `json:"read_complete"`
+	ReadTime        int   `json:"read_time"`
+	ReadLater       bool  `json:"readlater_tag"`
+	Board           bool  `json:"board_tag"`
+	VectorDataCheck int   `json:"vector_data_check"`
 }
 
 // Categories represents a list of categories.

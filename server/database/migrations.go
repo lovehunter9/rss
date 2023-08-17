@@ -853,4 +853,13 @@ var migrations = []func(tx *sql.Tx) error{
 		_, err = tx.Exec(sql)
 		return err
 	},
+	func(tx *sql.Tx) (err error) {
+		sql := `ALTER TABLE stat_entry_read ADD COLUMN vector_data_check int default 0;
+				ALTER TABLE recommend ADD COLUMN model_name text;
+				ALTER TABLE recommend ADD COLUMN model_version text;
+				CREATE INDEX index_stat_entry_vector_data on stat_entry_read using btree(vector_data_check);
+				`
+		_, err = tx.Exec(sql)
+		return err
+	},
 }
