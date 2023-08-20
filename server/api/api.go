@@ -112,6 +112,7 @@ func Serve(router *mux.Router, store *storage.Storage, s3action *s3action.S3acti
 	sr.HandleFunc("/recommend/getOption", handler.getRecommendOption).Methods(http.MethodGet)
 
 	sr.HandleFunc("/page/addPageToBoard", handler.addPageToBoard).Methods(http.MethodPut)
+	sr.HandleFunc("/page/addBatchPageToBoard", handler.addBatchPageToBoard).Methods(http.MethodPut)
 	sr.HandleFunc("/rss/contentQuery", handler.contentQuery).Methods(http.MethodGet)
 
 	sr.HandleFunc("/discover/feeds", handler.getDiscoverFeeds).Methods(http.MethodGet)

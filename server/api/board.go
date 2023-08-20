@@ -185,3 +185,51 @@ func (h *handler) addPageToBoard(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NoContent(w, r)
 }
+
+func (h *handler) addBatchPageToBoard(w http.ResponseWriter, r *http.Request) {
+	userID := request.UserID(r)
+	var requests []model.PageToBoardRequest
+
+	if err := json_parser.NewDecoder(r.Body).Decode(&requests); err != nil {
+
+		json.BadRequest(w, r, err)
+		return
+	}
+	var addErrUrls []string
+
+	for _, req := range requests {
+		content, img := processor.ScraperWebPage(req.Url)
+		if content == "" {
+			addErrUrls = append(addErrUrls, req.Url)
+			continue
+		}
+		var feedId int64 = 0
+		existEntryID := h.store.GetEntryIDByURL(feedId, req.Url)
+
+		logger.Info("[addPageToBoard ...: url:%s,boardId:%d, entryID:%d]", req.Url, req.BoardID, existEntryID)
+
+		if existEntryID == int64(0) {
+			entry := model.Entry{
+				UserID:      userID,
+				FeedID:      feedId,
+				Title:       req.Title,
+				Author:      "",
+				Date:        time.Now(),
+				URL:         req.Url,
+				Content:     "",
+				FullContent: content,
+				ReadLater:   false,
+				Hash:        crypto.Hash(req.Url),
+				ImageUrl:    img,
+			}
+
+			h.store.CreateEntrySingle(&entry)
+			existEntryID = entry.ID
+		}
+		logger.Info("[addPageToBoard ...:  entryID:%d]", existEntryID)
+		if err := h.store.AddEntryToBoard(existEntryID, req.BoardID); err != nil {
+			addErrUrls = append(addErrUrls, req.Url)
+		}
+	}
+	json.OK(w, r, addErrUrls)
+}

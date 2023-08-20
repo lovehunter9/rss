@@ -37,3 +37,5 @@ type PageToBoardRequest struct {
 
 // Categories represents a list of categories.
 type Boards []*Board
+
+type PageToBoardRequests []*PageToBoardRequest

@@ -339,9 +339,9 @@ func ScraperWebPage(url string) (string, string) {
 		return "", ""
 	}
 
-	//writeFile(content)
 	content = rewrite.Rewriter(url, content, "add_dynamic_image")
 	content = sanitizer.Sanitize(url, content)
+	//writeFile(content)
 	var img string
 
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))

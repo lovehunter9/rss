@@ -112,7 +112,7 @@ func getArticle(topCandidate *candidate, candidates candidateList) string {
 		if node == topCandidate.Node() {
 			append = true
 		} else if c, ok := candidates[node]; ok && c.score >= siblingScoreThreshold {
-			append = true
+			append = false
 		}
 
 		if s.Is("p") {
