@@ -26,9 +26,9 @@ var (
 	divToPElementsRegexp = regexp.MustCompile(`(?i)<(a|blockquote|dl|div|img|ol|p|pre|table|ul)`)
 	sentenceRegexp       = regexp.MustCompile(`\.( |$)`)
 
-	blacklistCandidatesRegexp  = regexp.MustCompile(`(?i)popupbody|-ad|g-plus`)
+	blacklistCandidatesRegexp  = regexp.MustCompile(`(?i)popupbody|-ad|g-plus|header|heading|subscribe`)
 	okMaybeItsACandidateRegexp = regexp.MustCompile(`(?i)and|article|body|column|main|shadow`)
-	unlikelyCandidatesRegexp   = regexp.MustCompile(`(?i)banner|breadcrumbs|combx|comment|community|cover-wrap|disqus|extra|foot|header|legends|menu|modal|related|remark|replies|rss|shoutbox|sidebar|skyscraper|social|sponsor|supplemental|ad-break|agegate|pagination|pager|popup|yom-remote|heading|subscribe`)
+	unlikelyCandidatesRegexp   = regexp.MustCompile(`(?i)banner|breadcrumbs|combx|comment|community|cover-wrap|disqus|extra|foot|legends|menu|modal|related|remark|replies|rss|shoutbox|sidebar|skyscraper|social|sponsor|supplemental|ad-break|agegate|pagination|pager|popup|yom-remote`)
 
 	negativeRegexp = regexp.MustCompile(`(?i)hidden|^hid$|hid$|hid|^hid |banner|combx|comment|com-|contact|foot|footer|footnote|masthead|media|meta|modal|outbrain|promo|related|scroll|share|shoutbox|sidebar|skyscraper|sponsor|shopping|tags|tool|widget|byline|author|dateline|writtenby|p-author`)
 	positiveRegexp = regexp.MustCompile(`(?i)article|body|content|entry|hentry|h-entry|main|page|pagination|post|text|blog|story`)
@@ -103,7 +103,7 @@ func ExtractContent(page io.Reader) (string, error) {
 // Things like preambles, content split by ads that we removed, etc.
 func getArticle(topCandidate *candidate, candidates candidateList) string {
 	output := bytes.NewBufferString("<div>")
-	siblingScoreThreshold := float32(math.Max(10, float64(topCandidate.score*.2)))
+	siblingScoreThreshold := float32(math.Max(10, float64(topCandidate.score*.4))) //init score*.2
 
 	topCandidate.selection.Siblings().Union(topCandidate.selection).Each(func(i int, s *goquery.Selection) {
 		append := false
@@ -143,25 +143,51 @@ func getArticle(topCandidate *candidate, candidates candidateList) string {
 }
 
 func removeUnlikelyCandidates(document *goquery.Document) {
+
 	document.Find("*").Not("html,body").Each(func(i int, s *goquery.Selection) {
 		class, _ := s.Attr("class")
 		id, _ := s.Attr("id")
 		str := class + id
-
 		if blacklistCandidatesRegexp.MatchString(str) || (unlikelyCandidatesRegexp.MatchString(str) && !okMaybeItsACandidateRegexp.MatchString(str)) {
 			removeNodes(s)
 		}
+	})
+
+	document.Find("a").Each(func(i int, s *goquery.Selection) {
+		href, _ := s.Attr("href")
+		if href == "/" || href == "#" {
+			removeNodes(s)
+		}
+	})
+
+	document.Find("img[data-lazy-src]").Each(func(i int, s *goquery.Selection) {
+		removeNodes(s)
 	})
 }
 
 func checkBeginningAndEnd(topCandidate *candidate) {
 	isMainTextStart := false
-	topCandidate.selection.Children().Each(func(i int, s *goquery.Selection) {
-		linkDensity := getLinkDensity(s)
+	selCandidate := topCandidate.selection
+	searchCnt := 1
+	for {
+		searchCnt++
+		if len(selCandidate.Children().Nodes) > 1 || searchCnt > 8 {
+			break
+		}
+		selCandidate = selCandidate.Children()
+	}
+	if len(selCandidate.Children().Nodes) < 1 {
+		selCandidate = selCandidate.Parent()
+	}
+	selCandidate.Children().Each(func(i int, s *goquery.Selection) {
 		content := s.Text()
+		linkDensity := getLinkDensity(s)
+		content = strings.Replace(content, " ", "", -1)
+		content = strings.Replace(content, "\n", "", -1)
+		content = strings.Replace(content, "\t", "", -1)
 		contentLength := len(content)
 		if !isMainTextStart {
-			if contentLength >= 80 && linkDensity < .25 {
+			if contentLength >= 120 && linkDensity < .25 {
 				isMainTextStart = true
 			} else if contentLength < 80 && linkDensity == 0 && sentenceRegexp.MatchString(content) {
 				isMainTextStart = true
@@ -236,7 +262,7 @@ func getCandidates(document *goquery.Document) candidateList {
 		contentScore += float32(strings.Count(text, ",") + 1)
 
 		// For every 100 characters in this paragraph, add another point. Up to 3 points.
-		contentScore += float32(math.Min(float64(int(len(text)/100.0)), 3))
+		contentScore += float32(math.Min(float64(int(len(text)/100.0)), 3)) //20
 
 		candidates[parentNode].score += contentScore
 		if grandParentNode != nil {
@@ -277,8 +303,6 @@ func scoreNode(s *goquery.Selection) *candidate {
 func getLinkDensity(s *goquery.Selection) float32 {
 	linkText := s.Find("a").Text()
 	text := s.Text()
-	text = strings.Replace(text, " ", "", -1)
-	text = strings.Replace(text, "\n", "", -1)
 	linkLength := len(linkText)
 	textLength := len(text)
 
@@ -286,6 +310,9 @@ func getLinkDensity(s *goquery.Selection) float32 {
 		return 0
 	}
 
+	if linkLength > 100 {
+		linkLength = 100
+	}
 	return float32(linkLength) / float32(textLength)
 }
 

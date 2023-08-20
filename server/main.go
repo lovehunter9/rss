@@ -4,9 +4,7 @@
 
 package main // import "miniflux.app"
 
-import (
-	"miniflux.app/cli"
-)
+import "miniflux.app/cli"
 
 func main() {
 	cli.Parse()

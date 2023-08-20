@@ -864,6 +864,7 @@ var migrations = []func(tx *sql.Tx) error{
 	},
 	func(tx *sql.Tx) (err error) {
 		sql := `ALTER TABLE recommend_result ADD COLUMN cloud_id int ;
+				ALTER TABLE recommend_result ALTER COLUMN url DROP NOT NULL;
 				`
 		_, err = tx.Exec(sql)
 		return err

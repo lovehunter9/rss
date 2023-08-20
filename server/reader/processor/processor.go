@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -309,6 +310,22 @@ func calculateReadingTime(content string, user *model.User) int {
 	return timeToReadInt
 }
 
+func writeFile(str string) {
+	file, err := os.OpenFile("debug.html", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	content := []byte(str)
+	_, err = file.Write(content)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Content appended to file successfully.")
+}
+
 func ScraperWebPage(url string) (string, string) {
 	content, scraperErr := scraper.Fetch(
 		url,
@@ -322,6 +339,7 @@ func ScraperWebPage(url string) (string, string) {
 		return "", ""
 	}
 
+	//writeFile(content)
 	content = rewrite.Rewriter(url, content, "add_dynamic_image")
 	content = sanitizer.Sanitize(url, content)
 	var img string
