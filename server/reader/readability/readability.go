@@ -26,7 +26,7 @@ var (
 	divToPElementsRegexp = regexp.MustCompile(`(?i)<(a|blockquote|dl|div|img|ol|p|pre|table|ul)`)
 	sentenceRegexp       = regexp.MustCompile(`\.( |$)`)
 
-	blacklistCandidatesRegexp  = regexp.MustCompile(`(?i)popupbody|-ad|g-plus|header|heading|subscribe`)
+	blacklistCandidatesRegexp  = regexp.MustCompile(`(?i)popupbody|-ad|g-plus|header|subscribe`)
 	okMaybeItsACandidateRegexp = regexp.MustCompile(`(?i)and|article|body|column|main|shadow`)
 	unlikelyCandidatesRegexp   = regexp.MustCompile(`(?i)banner|breadcrumbs|combx|comment|community|cover-wrap|disqus|extra|foot|legends|menu|modal|related|remark|replies|rss|shoutbox|sidebar|skyscraper|social|sponsor|supplemental|ad-break|agegate|pagination|pager|popup|yom-remote`)
 
@@ -92,7 +92,7 @@ func ExtractContent(page io.Reader) (string, error) {
 	topCandidate := getTopCandidate(document, candidates)
 	logger.Debug("[Readability] TopCandidate: %v", topCandidate)
 
-	checkBeginningAndEnd(topCandidate)
+	topCandidate = checkDivCandidate(topCandidate, candidates)
 
 	output := getArticle(topCandidate, candidates)
 
@@ -108,14 +108,15 @@ func getArticle(topCandidate *candidate, candidates candidateList) string {
 	topCandidate.selection.Siblings().Union(topCandidate.selection).Each(func(i int, s *goquery.Selection) {
 		append := false
 		node := s.Get(0)
-
+		content := s.Text()
+		print(content)
 		if node == topCandidate.Node() {
 			append = true
 		} else if c, ok := candidates[node]; ok && c.score >= siblingScoreThreshold {
 			append = false
 		}
 
-		if s.Is("p") {
+		/*if s.Is("p") {
 			linkDensity := getLinkDensity(s)
 			content := s.Text()
 			contentLength := len(content)
@@ -125,7 +126,7 @@ func getArticle(topCandidate *candidate, candidates candidateList) string {
 			} else if contentLength < 80 && linkDensity == 0 && sentenceRegexp.MatchString(content) {
 				append = true
 			}
-		}
+		}*/
 
 		if append {
 			tag := "div"
@@ -148,6 +149,12 @@ func removeUnlikelyCandidates(document *goquery.Document) {
 		class, _ := s.Attr("class")
 		id, _ := s.Attr("id")
 		str := class + id
+
+		text := s.Text()
+		len := len(text)
+		if len > 1000 {
+			print(len)
+		}
 		if blacklistCandidatesRegexp.MatchString(str) || (unlikelyCandidatesRegexp.MatchString(str) && !okMaybeItsACandidateRegexp.MatchString(str)) {
 			removeNodes(s)
 		}
@@ -165,10 +172,13 @@ func removeUnlikelyCandidates(document *goquery.Document) {
 	})
 }
 
-func checkBeginningAndEnd(topCandidate *candidate) {
-	isMainTextStart := false
-	selCandidate := topCandidate.selection
+func checkDivCandidate(topCandidate *candidate, candidates candidateList) *candidate {
+	//isMainTextStart := false
 	searchCnt := 1
+	lastDivCandidate := topCandidate
+	selCandidate := topCandidate.selection
+	topcontent := selCandidate.Text()
+	print(topcontent)
 	for {
 		searchCnt++
 		if len(selCandidate.Children().Nodes) > 1 || searchCnt > 8 {
@@ -176,11 +186,75 @@ func checkBeginningAndEnd(topCandidate *candidate) {
 		}
 		selCandidate = selCandidate.Children()
 	}
-	if len(selCandidate.Children().Nodes) < 1 {
-		selCandidate = selCandidate.Parent()
+	searchLoop := 1
+	for {
+		if len(selCandidate.Children().Nodes) <= 1 || searchLoop > 3 {
+			break
+		}
+		var divCandidate *candidate
+		var lastRemoveSelection *goquery.Selection
+		//divlist := make([]*goquery.Selection, 0)
+		selCandidate.Children().Each(func(i int, s *goquery.Selection) {
+			content := s.Text()
+			print(content)
+			node := s.Get(0)
+			d1 := node.Data
+			if d1 == "div" {
+				c, ok := candidates[node]
+				if ok {
+					if divCandidate == nil || c.score >= divCandidate.score {
+						divCandidate = c
+					}
+				}
+				//divlist = append(divlist, s)
+				/*if ok && (divCandidate == nil || c.score >= divCandidate.score) {
+					divCandidate = c
+					lastDivCandidate = c
+				}*/
+			}
+			lastRemoveSelection = s
+		})
+		if divCandidate != nil && divCandidate.score > lastDivCandidate.score*.8 {
+			lastDivCandidate = divCandidate
+			selCandidate = divCandidate.selection
+		} else {
+			/*for _, v := range divlist {
+				removeNodes(v)
+			}*/
+			if lastRemoveSelection != nil {
+				if lastRemoveSelection.Get(0).Data == "div" {
+					removeNodes(lastRemoveSelection)
+				}
+			}
+			break
+		}
+		searchLoop++
 	}
-	selCandidate.Children().Each(func(i int, s *goquery.Selection) {
+	return lastDivCandidate
+	/*if len(selCandidate.Children().Nodes) > 1 {
+		var divCandidate *candidate
+		selCandidate.Children().Each(func(i int, s *goquery.Selection) {
+			node := s.Get(0)
+			//d1 := s.Nodes[0].Data
+			d1 := node.Data
+			if d1 == "div" {
+				c, ok := candidates[node]
+				if ok && (divCandidate == nil || c.score >= divCandidate.score) {
+					divCandidate = c
+
+				}
+			}
+		})
+		if divCandidate != nil {
+			return divCandidate
+		}
+	}*/
+	/*selCandidate.Children().Each(func(i int, s *goquery.Selection) {
 		content := s.Text()
+		t1 := s.Nodes[0].Type
+		d1 := s.Nodes[0].Data
+		l1 := len(s.Nodes)
+		print(t1, d1, l1)
 		linkDensity := getLinkDensity(s)
 		content = strings.Replace(content, " ", "", -1)
 		content = strings.Replace(content, "\n", "", -1)
@@ -200,7 +274,7 @@ func checkBeginningAndEnd(topCandidate *candidate) {
 			}
 		}
 
-	})
+	})*/
 }
 
 func getTopCandidate(document *goquery.Document, candidates candidateList) *candidate {
@@ -234,6 +308,9 @@ func getCandidates(document *goquery.Document) candidateList {
 		// If this paragraph is less than 25 characters, don't even count it.
 		if len(text) < 25 {
 			return
+		}
+		if len(text) > 1000 {
+			print("1000")
 		}
 
 		parent := s.Parent()
