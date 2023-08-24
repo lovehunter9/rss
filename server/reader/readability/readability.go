@@ -26,9 +26,9 @@ var (
 	divToPElementsRegexp = regexp.MustCompile(`(?i)<(a|blockquote|dl|div|img|ol|p|pre|table|ul)`)
 	sentenceRegexp       = regexp.MustCompile(`\.( |$)`)
 
-	blacklistCandidatesRegexp  = regexp.MustCompile(`(?i)popupbody|-ad|g-plus|header|subscribe`)
+	blacklistCandidatesRegexp  = regexp.MustCompile(`(?i)popupbody|-ad|g-plus|header|subscribe|navigation`)
 	okMaybeItsACandidateRegexp = regexp.MustCompile(`(?i)and|article|body|column|main|shadow`)
-	unlikelyCandidatesRegexp   = regexp.MustCompile(`(?i)banner|breadcrumbs|combx|comment|community|cover-wrap|disqus|extra|foot|legends|menu|modal|related|remark|replies|rss|shoutbox|sidebar|skyscraper|social|sponsor|supplemental|ad-break|agegate|pagination|pager|popup|yom-remote|publication|title-text`)
+	unlikelyCandidatesRegexp   = regexp.MustCompile(`(?i)banner|breadcrumbs|combx|comment|cover-wrap|disqus|extra|foot|legends|menu|modal|related|remark|replies|rss|shoutbox|skyscraper|social|sponsor|supplemental|ad-break|agegate|pagination|pager|popup|yom-remote|publication|title-text|footer`)
 
 	negativeRegexp = regexp.MustCompile(`(?i)hidden|^hid$|hid$|hid|^hid |banner|combx|comment|com-|contact|foot|footer|footnote|masthead|media|meta|modal|outbrain|promo|related|scroll|share|shoutbox|sidebar|skyscraper|sponsor|shopping|tags|tool|widget|byline|author|dateline|writtenby|p-author`)
 	positiveRegexp = regexp.MustCompile(`(?i)article|body|content|entry|hentry|h-entry|main|page|pagination|post|text|blog|story`)
@@ -201,7 +201,7 @@ func checkDivCandidate(topCandidate *candidate, candidates candidateList) *candi
 			}
 			lastRemoveSelection = s
 		})
-		if divCandidate != nil && divCandidate.score > lastDivCandidate.score*.6 {
+		if divCandidate != nil && divCandidate.score > lastDivCandidate.score*.7 {
 			lastDivCandidate = divCandidate
 			selCandidate = divCandidate.selection
 		} else {
