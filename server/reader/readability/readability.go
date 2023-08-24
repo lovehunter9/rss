@@ -26,7 +26,7 @@ var (
 	divToPElementsRegexp = regexp.MustCompile(`(?i)<(a|blockquote|dl|div|img|ol|p|pre|table|ul)`)
 	sentenceRegexp       = regexp.MustCompile(`\.( |$)`)
 
-	blacklistCandidatesRegexp  = regexp.MustCompile(`(?i)popupbody|-ad|g-plus|header|subscribe|navigation`)
+	blacklistCandidatesRegexp  = regexp.MustCompile(`(?i)popupbody|g-plus|header|subscribe|navigation`)
 	okMaybeItsACandidateRegexp = regexp.MustCompile(`(?i)and|article|body|column|main|shadow`)
 	unlikelyCandidatesRegexp   = regexp.MustCompile(`(?i)banner|breadcrumbs|combx|comment|cover-wrap|disqus|extra|foot|legends|menu|modal|related|remark|replies|rss|shoutbox|skyscraper|social|sponsor|supplemental|ad-break|agegate|pagination|pager|popup|yom-remote|publication|title-text|footer`)
 
@@ -180,9 +180,16 @@ func checkDivCandidate(topCandidate *candidate, candidates candidateList) *candi
 	topcontent := selCandidate.Text()
 	print(topcontent)
 	for {
-		if len(selCandidate.Children().Nodes) <= 1 || searchLoop > 6 {
-			break
+		if len(selCandidate.Children().Nodes) == 1 {
+			if searchLoop < 8 {
+				selCandidate = selCandidate.Children()
+				searchLoop++
+				continue
+			} else {
+				break
+			}
 		}
+
 		var divCandidate *candidate
 		var lastRemoveSelection *goquery.Selection
 		selCandidate.Children().Each(func(i int, s *goquery.Selection) {
@@ -201,7 +208,7 @@ func checkDivCandidate(topCandidate *candidate, candidates candidateList) *candi
 			}
 			lastRemoveSelection = s
 		})
-		if divCandidate != nil && divCandidate.score > lastDivCandidate.score*.7 {
+		if divCandidate != nil && divCandidate.score > lastDivCandidate.score*.35 {
 			lastDivCandidate = divCandidate
 			selCandidate = divCandidate.selection
 		} else {
