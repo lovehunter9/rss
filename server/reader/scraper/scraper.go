@@ -20,7 +20,7 @@ import (
 )
 
 // Fetch downloads a web page and returns relevant contents.
-func Fetch(websiteURL, rules, userAgent string, cookie string, allowSelfSignedCertificates, useProxy bool) (string, error) {
+func Fetch(websiteURL, title, rules, userAgent string, cookie string, allowSelfSignedCertificates, useProxy bool) (string, error) {
 	clt := client.NewClientWithConfig(websiteURL, config.Opts)
 	clt.WithUserAgent(userAgent)
 	clt.WithCookie(cookie)
@@ -60,7 +60,7 @@ func Fetch(websiteURL, rules, userAgent string, cookie string, allowSelfSignedCe
 		content, err = scrapContent(response.Body, rules)
 	} else {
 		logger.Debug(`[Scraper] Using readability for %q`, websiteURL)
-		content, err = readability.ExtractContent(response.Body)
+		content, err = readability.ExtractContent(response.Body, title)
 	}
 
 	if err != nil {

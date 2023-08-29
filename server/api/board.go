@@ -150,7 +150,7 @@ func (h *handler) addPageToBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	content, img := processor.ScraperWebPage(request.Url)
+	content, img := processor.ScraperWebPage(request.Url, request.Title)
 	if content == "" {
 		json.ServerError(w, r, errors.New("fetch_error"))
 		return
@@ -198,7 +198,7 @@ func (h *handler) addBatchPageToBoard(w http.ResponseWriter, r *http.Request) {
 	var addErrUrls []string
 
 	for _, req := range requests {
-		content, img := processor.ScraperWebPage(req.Url)
+		content, img := processor.ScraperWebPage(req.Url, req.Title)
 		if content == "" {
 			addErrUrls = append(addErrUrls, req.Url)
 			continue

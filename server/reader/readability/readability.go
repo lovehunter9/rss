@@ -19,14 +19,14 @@ import (
 )
 
 const (
-	defaultTagsToScore = "section,h2,h3,h4,h5,h6,p,td,pre,div"
+	defaultTagsToScore = "section,h2,h3,h4,h5,h6,p,pre,div"
 )
 
 var (
 	divToPElementsRegexp = regexp.MustCompile(`(?i)<(a|blockquote|dl|div|img|ol|p|pre|table|ul)`)
 	sentenceRegexp       = regexp.MustCompile(`\.( |$)`)
 
-	blacklistCandidatesRegexp  = regexp.MustCompile(`(?i)popupbody|g-plus|header|subscribe|navigation`)
+	blacklistCandidatesRegexp  = regexp.MustCompile(`(?i)popupbody|g-plus|header|subscribe|navigation|comments`)
 	okMaybeItsACandidateRegexp = regexp.MustCompile(`(?i)and|article|body|column|main|shadow`)
 	unlikelyCandidatesRegexp   = regexp.MustCompile(`(?i)banner|breadcrumbs|combx|comment|cover-wrap|disqus|extra|foot|legends|menu|modal|related|remark|replies|rss|shoutbox|skyscraper|social|sponsor|supplemental|ad-break|agegate|pagination|pager|popup|yom-remote|publication|title-text|footer`)
 
@@ -70,7 +70,7 @@ func (c candidateList) String() string {
 }
 
 // ExtractContent returns relevant content.
-func ExtractContent(page io.Reader) (string, error) {
+func ExtractContent(page io.Reader, title string) (string, error) {
 	document, err := goquery.NewDocumentFromReader(page)
 	if err != nil {
 		return "", err
@@ -83,20 +83,30 @@ func ExtractContent(page io.Reader) (string, error) {
 	transformMisusedDivsIntoParagraphs(document)
 	removeUnlikelyCandidates(document)
 
-	//img, _ := document.Find("img").First().Attr("src")
-	//logger.Debug("img in content: %s", img)
+	output := getArticleByDivClass(document)
 
-	candidates := getCandidates(document)
-	logger.Debug("[Readability] Candidates: %v", candidates)
+	if output == "" {
+		candidates := getCandidates(document)
+		logger.Debug("[Readability] Candidates: %v", candidates)
 
-	topCandidate := getTopCandidate(document, candidates)
-	logger.Debug("[Readability] TopCandidate: %v", topCandidate)
+		topCandidate := getTopCandidate(document, candidates)
+		logger.Debug("[Readability] TopCandidate: %v", topCandidate)
 
-	topCandidate = checkDivCandidate(topCandidate, candidates)
-
-	output := getArticle(topCandidate, candidates)
+		topCandidate = checkDivCandidate(topCandidate, candidates)
+		output = getArticle(topCandidate, candidates)
+		output = checkHeaderInfo(output, title)
+	}
 
 	return output, nil
+}
+
+func getArticleByDivClass(document *goquery.Document) string {
+	content := ""
+	document.Find("div.entry-content,div.content-entry,div.entry-body,div.article-detail,div.entry").Each(func(i int, s *goquery.Selection) {
+		content, _ = goquery.OuterHtml(s)
+	})
+
+	return content
 }
 
 // Now that we have the top candidate, look through its siblings for content that might also be related.
@@ -167,10 +177,16 @@ func removeUnlikelyCandidates(document *goquery.Document) {
 		}
 	})
 
-	document.Find("img[data-lazy-src]").Each(func(i int, s *goquery.Selection) {
+	document.Find("img[data-lazy-src],form").Each(func(i int, s *goquery.Selection) {
 		removeNodes(s)
 	})
 }
+
+type removeCandidate struct {
+	selection *goquery.Selection
+	index     int
+}
+type removeCandidateList []*removeCandidate
 
 func checkDivCandidate(topCandidate *candidate, candidates candidateList) *candidate {
 	//isMainTextStart := false
@@ -191,35 +207,74 @@ func checkDivCandidate(topCandidate *candidate, candidates candidateList) *candi
 		}
 
 		var divCandidate *candidate
-		var lastRemoveSelection *goquery.Selection
+		removeCandidates := make(removeCandidateList, 0)
+		contentLens := make([]int, 0)
+
+		index := 0
+		totalContentLen := 0
+		divCandidateContentLen := 0
 		selCandidate.Children().Each(func(i int, s *goquery.Selection) {
 			content := s.Text()
 			print(content)
+			usefulL := usefulContentLen(content)
+			totalContentLen += usefulL
+			contentLens = append(contentLens, usefulL)
+
 			node := s.Get(0)
 			d1 := node.Data
-			if d1 == "div" {
+			if d1 == "div" || d1 == "section" || d1 == "main" || d1 == "article" {
 				c, ok := candidates[node]
 				if ok {
 					if divCandidate == nil || c.score >= divCandidate.score {
 						divCandidate = c
+						divCandidateContentLen = usefulL
+
 					}
 				}
-
+				cand := &removeCandidate{selection: s, index: index}
+				removeCandidates = append(removeCandidates, cand)
 			}
-			lastRemoveSelection = s
+			index++
 		})
-		if divCandidate != nil && divCandidate.score > lastDivCandidate.score*.35 {
+		//if divCandidate != nil && divCandidate.score > lastDivCandidate.score*.35 {
+		if divCandidate != nil && float32(divCandidateContentLen) > float32(totalContentLen)*.45 {
 			lastDivCandidate = divCandidate
 			selCandidate = divCandidate.selection
+			text := lastDivCandidate.selection.Text()
+			print(text)
 		} else {
-			if lastRemoveSelection != nil && lastRemoveSelection.Get(0).Data == "div" {
-				removeNodes(lastRemoveSelection)
+			if index > 0 {
+				threshold := totalContentLen / index
+				totalValid := index
+				for i := len(removeCandidates) - 1; i >= 0; i-- {
+					cand := removeCandidates[i]
+					isRemoveDiv := true
+					interval := len(removeCandidates) - i
+					if cand.index == len(contentLens)-interval {
+						totalValid--
+					} else {
+						for j := cand.index + 1; j < totalValid; j++ {
+							if float32(contentLens[j]) >= float32(threshold)*.4 {
+								isRemoveDiv = false
+								break
+							}
+						}
+					}
+					if isRemoveDiv {
+						removeNodes(cand.selection)
+						text := lastDivCandidate.selection.Text()
+						print(text)
+					} else {
+						break
+					}
+				}
 			}
 			break
 		}
 		searchLoop++
 	}
-
+	text := lastDivCandidate.selection.Text()
+	print(text)
 	return lastDivCandidate
 	/*if len(selCandidate.Children().Nodes) > 1 {
 		var divCandidate *candidate
@@ -267,6 +322,43 @@ func checkDivCandidate(topCandidate *candidate, candidates candidateList) *candi
 	})*/
 }
 
+func usefulContentLen(text string) int {
+	content := strings.Replace(text, " ", "", -1)
+	content = strings.Replace(content, "\n", "", -1)
+	content = strings.Replace(content, "\t", "", -1)
+	return len(content)
+}
+
+func checkHeaderInfo(output, title string) string {
+	var outReader = strings.NewReader(output)
+	doc, _ := goquery.NewDocumentFromReader(outReader)
+	searchLoop := 0
+	doc.Find("*").Not("html,body,div,article").Each(func(i int, s *goquery.Selection) {
+		if searchLoop < 6 {
+			node := s.Get(0)
+			d1 := node.Data
+			print(d1)
+			text := s.Text()
+			usedLen := usefulContentLen(text)
+			class, _ := s.Attr("class")
+			print(class)
+			if usedLen < 40 {
+				removeNodes(s)
+			}
+			if strings.Contains(class, "title") || strings.Contains(class, "header") {
+				removeNodes(s)
+			}
+			if (strings.Contains(title, strings.TrimSpace(text)) || strings.Contains(text, title)) && usedLen < 100 {
+				removeNodes(s)
+			}
+		}
+
+		searchLoop++
+
+	})
+	html, _ := doc.Selection.Html()
+	return html
+}
 func getTopCandidate(document *goquery.Document, candidates candidateList) *candidate {
 	var best *candidate
 

@@ -454,6 +454,7 @@ func (h *handler) queryTest(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) getFullContentTest(w http.ResponseWriter, r *http.Request) {
 	url := request.QueryStringParam(r, "url", "")
+	title := request.QueryStringParam(r, "title", "")
 	/*res, _ := http.Get(url)
 
 	defer res.Body.Close()
@@ -463,6 +464,7 @@ func (h *handler) getFullContentTest(w http.ResponseWriter, r *http.Request) {
 
 	content, _ := scraper.Fetch(
 		url,
+		title,
 		"",
 		"",
 		"",

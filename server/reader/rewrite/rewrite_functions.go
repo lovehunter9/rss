@@ -105,6 +105,7 @@ func addDynamicImage(entryURL, entryContent string) string {
 		"data-655src",
 		"data-500src",
 		"data-380src",
+		"nitro-lazy-src",
 	}
 
 	candidateSrcsetAttrs := []string{

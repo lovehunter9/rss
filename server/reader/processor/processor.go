@@ -60,6 +60,7 @@ func ProcessFeedEntries(store *storage.Storage, feed *model.Feed, user *model.Us
 			startTime := time.Now()
 			content, scraperErr := scraper.Fetch(
 				url,
+				entry.Title,
 				feed.ScraperRules,
 				feed.UserAgent,
 				feed.Cookie,
@@ -148,6 +149,7 @@ func ProcessEntryWebPage(feed *model.Feed, entry *model.Entry, user *model.User)
 
 	content, scraperErr := scraper.Fetch(
 		url,
+		entry.Title,
 		entry.Feed.ScraperRules,
 		entry.Feed.UserAgent,
 		entry.Feed.Cookie,
@@ -326,9 +328,10 @@ func writeFile(str string) {
 	fmt.Println("Content appended to file successfully.")
 }
 
-func ScraperWebPage(url string) (string, string) {
+func ScraperWebPage(url, title string) (string, string) {
 	content, scraperErr := scraper.Fetch(
 		url,
+		title,
 		"",
 		"",
 		"",
@@ -339,9 +342,10 @@ func ScraperWebPage(url string) (string, string) {
 		return "", ""
 	}
 
+	//writeFile(content)
 	content = rewrite.Rewriter(url, content, "add_dynamic_image")
 	content = sanitizer.Sanitize(url, content)
-	//writeFile(content)
+
 	var img string
 
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
