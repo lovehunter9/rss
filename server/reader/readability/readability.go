@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"os"
 	"regexp"
 	"strings"
 
@@ -69,6 +70,22 @@ func (c candidateList) String() string {
 	return strings.Join(output, ", ")
 }
 
+func writeFile(str string) {
+	file, err := os.OpenFile("debug.html2", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	content := []byte(str)
+	_, err = file.Write(content)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Content appended to file successfully.")
+}
+
 // ExtractContent returns relevant content.
 func ExtractContent(page io.Reader, title string) (string, error) {
 	document, err := goquery.NewDocumentFromReader(page)
@@ -76,12 +93,16 @@ func ExtractContent(page io.Reader, title string) (string, error) {
 		return "", err
 	}
 
+	text := document.Text()
+	//writeFile(text)
 	document.Find("script,style").Each(func(i int, s *goquery.Selection) {
 		removeNodes(s)
 	})
 
 	transformMisusedDivsIntoParagraphs(document)
 	removeUnlikelyCandidates(document)
+	text = document.Text()
+	print(text)
 
 	output := getArticleByDivClass(document)
 
@@ -102,8 +123,12 @@ func ExtractContent(page io.Reader, title string) (string, error) {
 
 func getArticleByDivClass(document *goquery.Document) string {
 	content := ""
-	document.Find("div.entry-content,div.content-entry,div.entry-body,div.article-detail,div.entry").Each(func(i int, s *goquery.Selection) {
-		content, _ = goquery.OuterHtml(s)
+	document.Find("div.entry-content,div.content-entry,div.entry-body,div.article-detail,div.entry,div.entry__content").Each(func(i int, s *goquery.Selection) {
+		text := s.Text()
+		len := usefulContentLen(text)
+		if len > 300 {
+			content, _ = goquery.OuterHtml(s)
+		}
 	})
 
 	return content

@@ -71,7 +71,7 @@ func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, err
 	query := `SELECT r.batch, e.id entry_id, e.title, e.author,e.url,e.published_at,r.score,r.rank,
 	 f.title feed_title,f.feed_url,f.site_url,f.icon_type,f.icon_content icon_byte_content,f.category_id,f.category_title,e.full_content ,e.image_url,f.id
 	 FROM recommend_result r,recommend_entries e,recommend_feed f 
-	 WHERE r.batch=$1 and r.cloud_id=e.cloud_id and e.feed_id=f.id
+	 WHERE r.batch=$1 and r.cloud_id=e.cloud_id and e.feed_id=f.id and f.disabled=false
 	 ORDER BY r.id  OFFSET $2 limit $3`
 	rows, err := s.db.Query(query, batch, offset, limit)
 	if err != nil {
@@ -239,7 +239,7 @@ func (s *Storage) KeywordRecommendList(batch, offset, limit int) (model.Recommen
 	query := `SELECT r.batch, e.id entry_id, e.title, e.author,e.url,e.published_at,r.keyword,
 	 f.title feed_title,f.feed_url,f.site_url,f.icon_type,f.icon_content icon_byte_content,f.category_id,f.category_title,e.full_content ,e.image_url,f.id
 	 FROM recommend_result_keyword r,recommend_entries e,recommend_feed f 
-	 WHERE r.batch=$1 and r.url=e.url and e.feed_id=f.id
+	 WHERE r.batch=$1 and r.url=e.url and e.feed_id=f.id and f.disabled=false
 	 ORDER BY r.rank,r.id  OFFSET $2 limit $3`
 	rows, err := s.db.Query(query, batch, offset, limit)
 	if err != nil {

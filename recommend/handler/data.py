@@ -184,11 +184,11 @@ class DataHandler:
             for v in versionList:
                 tool.check_model_and_version(model, v)
 
-    def download_feed(self, model_path):
+    def download_feed(self, model_path, weaviate_client):
         tool = RecommendPGDBTool()
         tool.empty_recommend_feed_model()
         feedList = []
-
+        disabledFeedList = []
         current_model_tool = ModelTool(model_path)
         feed_id_to_feed = current_model_tool.download_latest_all_feed()
         self.current_logger.debug(f'download feed id to feed compelete')
@@ -199,6 +199,7 @@ class DataHandler:
                 'feed_url': current_feed['feed_url'],
                 'site_url': current_feed['site_url'],
                 'category_id': current_feed['category_id'],
+                'disabled': current_feed['disabled'],
                 'category_title': current_feed['category_title'],
                 'feed_description': ''
             }
@@ -209,6 +210,8 @@ class DataHandler:
             if 'description' in current_feed and bool(current_feed['description']):
                 feed['feed_description'] = current_feed['description']
             feedList.append(feed)
+            if current_feed['disabled'] == True:
+                disabledFeedList.append(current_feed['id'])
             if len(feedList) > 200:
                 self.current_logger.debug(f'start insert feed to db')
                 tool.batch_insert_recommend_feed_model(feedList)

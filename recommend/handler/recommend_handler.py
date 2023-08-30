@@ -101,7 +101,7 @@ class RecommendHandler:
         self.current_logger.debug(f'init_model time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
 
         start_time = datetime.now()
-        data_handler.download_feed(model_path)
+        data_handler.download_feed(model_path, weaviate_client)
         self.current_logger.debug(f'download_feed time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
 
         self.downLastPackage(user, baseModel, weaviate_client)

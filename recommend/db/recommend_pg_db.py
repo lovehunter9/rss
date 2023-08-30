@@ -127,6 +127,7 @@ class RecommendFeedModel(RecommendPGBaseModel):
     icon_content = BlobField(null=True)
     category_id = BigIntegerField(null=True)
     category_title = TextField(null=True)
+    disabled = BooleanField(null=True)
 
     class Meta:
         db_table = 'recommend_feed'
