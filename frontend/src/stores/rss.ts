@@ -1,5 +1,6 @@
 import {defineStore} from 'pinia';
 import {
+  Blacklist,
   Board,
   BoardEntriesQueryRequest,
   BoardRequest,
@@ -15,15 +16,15 @@ import {
   FeedModificationRequest,
   MenuChoice,
   MenuType,
-  SDKQueryRequest,
+  OptionSetting,
   Recommend,
-  RssContentQueryItem, OptionSetting, Blacklist
+  RssContentQueryItem,
+  SDKQueryRequest
 } from 'src/types';
 
 import {
   create_board,
   discoverFeedRequest,
-  rssContentQuery,
   entry_readlater,
   feed_mark_all_as_read,
   fetch_feed_counter,
@@ -37,14 +38,19 @@ import {
   get_readLater,
   get_recommendList,
   get_today,
+  getBlackList,
+  getRecommendOption,
   remove_category,
   remove_feed,
+  removeBlackList,
   removeBoard,
+  rssContentQuery,
   sdkSearchFeedsByPath,
-  today_mark_all_as_read, unread_mark_all_as_read,
+  today_mark_all_as_read,
+  unread_mark_all_as_read,
   update_board,
   update_entry_status,
-  update_feed, getRecommendOption, removeBlackList, getBlackList,
+  update_feed,
 } from 'src/api/api';
 
 export type DataState = {
@@ -151,6 +157,11 @@ export const useRssStore = defineStore('rss', {
       }
     },
 
+    get_current_board(){
+      return this.boards.find((item) => {
+        return item.id === this.menu_choice.value
+      });
+    },
     async refresh_feeds_counter() {
       const feedCounter: FeedCounters = await fetch_feed_counter();
       for (const category of this.categories) {
@@ -377,12 +388,17 @@ export const useRssStore = defineStore('rss', {
     },
 
     async get_board_entries(boardId: number, request: BoardEntriesQueryRequest) {
-      try {
+      if (request.offset <= 0) {
         this.entries = [];
-        const response: EntriesQueryResponse = await get_board_entries(boardId, request);
-        this.entries = response.entries;
-        this.entries_total = response.total;
-        return this.entries.length;
+      }
+      try {
+        const data: EntriesQueryResponse = await get_board_entries(boardId, request);
+        this.entries = request.offset > 0 ? [...this.entries, ...data.entries] : data.entries;
+        this.entries_total = data.total;
+
+        console.log(this.entries)
+        console.log(this.entries_total)
+        return data.entries.length
       } catch (e) {
         console.log(e);
       }
