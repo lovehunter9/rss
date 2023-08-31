@@ -4,6 +4,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from recommend_model_sdk.tools.common_tool import CommonTool
 from recommend_model_sdk.tools.model_tool import ModelTool
+from recommend_model_sdk.recommend.common_enum import VectorStoreEnum, RecommendSupportLanguageEnum
 from db.recommend_pg_db_tool import *
 
 #path = os.environ.get('model_path', "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model")
@@ -184,7 +185,7 @@ class DataHandler:
             for v in versionList:
                 tool.check_model_and_version(model, v)
 
-    def download_feed(self, model_path, weaviate_client):
+    def download_feed(self, model_path):
         tool = RecommendPGDBTool()
         tool.empty_recommend_feed_model()
         feedList = []
@@ -218,7 +219,9 @@ class DataHandler:
                 feedList = []
         if len(feedList) > 0:
             tool.batch_insert_recommend_feed_model(feedList)
+
         self.current_logger.debug(f'insert downloaded feed to db')
+        return disabledFeedList
 
     def check_readed_entries_language(self, model_path):
         tool = RecommendPGDBTool()

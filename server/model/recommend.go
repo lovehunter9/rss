@@ -48,12 +48,13 @@ type RecommendResult struct {
 
 // Category represents a feed category.
 type Recommend struct {
-	Batch    int     `json:"batch"`
-	EntryID  int64   `json:"entry_id"`
-	Title    string  `json:"title"`
-	Author   *string `json:"author"`
-	ImageUrl string  `json:"image_url"`
-	Keyword  *string `json:"keyword"`
+	Batch            int     `json:"batch"`
+	EntryID          int64   `json:"entry_id"`
+	Title            string  `json:"title"`
+	Author           *string `json:"author"`
+	ImageUrl         string  `json:"image_url"`
+	RecommendKeyword *string `json:"recommend_keyword"`
+	Keyword          *string `json:"keyword"`
 
 	PublishedAt time.Time      `json:"published_at"`
 	URL         string         `json:"url"`

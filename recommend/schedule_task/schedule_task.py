@@ -27,13 +27,14 @@ def schedule_rank_task():
 
 def schedule_probe():
     current_pid = os.getpid()
-    current_memory = psutil.Process(os.getpid()).memory_info().rss / 1024 /1024
+    current_memory = psutil.Process(os.getpid()).memory_info().rss / 1024 / 1024
     current_logger.debug(f'schedule_probe datetime {datetime.now()} current_pid {current_pid} memory {current_memory} MB')
 
 
 if __name__ == '__main__':
     import nltk
     nltk.download('stopwords')
+    current_logger.debug(f"run start {datetime.now()}")
     # schedule_rank_task()
     schedule_task_interval = int(os.environ.get('schedule_task_interval', 2))
     schedule.every(schedule_task_interval).minutes.do(schedule_rank_task)

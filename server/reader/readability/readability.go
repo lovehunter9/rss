@@ -446,7 +446,7 @@ func getCandidates(document *goquery.Document) candidateList {
 		contentScore += float32(strings.Count(text, ",") + 1)
 
 		// For every 100 characters in this paragraph, add another point. Up to 3 points.
-		contentScore += float32(math.Min(float64(int(len(text)/100.0)), 3)) //20
+		contentScore += float32(math.Min(float64(int(len(text)/100.0)), 3))
 
 		candidates[parentNode].score += contentScore
 		if grandParentNode != nil {

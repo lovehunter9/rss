@@ -87,14 +87,18 @@ class ModelToolUnitTest(unittest.TestCase):
         current_model_tool = ModelTool(download_dir)
 
         feed_id_to_feed = current_model_tool.download_latest_all_feed()
-
+        total = 0
+        total2 = 0
         for current_id, current_feed in feed_id_to_feed.items():
-            print(current_feed["description"])
-            if 'description' in current_feed:
-                if bool(current_feed['description']):
-                    print("save")
-                else:
-                    print("f")
+            #print(current_feed["title"])
+            #print(current_feed["disabled"])
+            if current_feed["disabled"]:
+                total = total + 1
+            else:
+                total2 = total2 + 1
+        print('total:')
+        print(total)
+        print(total2)
 
     def test_db_handler(self):
         # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_db_handler

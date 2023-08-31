@@ -30,6 +30,7 @@ class RecommendHandler:
         self.commont_tool = CommonTool()
 
     def get_weaviate_client(self):
+        self.current_logger.info(f' get_weaviate_client')
         weaviate_tool = WeaviateTool(
             model_path,
             False,
@@ -39,7 +40,7 @@ class RecommendHandler:
         #weaviate_tool.init_class(model_name, model_version)
         return weaviate_tool
 
-    def downLastPackage(self, user, baseModel, weaviate_client):
+    def downLastPackage(self, user, baseModel, weaviate_client, disabledFeedList):
         start_time = datetime.now()
         data_handler = DataHandler()
         apiUrl = api_url + '?model_name=' + user.model_name + '&model_version=' + user.model_version
@@ -53,9 +54,15 @@ class RecommendHandler:
         for data in packageData:
             data_handler.download_increment_package(data['model_name'], data['model_version'], model_path, data['package_id'])
             if vector_database == 'weaviate':
-                weaviate_client.insert_package_data(data, data['model_name'], data['model_version'])
+                weaviate_client.insert_package_data(data, data['model_name'], data['model_version'], black_feed_set=set(disabledFeedList))
 
         self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+
+    def getWeaviateSupportLanauage(self, language):
+        supportLanauage = RecommendSupportLanguageEnum.ENGLISH
+        if language == 'en':
+            supportLanauage = RecommendSupportLanguageEnum.CHINESE
+        return supportLanauage
 
     def recommend(self):
         tool = RecommendPGDBTool()
@@ -70,6 +77,19 @@ class RecommendHandler:
         self.current_logger.debug(f'get weaviate_client client , start recommend')
         start_time = datetime.now()
         lastRecommendLanguage = 'en'
+
+        data_handler = DataHandler()
+        data_handler.down_valid_model_and_version(model_path)
+        self.current_logger.debug(f'model_name {user.model_name} model_version {user.model_version}')
+        self.current_logger.debug(f'select_users_model time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+
+        data_handler.init_model(model_path, user)
+        self.current_logger.debug(f'init_model time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+
+        disabledFeedList = data_handler.download_feed(model_path)
+        self.current_logger.debug(f'downfeed disabled feed num:{len(disabledFeedList)}')
+        self.current_logger.debug(f'download_feed time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+
         if len(baseModel) == 0:
             batch = 1
         else:
@@ -85,29 +105,19 @@ class RecommendHandler:
                 if baseModel[0].model_name != model_name or baseModel[0].model_version != model_version or user.recommend_language != lastRecommendLanguage:
                     self.current_logger.debug(f'weaviate delete_all_data')
                     weaviate_client.delete_all_data()
+                else:
+                    if len(disabledFeedList) > 0:
+                        weaviate_client.delete_batch_data(model_name, model_version, RecommendSupportLanguageEnum.ENGLISH, feed_id_list=disabledFeedList)
+                        weaviate_client.delete_batch_data(model_name, model_version, RecommendSupportLanguageEnum.CHINESE, feed_id_list=disabledFeedList)
 
         tool.insert_recommend_model(batch, user.recommend_language, model_name, model_version)
-
         tool.clear_recommend_entries(start_time + timedelta(days=-7))
 
-        self.current_logger.debug(f'model_name {user.model_name} model_version {user.model_version}')
-        self.current_logger.debug(f'select_users_model time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
-        data_handler = DataHandler()
-        data_handler.down_valid_model_and_version(model_path)
-
         start_time = datetime.now()
-        data_handler = DataHandler()
-        data_handler.init_model(model_path, user)
-        self.current_logger.debug(f'init_model time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
-
-        start_time = datetime.now()
-        data_handler.download_feed(model_path, weaviate_client)
-        self.current_logger.debug(f'download_feed time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
-
-        self.downLastPackage(user, baseModel, weaviate_client)
+        self.downLastPackage(user, baseModel, weaviate_client, disabledFeedList)
         #start_time = datetime.now()
         #data_handler.down_latest_article_embedding_package(user)
-        #self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+        self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
 
         data_handler.check_readed_entries_language(model_path)
         self.current_logger.debug('check_readed_entries_language finish ...')
@@ -128,9 +138,7 @@ class RecommendHandler:
             start_time = datetime.now()
             result = []
             if vector_database == 'weaviate':
-                supportLanauage = RecommendSupportLanguageEnum.ENGLISH
-                if language == 'en':
-                    supportLanauage = RecommendSupportLanguageEnum.CHINESE
+                supportLanauage = self.getWeaviateSupportLanauage(language)
                 recommend_tool = RecommendTool({}, user.model_name, user.model_version, VectorStoreEnum.WEAVIATE)
                 result = recommend_tool.recommend(query_url_to_embedding_dict, result_number_each, major_language=supportLanauage)
             else:
