@@ -59,9 +59,9 @@ class RecommendHandler:
         self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
 
     def getWeaviateSupportLanauage(self, language):
-        supportLanauage = RecommendSupportLanguageEnum.ENGLISH
+        supportLanauage = RecommendSupportLanguageEnum.CHINESE
         if language == 'en':
-            supportLanauage = RecommendSupportLanguageEnum.CHINESE
+            supportLanauage = RecommendSupportLanguageEnum.ENGLISH
         return supportLanauage
 
     def recommend(self):
