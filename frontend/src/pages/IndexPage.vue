@@ -53,7 +53,7 @@
 
 <script lang="ts" setup>
 import {useRssStore} from 'stores/rss';
-import {BoardEntriesQueryRequest, DeleteType, EntriesQueryRequest, Entry, EntryStatus, MenuType} from 'src/types';
+import {DeleteType, EntriesQueryRequest, Entry, EntryStatus, MenuType} from 'src/types';
 import {onMounted, ref, watch} from 'vue';
 import EntryView from 'components/rss/EntryView.vue';
 import {newsBus, newsBusMessage} from 'src/utils/utils';
@@ -64,7 +64,7 @@ import {useQuasar} from 'quasar';
 import AddBoardDialog from 'components/dialog/AddBoardDialog.vue';
 import OrganizeDeleteDialog from 'components/dialog/OrganizeDeleteDialog.vue';
 import FooterLoadingComponent from 'components/rss/FooterLoadingComponent.vue'
-import EntrySkeleton from "components/rss/EntrySkeleton.vue";
+import EntrySkeleton from 'components/rss/EntrySkeleton.vue';
 
 const store = useRssStore();
 const labelRef = ref('')
@@ -178,6 +178,15 @@ function updateUI() {
         break
       }
       labelRef.value = feed.title
+      break;
+    case MenuType.Board:
+      if (!store.menu_choice.value) {
+        break
+      }
+      const board = store.get_current_board();
+      if (board){
+        labelRef.value = board.title
+      }
       break;
   }
   if (store.entries.length > 0) {
@@ -297,16 +306,12 @@ const requestEntries = async (hasMore = false) => {
     })
     return
   }
-  if (store.menu_choice.type === MenuType.Board) {
-    await loadDataAnim(async () => {
-     return await store.get_board_entries(store.menu_choice.value || 0,new BoardEntriesQueryRequest({offset: 0}))
-    })
-    return
-  }
 
+  //EntriesQueryRequest use EntriesQueryRequest
   const entriesQurey = new EntriesQueryRequest({
     offset: hasMore ? store.entries.length : 0,
   })
+
   if (store.menu_choice.type === MenuType.Feed) {
     entriesQurey.feed_id = store.menu_choice.value
   } else if (store.menu_choice.type === MenuType.Category) {
@@ -318,13 +323,21 @@ const requestEntries = async (hasMore = false) => {
   let entryLength;
   if (entriesQurey.offset == 0){
     entryLength = await loadDataAnim(async () => {
-      return await store.get_entries(entriesQurey)
+      if (store.menu_choice.type === MenuType.Board) {
+        return await store.get_board_entries(store.menu_choice.value || 0,entriesQurey)
+      }else {
+        return await store.get_entries(entriesQurey)
+      }
     })
   }else {
     await new Promise((r) => {
       setTimeout(r,1000)
     })
-    entryLength = await store.get_entries(entriesQurey)
+    if (store.menu_choice.type === MenuType.Board) {
+      entryLength = await store.get_board_entries(store.menu_choice.value || 0,entriesQurey)
+    }else {
+      entryLength = await store.get_entries(entriesQurey)
+    }
   }
 
   if (store.entries.length > 0) {
