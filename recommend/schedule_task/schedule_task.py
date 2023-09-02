@@ -36,7 +36,7 @@ if __name__ == '__main__':
     nltk.download('stopwords')
     current_logger.debug(f"run start {datetime.now()}")
     # schedule_rank_task()
-    schedule_task_interval = int(os.environ.get('schedule_task_interval', 2))
+    schedule_task_interval = int(os.environ.get('schedule_task_interval', 30))
     schedule.every(schedule_task_interval).minutes.do(schedule_rank_task)
     schedule.every(1).minutes.do(schedule_probe)
     init_first = False

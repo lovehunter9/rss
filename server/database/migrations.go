@@ -871,6 +871,17 @@ var migrations = []func(tx *sql.Tx) error{
 	},
 	func(tx *sql.Tx) (err error) {
 		sql := `ALTER TABLE recommend_feed ADD COLUMN disabled boolean default 'f';
+				CREATE TABLE recommend_package_info (
+					package_id text not null,
+					model_name text not null,
+					model_version text not null,
+					main_language text,
+					entry_number int,
+					published_at_earliest timestamp with time zone,
+					published_at_latest timestamp with time zone,
+					generate_package_at timestamp with time zone,
+					primary key (package_id)
+				);
 				`
 		_, err = tx.Exec(sql)
 		return err

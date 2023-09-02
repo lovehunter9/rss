@@ -17,7 +17,7 @@ from db.recommend_pg_db_tool import *
 model_name = os.environ.get('model_name', 'bert')
 model_version = os.environ.get('model_version', 'v2')
 model_path = os.environ.get('model_path', "/Users/simon/Desktop/workspace/pp/apps/rss/recommend/model")
-api_url = os.environ.get('package_share_api', 'http://52.22.173.234:8080/api/share/s3packages')
+api_url = os.environ.get('package_share_api', 'http://52.22.173.234:8080/api/share/s3packages2')
 weaviate_port = os.environ.get('weaviate_port', 9000)
 recommend_result_number = os.environ.get('recommend_result_number', 1000)
 vector_database = os.environ.get('vector_database', 'weaviate')
@@ -40,23 +40,34 @@ class RecommendHandler:
         #weaviate_tool.init_class(model_name, model_version)
         return weaviate_tool
 
-    def downLastPackage(self, user, baseModel, weaviate_client, disabledFeedList):
+    def downLastPackage(self, user, baseModel, weaviate_client, disabledFeedList, isrestart):
         start_time = datetime.now()
         data_handler = DataHandler()
-        apiUrl = api_url + '?model_name=' + user.model_name + '&model_version=' + user.model_version
-        if len(baseModel) > 0:
-            lasttime = int(time.mktime(baseModel[0].fetch_at.timetuple()))
-            apiUrl = apiUrl + '&lasttime=' + str(lasttime)
-        self.current_logger.info(f'downLastPackage url {apiUrl}')
-        htmlResponse = requests.get(apiUrl)
-        self.current_logger.debug(f'downLastPackage result {htmlResponse.text}')
-        packageData = json.loads(htmlResponse.text)
-        for data in packageData:
-            data_handler.download_increment_package(data['model_name'], data['model_version'], model_path, data['package_id'])
-            if vector_database == 'weaviate':
-                weaviate_client.insert_package_data(data, data['model_name'], data['model_version'], black_feed_set=set(disabledFeedList))
+        tool = RecommendPGDBTool()
+        lst = user.recommend_language.split(",")
+        self.current_logger.debug(f'downLastPackage isrestart:{isrestart},language: {user.recommend_language}')
+        for language in lst:
+            lastPackageInfo = tool.select_package_info_last(user.model_name, user.model_version, language)
+            apiUrl = api_url + '?model_name=' + user.model_name + '&model_version=' + user.model_version + '&language=' + language
+            if len(lastPackageInfo) > 0:
+                lasttime = int(time.mktime(lastPackageInfo[0].generate_package_at.timetuple())) + 1
+                apiUrl = apiUrl + '&lasttime=' + str(lasttime)
+            self.current_logger.info(f'downLastPackage url {apiUrl}')
+            htmlResponse = requests.get(apiUrl)
+            #self.current_logger.debug(f'downLastPackage result {htmlResponse.text}')
+            packageData = json.loads(htmlResponse.text)
+            for data in packageData:
+                tool.insert_package_info_single(data['package_id'], data['published_at_earliest'], data['published_at_latest'], data['generate_package_at'], data['entry_number'],
+                                                model_name, model_version, language)
+                data_handler.download_increment_package(data['model_name'], data['model_version'], model_path, data['package_id'])
+                if vector_database == 'weaviate' and isrestart == False:
+                    weaviate_client.insert_package_data(data, data['model_name'], data['model_version'], black_feed_set=set(disabledFeedList))
+            if vector_database == 'weaviate' and isrestart:
+                packageInfoList = tool.select_package_info(user.model_name, user.model_version, language)
+                for pack in packageInfoList:
+                    weaviate_client.insert_package_data(pack, user.model_name, user.model_version, black_feed_set=set(disabledFeedList))
 
-        self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
+        self.current_logger.debug(f'down_latest_article_embedding_package isrestart: {isrestart} time: {self.commont_tool.compute_diff_time(start_time,datetime.now())}')
 
     def getWeaviateSupportLanauage(self, language):
         supportLanauage = RecommendSupportLanguageEnum.CHINESE
@@ -67,6 +78,7 @@ class RecommendHandler:
     def recommend(self):
         tool = RecommendPGDBTool()
 
+        isrestart = False
         user = tool.select_users_model()
         user.model_name = model_name
         user.model_version = model_version
@@ -105,6 +117,7 @@ class RecommendHandler:
                 if baseModel[0].model_name != model_name or baseModel[0].model_version != model_version or user.recommend_language != lastRecommendLanguage:
                     self.current_logger.debug(f'weaviate delete_all_data')
                     weaviate_client.delete_all_data()
+                    isrestart = True
                 else:
                     if len(disabledFeedList) > 0:
                         weaviate_client.delete_batch_data(model_name, model_version, RecommendSupportLanguageEnum.ENGLISH, feed_id_list=disabledFeedList)
@@ -114,7 +127,7 @@ class RecommendHandler:
         tool.clear_recommend_entries(start_time + timedelta(days=-7))
 
         start_time = datetime.now()
-        self.downLastPackage(user, baseModel, weaviate_client, disabledFeedList)
+        self.downLastPackage(user, baseModel, weaviate_client, disabledFeedList, isrestart)
         #start_time = datetime.now()
         #data_handler.down_latest_article_embedding_package(user)
         self.current_logger.debug(f'down_latest_article_embedding_package time {self.commont_tool.compute_diff_time(start_time,datetime.now())}')

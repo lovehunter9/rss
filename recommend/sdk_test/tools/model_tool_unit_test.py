@@ -90,15 +90,8 @@ class ModelToolUnitTest(unittest.TestCase):
         total = 0
         total2 = 0
         for current_id, current_feed in feed_id_to_feed.items():
-            #print(current_feed["title"])
-            #print(current_feed["disabled"])
-            if current_feed["disabled"]:
-                total = total + 1
-            else:
-                total2 = total2 + 1
-        print('total:')
+            total = total + 1
         print(total)
-        print(total2)
 
     def test_db_handler(self):
         # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_db_handler
@@ -190,3 +183,9 @@ class ModelToolUnitTest(unittest.TestCase):
         current_model_tool = ModelTool(download_dir)
         language_type = current_model_tool.infer_text_language_type("what happen")
         print(language_type)
+
+    def test_rank(self):
+        # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_rank
+
+        handler = RecommendHandler()
+        handler.recommend()

@@ -184,3 +184,18 @@ class RecommendReadStatModel(RecommendPGBaseModel):
     class Meta:
         db_table = 'stat_entry_read'
         primary_key = False
+
+
+class RecommendPackageInfoModel(RecommendPGBaseModel):
+    package_id = TextField(null=False, unique=True, index=True)
+    model_name = TextField(null=False)
+    model_version = TextField(null=False)
+    main_language = TextField(null=True)
+    entry_number = IntegerField(null=True)
+    published_at_earliest = DateTimeField(null=False)
+    published_at_latest = DateTimeField(null=True, index=True)
+    generate_package_at = DateTimeField(null=True, index=True)
+
+    class Meta:
+        db_table = 'recommend_package_info'
+        primary_key = False

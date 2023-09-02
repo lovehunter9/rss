@@ -154,3 +154,29 @@ class RecommendPGDBTool:
 
     def update_read_stat(self):
         RecommendReadStatModel.update(vector_data_check=2).where(RecommendReadStatModel.vector_data_check == 1).execute()
+
+    def insert_package_info_single(self, package_id, published_at_earliest, published_at_latest, generate_package_at, entry_number, model_name, model_version, main_language):
+
+        RecommendPackageInfoModel.insert(package_id=package_id,
+                                         model_name=model_name,
+                                         model_version=model_version,
+                                         published_at_earliest=published_at_earliest,
+                                         published_at_latest=published_at_latest,
+                                         generate_package_at=generate_package_at,
+                                         entry_number=entry_number,
+                                         main_language=main_language).execute()
+
+    def select_package_info_last(self, model_name, model_version, language):
+        return RecommendPackageInfoModel.select().where((RecommendPackageInfoModel.model_name == model_name)
+                                                        & (RecommendPackageInfoModel.model_version == model_version)
+                                                        & (RecommendPackageInfoModel.main_language == language)).order_by(
+                                                            RecommendPackageInfoModel.generate_package_at.desc()).limit(1).execute()
+
+    def select_package_info(self, model_name, model_version, language):
+        result_list = list(RecommendPackageInfoModel.select().where((RecommendPackageInfoModel.main_language == language) & (RecommendPackageInfoModel.model_name == model_name)
+                                                                    & (RecommendPackageInfoModel.model_version == model_version)).order_by(
+                                                                        RecommendPackageInfoModel.generate_package_at.desc()).limit(100).execute())
+        result_dict_list = list()
+        for current_model in result_list:
+            result_dict_list.append(model_to_dict(current_model))
+        return result_dict_list
