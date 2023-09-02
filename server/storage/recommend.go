@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt" // Categories returns all categories that belongs to the given user.
 
+	"github.com/lib/pq"
 	"miniflux.app/model"
 )
 
@@ -58,7 +59,7 @@ func (s *Storage) RecommendFeed(feedID int64) (*model.RecommendFeed, error) {
 }
 
 func (s *Storage) GetRecommendCount(batch int) int {
-	query := `select count(*) from recommend_result where batch=$1 `
+	query := `select count(r.id) from recommend_result r,recommend_entries e where r.batch=$1 and r.cloud_id=e.cloud_id and e.feed_id not in (select distinct(feed_id) from recommend_blacklist)`
 	var result int
 	err := s.db.QueryRow(query, batch).Scan(&result)
 	if err != nil {
@@ -68,10 +69,10 @@ func (s *Storage) GetRecommendCount(batch int) int {
 
 }
 func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, error) {
-	query := `SELECT r.batch, e.id entry_id, e.title, e.author,e.url,e.published_at,r.score,r.rank,
+	query := `SELECT r.id,r.batch, e.id entry_id, e.title, e.author,e.url,e.published_at,r.score,r.rank,
 	 f.title feed_title,f.feed_url,f.site_url,f.icon_type,f.icon_content icon_byte_content,f.category_id,f.category_title,e.full_content ,e.image_url,f.id,e.keyword
 	 FROM recommend_result r,recommend_entries e,recommend_feed f 
-	 WHERE r.batch=$1 and r.cloud_id=e.cloud_id and e.feed_id=f.id and f.disabled=false
+	 WHERE r.batch=$1 and r.cloud_id=e.cloud_id and e.feed_id=f.id and f.disabled=false and f.id not in (select distinct(feed_id) from recommend_blacklist)
 	 ORDER BY r.id  OFFSET $2 limit $3`
 	rows, err := s.db.Query(query, batch, offset, limit)
 	if err != nil {
@@ -83,7 +84,7 @@ func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, err
 	for rows.Next() {
 		var recommend model.Recommend
 		recommend.Feed = &model.RecommendFeed{}
-		if err := rows.Scan(&recommend.Batch, &recommend.EntryID, &recommend.Title,
+		if err := rows.Scan(&recommend.ID, &recommend.Batch, &recommend.EntryID, &recommend.Title,
 			&recommend.Author, &recommend.URL, &recommend.PublishedAt, &recommend.Score, &recommend.Rank,
 			&recommend.Feed.Title, &recommend.Feed.FeedUrl, &recommend.Feed.SiteUrl,
 			&recommend.Feed.IconType, &recommend.Feed.IconByteContent, &recommend.Feed.CategoryID, &recommend.Feed.CategoryTitle, &recommend.FullContent, &recommend.ImageUrl, &recommend.Feed.ID, &recommend.Keyword); err != nil {
@@ -236,10 +237,10 @@ func (s *Storage) RemoveBlacklist(id int64) error {
 }
 
 func (s *Storage) KeywordRecommendList(batch, offset, limit int) (model.Recommends, error) {
-	query := `SELECT r.batch, e.id entry_id, e.title, e.author,e.url,e.published_at,r.keyword recommend_keyword,
+	query := `SELECT r.id,r.batch, e.id entry_id, e.title, e.author,e.url,e.published_at,r.keyword recommend_keyword,
 	 f.title feed_title,f.feed_url,f.site_url,f.icon_type,f.icon_content icon_byte_content,f.category_id,f.category_title,e.full_content ,e.image_url,f.id,e.keyword
 	 FROM recommend_result_keyword r,recommend_entries e,recommend_feed f 
-	 WHERE r.batch=$1 and r.url=e.url and e.feed_id=f.id and f.disabled=false
+	 WHERE r.batch=$1 and r.url=e.url and e.feed_id=f.id and f.disabled=false and f.id not in (select distinct(feed_id) from recommend_blacklist)
 	 ORDER BY r.rank,r.id  OFFSET $2 limit $3`
 	rows, err := s.db.Query(query, batch, offset, limit)
 	if err != nil {
@@ -251,7 +252,7 @@ func (s *Storage) KeywordRecommendList(batch, offset, limit int) (model.Recommen
 	for rows.Next() {
 		var recommend model.Recommend
 		recommend.Feed = &model.RecommendFeed{}
-		if err := rows.Scan(&recommend.Batch, &recommend.EntryID, &recommend.Title,
+		if err := rows.Scan(&recommend.ID, &recommend.Batch, &recommend.EntryID, &recommend.Title,
 			&recommend.Author, &recommend.URL, &recommend.PublishedAt, &recommend.Keyword,
 			&recommend.Feed.Title, &recommend.Feed.FeedUrl, &recommend.Feed.SiteUrl,
 			&recommend.Feed.IconType, &recommend.Feed.IconByteContent, &recommend.Feed.CategoryID, &recommend.Feed.CategoryTitle, &recommend.FullContent, &recommend.ImageUrl, &recommend.Feed.ID, &recommend.Keyword); err != nil {
@@ -266,7 +267,7 @@ func (s *Storage) KeywordRecommendList(batch, offset, limit int) (model.Recommen
 }
 
 func (s *Storage) GetKeywordRecommendCount(batch int) int {
-	query := `select count(*) from recommend_result_keyword where batch=$1 `
+	query := `select count(r.id) from recommend_result_keyword r,recommend_entries e where batch=$1 and r.url=e.url and e.id not in (select distinct(feed_id) from recommend_blacklist)`
 	var result int
 	err := s.db.QueryRow(query, batch).Scan(&result)
 	if err != nil {
@@ -274,4 +275,24 @@ func (s *Storage) GetKeywordRecommendCount(batch int) int {
 	}
 	return result
 
+}
+
+func (s *Storage) UpdateRecommendResultImpression(ids []int64) error {
+	idParam := pq.Array(ids)
+	query := "update  recommend_result set  impression_at=now()  WHERE  id = ANY($1)"
+	_, err := s.db.Exec(query, idParam)
+	if err != nil {
+		return fmt.Errorf("unable to UpdateKeywordResultImpression: %v", err)
+	}
+	return nil
+}
+
+func (s *Storage) UpdateKeywordRecommendResultImpression(ids []int64) error {
+	idParam := pq.Array(ids)
+	query := "update  recommend_result_keyword set  impression_at=now()  WHERE  id = ANY($1)"
+	_, err := s.db.Exec(query, idParam)
+	if err != nil {
+		return fmt.Errorf("unable to UpdateKeywordResultImpression: %v", err)
+	}
+	return nil
 }

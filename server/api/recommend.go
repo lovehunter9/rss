@@ -31,9 +31,11 @@ const (
 //每天活跃时间段
 
 func (h *handler) getRecommendList(w http.ResponseWriter, r *http.Request) {
+
 	recommendBase, _ := h.store.LastRecommendBase()
 	count := h.store.GetRecommendCount(recommendBase.Batch)
 	keycount := h.store.GetKeywordRecommendCount(recommendBase.Batch)
+	var recommendIDS, recommendKeywordIDS []int64
 
 	limit := 4
 	if recommendBase.Batch != RecommendCacheBatch {
@@ -49,6 +51,10 @@ func (h *handler) getRecommendList(w http.ResponseWriter, r *http.Request) {
 		json.ServerError(w, r, err)
 		return
 	}
+	for _, item := range list {
+		recommendIDS = append(recommendIDS, item.ID)
+	}
+
 	keylist, _ := h.store.KeywordRecommendList(recommendBase.Batch, RecommendKeywordCachePage, 1)
 	list = append(list, keylist...)
 	RecommendCachePage = RecommendCachePage + 1
@@ -59,6 +65,12 @@ func (h *handler) getRecommendList(w http.ResponseWriter, r *http.Request) {
 	if RecommendKeywordCachePage > keycount {
 		RecommendKeywordCachePage = 0
 	}
+	for _, item := range keylist {
+		recommendKeywordIDS = append(recommendKeywordIDS, item.ID)
+	}
+	h.store.UpdateRecommendResultImpression(recommendIDS)
+	h.store.UpdateKeywordRecommendResultImpression(recommendKeywordIDS)
+
 	/*for _, item := range list {
 		if item.FullContent != "" {
 			doc, err := goquery.NewDocumentFromReader(strings.NewReader(item.FullContent))

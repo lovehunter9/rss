@@ -882,6 +882,8 @@ var migrations = []func(tx *sql.Tx) error{
 					generate_package_at timestamp with time zone,
 					primary key (package_id)
 				);
+				ALTER TABLE recommend_result ADD COLUMN impression_at timestamp with time zone;
+				ALTER TABLE recommend_result_keyword ADD COLUMN impression_at timestamp with time zone;
 				`
 		_, err = tx.Exec(sql)
 		return err

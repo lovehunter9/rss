@@ -48,6 +48,7 @@ type RecommendResult struct {
 
 // Category represents a feed category.
 type Recommend struct {
+	ID               int64   `json:"id"`
 	Batch            int     `json:"batch"`
 	EntryID          int64   `json:"entry_id"`
 	Title            string  `json:"title"`
