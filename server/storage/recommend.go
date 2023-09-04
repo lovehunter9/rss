@@ -296,3 +296,36 @@ func (s *Storage) UpdateKeywordRecommendResultImpression(ids []int64) error {
 	}
 	return nil
 }
+
+func (s *Storage) ClearRecommendData() error {
+	query := `DELETE FROM recommend WHERE fetch_at < (now() - interval '3 day')`
+	_, err := s.db.Exec(query)
+	if err != nil {
+		return fmt.Errorf(`store: unable to remove recommend: %v`, err)
+	}
+
+	query = `DELETE FROM recommend_result WHERE batch not in (select batch from recommend) `
+	_, err = s.db.Exec(query)
+	if err != nil {
+		return fmt.Errorf(`store: unable to remove recommend_result: %v`, err)
+	}
+
+	query = `DELETE FROM recommend_result_keyword WHERE batch not in (select batch from recommend)`
+	_, err = s.db.Exec(query)
+	if err != nil {
+		return fmt.Errorf(`store: unable to remove recommend_result_keyword: %v`, err)
+	}
+
+	query = `DELETE FROM recommend_entries WHERE published_at < (now() - interval '4 day')`
+	_, err = s.db.Exec(query)
+	if err != nil {
+		return fmt.Errorf(`store: unable to remove recommend_entries: %v`, err)
+	}
+
+	query = `DELETE FROM recommend_entries_embedding WHERE url not in (select url from recommend_entries)`
+	_, err = s.db.Exec(query)
+	if err != nil {
+		return fmt.Errorf(`store: unable to remove recommend_entries_embedding: %v`, err)
+	}
+	return nil
+}

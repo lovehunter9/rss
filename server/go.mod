@@ -50,6 +50,7 @@ require (
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
+	github.com/robfig/cron/v3 v3.0.0 // indirect
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/tdewolff/parse/v2 v2.6.4 // indirect
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect

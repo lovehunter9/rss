@@ -105,7 +105,7 @@ class RecommendHandler:
         if len(baseModel) == 0:
             batch = 1
         else:
-            tool.clear_recommend_result(baseModel[0].batch)
+            #tool.clear_recommend_result(baseModel[0].batch)
             lastRecommendLanguage = baseModel[0].language
             batch = baseModel[0].batch + 1
 
@@ -124,7 +124,7 @@ class RecommendHandler:
                         weaviate_client.delete_batch_data(model_name, model_version, RecommendSupportLanguageEnum.CHINESE, feed_id_list=disabledFeedList)
 
         tool.insert_recommend_model(batch, user.recommend_language, model_name, model_version)
-        tool.clear_recommend_entries(start_time + timedelta(days=-7))
+        #tool.clear_recommend_entries(start_time + timedelta(days=-3))
 
         start_time = datetime.now()
         self.downLastPackage(user, baseModel, weaviate_client, disabledFeedList, isrestart)

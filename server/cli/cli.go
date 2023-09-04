@@ -11,6 +11,7 @@ import (
 
 	s3config "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/robfig/cron/v3"
 	"miniflux.app/config"
 	"miniflux.app/database"
 	"miniflux.app/locale"
@@ -198,6 +199,13 @@ func Parse() {
 	if config.Opts.CreateAdmin() {
 		createAdmin(store)
 	}
+
+	c := cron.New(cron.WithSeconds())
+	c.AddFunc("0 0 23 * * ?", func() {
+		logger.Info(`clear recommend data task exec`)
+		store.ClearRecommendData()
+	})
+	c.Start()
 
 	startDaemon(store, s3action)
 }
