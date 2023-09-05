@@ -10,10 +10,10 @@ current_logger = CommonTool().get_logger()
 peewee_logger = logging.getLogger('peewee')
 peewee_logger.addHandler(logging.StreamHandler())
 
-dbhost = os.environ.get('dbhost', '124.222.40.95')
+dbhost = os.environ.get('dbhost', '52.90.117.51')
 dbuser = os.environ.get('dbuser', 'postgres')
-dbpassword = os.environ.get('dbpassword', 'liujx123')
-database = os.environ.get('database', 'miniflux2')
+dbpassword = os.environ.get('dbpassword', 'postgres')
+database = os.environ.get('database', 'rss')
 RECOMMEND_PG_DB = PooledPostgresqlDatabase(database=database, user=dbuser, password=dbpassword, host=dbhost, stale_timeout=300, max_connections=100)
 
 
@@ -139,10 +139,10 @@ class RecommendResultModel(RecommendPGBaseModel):
     batch = IntegerField(null=True)
     cloud_id = BigIntegerField(null=True)
     url = BigIntegerField(null=True)
-    entry_id = DateTimeField(null=False, index=True)
     score = DecimalField(null=True)
     rank = IntegerField(null=True)
     language = TextField(null=True)
+    impression_at = DateTimeField(null=True)
 
     class Meta:
         db_table = 'recommend_result'
@@ -169,6 +169,7 @@ class RecommendKeywordlist(RecommendPGBaseModel):
     url = TextField(null=True, index=True)
     rank = TextField(null=True)
     language = TextField(null=True)
+    impression_at = DateTimeField(null=True)
 
     class Meta:
         db_table = 'recommend_result_keyword'
