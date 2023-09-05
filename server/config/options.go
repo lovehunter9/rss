@@ -33,7 +33,7 @@ const (
 	defaultSchedulerEntryFrequencyMaxInterval = 24 * 60
 	defaultPollingParsingErrorLimit           = 3
 	defaultRunMigrations                      = false
-	defaultDatabaseURL                        = "host=124.222.40.95 user=postgres password=liujx123 dbname=miniflux2 sslmode=disable"
+	defaultDatabaseURL                        = "host=52.90.117.51 user=postgres password=postgres dbname=rss sslmode=disable"
 	defaultDatabaseMaxConns                   = 20
 	defaultDatabaseMinConns                   = 1
 	defaultDatabaseConnectionLifetime         = 5

@@ -284,6 +284,7 @@ func (h *handler) initRecommendStat(entryID int64) *model.StatEntry {
 			Batch:   recommendBase.Batch,
 			EntryID: entryID,
 			Rank:    result.Rank,
+			CloudID: result.CloudID,
 		}
 		h.store.CreateStatEntryRead(&insertStat)
 		return &insertStat

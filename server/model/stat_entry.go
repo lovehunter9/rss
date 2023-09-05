@@ -16,6 +16,7 @@ type StatEntry struct {
 	ReadLater       bool  `json:"readlater_tag"`
 	Board           bool  `json:"board_tag"`
 	VectorDataCheck int   `json:"vector_data_check"`
+	CloudID         int64 `json:"cloud_id"`
 }
 
 // Categories represents a list of categories.

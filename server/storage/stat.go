@@ -28,7 +28,7 @@ func (s *Storage) CreateStatEntryRead(request *model.StatEntry) (*model.StatEntr
 
 	query := `
 		INSERT INTO stat_entry_read
-			(batch, entry_id,rank,read_complete,readlater_tag,board_tag,click_num)
+			(batch, entry_id,rank,read_complete,readlater_tag,board_tag,click_num,cloud_id)
 		VALUES
 			($1, $2, $3, $4, $5, $6, $7)
 		RETURNING
@@ -43,6 +43,7 @@ func (s *Storage) CreateStatEntryRead(request *model.StatEntry) (*model.StatEntr
 		request.ReadLater,
 		request.Board,
 		request.ClickNum,
+		request.CloudID,
 	).Scan(
 		&stat.ID,
 	)

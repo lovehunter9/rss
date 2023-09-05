@@ -40,10 +40,11 @@ type RecommendEntry struct {
 }
 
 type RecommendResult struct {
-	Batch int    `json:"batch"`
-	URL   string `json:"url"`
-	Score int    `json:"score"`
-	Rank  int    `json:"rank"`
+	Batch   int    `json:"batch"`
+	URL     string `json:"url"`
+	Score   int    `json:"score"`
+	Rank    int    `json:"rank"`
+	CloudID int64  `json:"cloud_id"`
 }
 
 // Category represents a feed category.

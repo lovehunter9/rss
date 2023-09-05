@@ -53,6 +53,13 @@ class RecommendPGDBTool:
         q = RecommendEntriesModel.insert_many(model_list)
         q.execute()
 
+    def select_recommend_entries(self):
+        result_list = list(RecommendEntriesModel.select().limit(1000).execute())
+        result_dict_list = list()
+        for current_model in result_list:
+            result_dict_list.append(model_to_dict(current_model))
+        return result_dict_list
+
     def select_exist_recommend_entries_embedding(self, url_list, model, version):
         result_list = list(
             RecommendEntriesEmbedingModel.select(RecommendEntriesEmbedingModel.url).where((RecommendEntriesEmbedingModel.url << url_list)

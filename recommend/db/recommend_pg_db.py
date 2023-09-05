@@ -180,6 +180,7 @@ class RecommendReadStatModel(RecommendPGBaseModel):
     id = BigIntegerField(null=False, unique=True, index=True)
     batch = IntegerField(null=True)
     entry_id = IntegerField(null=False)
+    cloud_id = IntegerField(null=False)
     vector_data_check = IntegerField(null=True, index=True)
 
     class Meta:

@@ -100,8 +100,8 @@ func (s *Storage) RecommendList(batch, offset, limit int) (model.Recommends, err
 
 func (s *Storage) GetRecommendResult(batch int, entryId int64) (*model.RecommendResult, error) {
 	var result model.RecommendResult
-	query := `SELECT r.batch,r.url,r.rank,r.score FROM recommend_result r, recommend_entries e WHERE r.cloud_id=e.cloud_id and r.batch=$1 and e.id=$2`
-	err := s.db.QueryRow(query, batch, entryId).Scan(&result.Batch, &result.URL, &result.Rank, &result.Score)
+	query := `SELECT r.batch,r.url,r.rank,r.score,e.cloud_id FROM recommend_result r, recommend_entries e WHERE r.cloud_id=e.cloud_id and r.batch=$1 and e.id=$2`
+	err := s.db.QueryRow(query, batch, entryId).Scan(&result.Batch, &result.URL, &result.Rank, &result.Score, &result.CloudID)
 	switch {
 	case err == sql.ErrNoRows:
 		return nil, nil

@@ -189,3 +189,48 @@ class ModelToolUnitTest(unittest.TestCase):
 
         handler = RecommendHandler()
         handler.recommend()
+
+    def test_generate_entry(self):
+        # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_generate_entry
+        tool = RecommendPGDBTool()
+        article_list = []
+        entries = tool.select_recommend_entries()
+        cloud_id = 1
+        for current_entry in entries:
+            article = {
+                'url': current_entry['url'],
+                'feed_id': current_entry['feed_id'],
+                'created_at': current_entry['created_at'],
+                'published_at': current_entry['published_at'],
+                'hash': current_entry['hash'],
+                'author': current_entry['author'],
+                'content': current_entry['content'],
+                'full_content': current_entry['full_content'],
+                'title': current_entry['title'],
+                'image_url': '',
+                'cloud_id': cloud_id
+            }
+            cloud_id = cloud_id + 1
+            article_list.append(article)
+        tool.batch_insert_recommend_entries(article_list)
+
+    def test_generate_data(self):
+        # python  -m unittest model_tool_unit_test.ModelToolUnitTest.test_generate_data
+
+        tool = RecommendPGDBTool()
+        model_name = 'bert'
+        model_version = 'v2'
+        language = 'en'
+        baseModel = tool.select_recommend_model()
+        if len(baseModel) == 0:
+            batch = 1
+        else:
+            batch = baseModel[0].batch + 1
+        for i in range(20):
+            recommendResultList = []
+            score = 0.8
+            for j in range(1000):
+                result = {'batch': batch + i, 'cloud_id': j, 'score': score, 'rank': j + 1, 'language': language}
+                recommendResultList.append(result)
+            tool.batch_insert_recommend_result(recommendResultList)
+            tool.insert_recommend_model(batch + i, language, model_name, model_version)
