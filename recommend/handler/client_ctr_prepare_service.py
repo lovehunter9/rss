@@ -31,4 +31,12 @@ class ClientCTRPrepareService:
         negative_cloud_id_set = exist_cloud_id_set - positive_cloud_id_set
         return negative_cloud_id_set,positive_cloud_id_set
         
-        
+    def method_according_entry_id_and_label_to_get_embedding(self,cloud_id_and_label_tuple_list):
+        if isinstance(cloud_id_and_label_tuple_list,list) is False:
+            raise ValueError("cloud_id_and_label_tuple_list is not list")
+        for current_cloud_id,current_label in cloud_id_and_label_tuple_list:
+            if isinstance(current_cloud_id,int) is False:
+                raise ValueError("current_cloud_id is not int")
+            if isinstance(current_label,int) is False:
+                raise ValueError("current_label is not int")
+        RecommendEntriesEmbedingModel.select(RecommendEntriesEmbedingModel.embedding).where()
