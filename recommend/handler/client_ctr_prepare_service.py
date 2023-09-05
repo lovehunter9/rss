@@ -39,4 +39,4 @@ class ClientCTRPrepareService:
                 raise ValueError("current_cloud_id is not int")
             if isinstance(current_label,int) is False:
                 raise ValueError("current_label is not int")
-        RecommendEntriesEmbedingModel.select(RecommendEntriesEmbedingModel.embedding).where()
+        # RecommendEntriesEmbedingModel.select(RecommendEntriesEmbedingModel.embedding).where()
