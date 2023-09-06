@@ -150,13 +150,13 @@ func getAccessToken(dataType, group string, ops []string) (string, error) {
 	return r.Data.AccessToken, nil
 }
 
-func IntputRSS(notificationData *NotificationData) string {
+func InputRSS(notificationData *NotificationData) string {
 
-	accessToken, err := getAccessToken("search", "service.search", []string{"InputRSS"})
-	if err != nil {
-		logger.Error("get access token failed: %+v", err)
-		return ""
-	}
+	//accessToken, err := getAccessToken("search", "service.search", []string{"InputRSS"})
+	//if err != nil {
+	//	logger.Error("get access token failed: %+v", err)
+	//	return ""
+	//}
 
 	requestBytes, err := json.Marshal(notificationData)
 	if err != nil {
@@ -164,7 +164,8 @@ func IntputRSS(notificationData *NotificationData) string {
 	}
 	logger.Info("request bodys:%s", string(requestBytes))
 	bodyReader := bytes.NewReader(requestBytes)
-	requestUrl := "http://" + config.Opts.OsSystemServer() + "/system-server/v1alpha1/search/service.search/v1/InputRSS"
+	//requestUrl := "http://" + config.Opts.OsSystemServer() + "/system-server/v1alpha1/search/service.search/v1/InputRSS"
+	requestUrl := "http://localhost:6317/api/input?index=Rss"
 	logger.Info(requestUrl)
 	req, err := http.NewRequest(http.MethodPost, requestUrl, bodyReader)
 
@@ -176,7 +177,7 @@ func IntputRSS(notificationData *NotificationData) string {
 	req.Header.Set("Access-Control-Allow-Origin", "*")
 	req.Header.Set("Access-Control-Allow-Headers", "X-Requested-With,Content-Type")
 	req.Header.Set("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS")
-	req.Header.Set("X-Access-Token", accessToken)
+	//req.Header.Set("X-Access-Token", accessToken)
 
 	client := http.Client{
 		Timeout: 3 * time.Second,
@@ -222,13 +223,14 @@ type DelRssReqStru struct {
 }
 
 func DeleteRSS(entries model.Entries) {
-	accessToken, err := getAccessToken("search", "service.search", []string{"DeleteRSS"})
-	if err != nil {
-		logger.Error("get access token failed: %+v", err)
-		return
-	}
+	//accessToken, err := getAccessToken("search", "service.search", []string{"DeleteRSS"})
+	//if err != nil {
+	//	logger.Error("get access token failed: %+v", err)
+	//	return
+	//}
 
-	requestUrl := "http://" + config.Opts.OsSystemServer() + "/system-server/v1alpha1/search/service.search/v1/DeleteRSS"
+	//requestUrl := "http://" + config.Opts.OsSystemServer() + "/system-server/v1alpha1/search/service.search/v1/DeleteRSS"
+	requestUrl := "http://localhost:6317/api/delete?index=Rss"
 	logger.Info(requestUrl)
 	for _, entry := range entries {
 		if entry.DocId == "" {
@@ -254,7 +256,7 @@ func DeleteRSS(entries model.Entries) {
 		req.Header.Set("Access-Control-Allow-Origin", "*")
 		req.Header.Set("Access-Control-Allow-Headers", "X-Requested-With,Content-Type")
 		req.Header.Set("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS")
-		req.Header.Set("X-Access-Token", accessToken)
+		//req.Header.Set("X-Access-Token", accessToken)
 
 		client := http.Client{
 			Timeout: 3 * time.Second,
@@ -284,13 +286,14 @@ type QueryRssReqStru struct {
 
 func QueryRSS(query string) string {
 	logger.Info("queryRSS:%s", query)
-	accessToken, err := getAccessToken("search", "service.search", []string{"QueryRSS"})
-	if err != nil {
-		logger.Error("get access token failed: %+v", err)
-		return ""
-	}
+	//accessToken, err := getAccessToken("search", "service.search", []string{"QueryRSS"})
+	//if err != nil {
+	//	logger.Error("get access token failed: %+v", err)
+	//	return ""
+	//}
 
-	requestUrl := "http://" + config.Opts.OsSystemServer() + "/system-server/v1alpha1/search/service.search/v1/QueryRSS"
+	//requestUrl := "http://" + config.Opts.OsSystemServer() + "/system-server/v1alpha1/search/service.search/v1/QueryRSS"
+	requestUrl := "http://localhost:6317/api/query?index=Rss"
 	logger.Info(requestUrl)
 
 	reqStr := QueryRssReqStru{
@@ -311,7 +314,7 @@ func QueryRSS(query string) string {
 	req.Header.Set("Access-Control-Allow-Origin", "*")
 	req.Header.Set("Access-Control-Allow-Headers", "X-Requested-With,Content-Type")
 	req.Header.Set("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS")
-	req.Header.Set("X-Access-Token", accessToken)
+	//req.Header.Set("X-Access-Token", accessToken)
 
 	client := http.Client{
 		Timeout: 3 * time.Second,
