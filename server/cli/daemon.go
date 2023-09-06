@@ -6,6 +6,8 @@ package cli // import "miniflux.app/cli"
 
 import (
 	"context"
+	"fmt"
+	"miniflux.app/service/rpc"
 	"net/http"
 	"os"
 	"os/signal"
@@ -23,8 +25,42 @@ import (
 	"miniflux.app/worker"
 )
 
+const DefaultPort = "6317"
+
 func startDaemon(store *storage.Storage, s3action *s3action.S3action) {
 	logger.Info("Starting Miniflux...")
+
+	// rpcServer for zinc
+	zincHost := os.Getenv("ZINC_HOST")
+	zincPort := os.Getenv("ZINC_PORT")
+	url := "http://" + zincHost + ":" + zincPort
+	if zincHost == "" || zincPort == "" {
+		url = "http://localhost:4080"
+	}
+	port := os.Getenv("W_PORT")
+	if port == "" {
+		port = DefaultPort
+	}
+	username := os.Getenv("ZINC_USER")
+	if username == "" {
+		username = "admin"
+	}
+	password := os.Getenv("ZINC_PASSWORD")
+	if password == "" {
+		password = "User#123"
+	}
+
+	fmt.Println("Init RPCSERVER!")
+	rpc.InitRpcService(url, port, username, password, map[string]string{})
+
+	fmt.Println("RPCSERVER to start!")
+	contx := context.Background()
+	rpcErr := rpc.RpcServer.Start(contx)
+
+	if rpcErr != nil {
+		panic(rpcErr)
+	}
+	// rpc server end
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
